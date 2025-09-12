@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Clock, Pill, CheckCircle, Snooze, X } from 'lucide-react';
+import { Bell, Clock, Pill, CheckCircle, Timer, X } from 'lucide-react';
 import { Medication } from '@/types/health';
 import { cn } from '@/lib/utils';
 import { showSuccess, showError } from '@/utils/toast';
@@ -225,7 +225,7 @@ const MedicationReminder: React.FC<MedicationReminderProps> = ({
                     variant="outline"
                     onClick={() => handleSnooze(reminder, 15)}
                   >
-                    <Snooze className="h-4 w-4 mr-2" />
+                    <Timer className="h-4 w-4 mr-2" />
                     Snooze 15m
                   </Button>
                   
