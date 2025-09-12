@@ -30,9 +30,7 @@ const Index = () => {
     }
   });
 
-  const handleSymptomAdd = (newSymptom: Omit<Symptom, '
-
-'>) => {
+  const handleSymptomAdd = (newSymptom: Omit<Symptom, 'id'>) => {
     const symptom: Symptom = {
       ...newSymptom,
       id: Date.now().toString()
