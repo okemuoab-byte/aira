@@ -59,6 +59,8 @@ export interface UserProfile {
     photoReminders: boolean;
     progressionAlerts: boolean;
     familySharing: boolean;
+    medicationReminders: boolean;
+    reminderTone: 'gentle' | 'standard' | 'urgent';
   };
 }
 
@@ -67,10 +69,36 @@ export interface Medication {
   name: string;
   dosage: string;
   frequency: string;
+  times?: string[]; // Array of time strings like ["09:00", "21:00"]
   startDate: Date;
   endDate?: Date;
+  notes?: string;
+  pillPhoto?: string;
+  reminderEnabled: boolean;
   sideEffects?: string[];
   effectiveness?: number; // 1-10 scale
+  adherenceRate?: number; // Calculated percentage
+  missedDoses?: MissedDose[];
+}
+
+export interface MissedDose {
+  id: string;
+  medicationId: string;
+  scheduledTime: Date;
+  missedTime: Date;
+  reason?: string;
+  takenLater?: boolean;
+  takenLaterTime?: Date;
+}
+
+export interface MedicationReminder {
+  id: string;
+  medicationId: string;
+  scheduledTime: Date;
+  status: 'pending' | 'taken' | 'missed' | 'snoozed';
+  takenTime?: Date;
+  snoozedUntil?: Date;
+  notes?: string;
 }
 
 export interface SymptomSuggestion {
@@ -89,4 +117,32 @@ export interface FamilyMember {
   email: string;
   accessLevel: 'view_only' | 'emergency_contact' | 'caregiver';
   sharedData: ('symptoms' | 'medications' | 'appointments' | 'photos')[];
+  inviteStatus: 'pending' | 'accepted' | 'declined';
+  invitedDate: Date;
+  acceptedDate?: Date;
+  lastAccess?: Date;
+}
+
+export interface FamilyNotification {
+  id: string;
+  type: 'symptom_alert' | 'medication_missed' | 'emergency' | 'improvement';
+  message: string;
+  timestamp: Date;
+  read: boolean;
+  familyMemberId: string;
+  relatedData?: {
+    symptomId?: string;
+    medicationId?: string;
+    severity?: 'low' | 'medium' | 'high';
+  };
+}
+
+export interface ShareSettings {
+  allowSymptomSharing: boolean;
+  allowMedicationSharing: boolean;
+  allowPhotoSharing: boolean;
+  allowEmergencyAccess: boolean;
+  requireApprovalForSharing: boolean;
+  autoShareHighSeverity: boolean;
+  emergencyContactIds: string[];
 }

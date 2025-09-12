@@ -1,29 +1,95 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Activity, User, BookOpen } from 'lucide-react';
+import { Plus, Activity, User, BookOpen, Pill, Users, Bell } from 'lucide-react';
 import HealthDashboard from '@/components/HealthDashboard';
 import SymptomLogger from '@/components/SymptomLogger';
-import { Symptom, UserProfile } from '@/types/health';
+import MedicationTracker from '@/components/MedicationTracker';
+import MedicationReminder from '@/components/MedicationReminder';
+import FamilyDashboard from '@/components/FamilyDashboard';
+import { Symptom, UserProfile, Medication, FamilyMember, MedicationReminder as MedicationReminderType } from '@/types/health';
 
 const Index = () => {
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
+  const [medicationReminders, setMedicationReminders] = useState<MedicationReminderType[]>([]);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [userProfile] = useState<UserProfile>({
     id: '1',
     name: 'Sarah',
     conditions: ['diabetes', 'arthritis'],
-    medications: ['Metformin', 'Ibuprofen'],
-    createdAt: new Date()
+    medications: [],
+    createdAt: new Date(),
+    preferences: {
+      photoReminders: true,
+      progressionAlerts: true,
+      familySharing: true,
+      medicationReminders: true,
+      reminderTone: 'gentle'
+    }
   });
 
-  const handleSymptomAdd = (newSymptom: Omit<Symptom, 'id'>) => {
+  const handleSymptomAdd = (newSymptom: Omit<Symptom, '
+
+'>) => {
     const symptom: Symptom = {
       ...newSymptom,
       id: Date.now().toString()
     };
     setSymptoms(prev => [symptom, ...prev]);
-    setActiveTab('dashboard'); // Return to dashboard after logging
+    setActiveTab('dashboard');
+  };
+
+  const handleMedicationAdd = (newMedication: Omit<Medication, 'id'>) => {
+    const medication: Medication = {
+      ...newMedication,
+      id: Date.now().toString(),
+      adherenceRate: 100,
+      missedDoses: []
+    };
+    setMedications(prev => [medication, ...prev]);
+  };
+
+  const handleMedicationUpdate = (id: string, updates: Partial<Medication>) => {
+    setMedications(prev => prev.map(med => 
+      med.id === id ? { ...med, ...updates } : med
+    ));
+  };
+
+  const handleFamilyMemberAdd = (newMember: Omit<FamilyMember, 'id'>) => {
+    const member: FamilyMember = {
+      ...newMember,
+      id: Date.now().toString(),
+      inviteStatus: 'pending',
+      invitedDate: new Date()
+    };
+    setFamilyMembers(prev => [member, ...prev]);
+  };
+
+  const handleFamilyMemberUpdate = (id: string, updates: Partial<FamilyMember>) => {
+    setFamilyMembers(prev => prev.map(member => 
+      member.id === id ? { ...member, ...updates } : member
+    ));
+  };
+
+  const handleDoseTaken = (medicationId: string, timestamp: Date) => {
+    // Update medication adherence and create reminder record
+    console.log(`Dose taken for medication ${medicationId} at ${timestamp}`);
+  };
+
+  const handleDoseMissed = (medicationId: string, timestamp: Date) => {
+    // Record missed dose and update adherence
+    console.log(`Dose missed for medication ${medicationId} at ${timestamp}`);
+  };
+
+  const handleSnoozeReminder = (medicationId: string, minutes: number) => {
+    // Snooze reminder for specified minutes
+    console.log(`Reminder snoozed for medication ${medicationId} for ${minutes} minutes`);
+  };
+
+  const handleShareSettingsUpdate = (settings: any) => {
+    console.log('Share settings updated:', settings);
   };
 
   const getGreeting = () => {
@@ -32,6 +98,8 @@ const Index = () => {
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
   };
+
+  const hasActiveReminders = medications.some(med => med.reminderEnabled);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -50,6 +118,17 @@ const Index = () => {
               <span className="text-sm text-gray-600">
                 {getGreeting()}, {userProfile.name}
               </span>
+              {hasActiveReminders && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveTab('reminders')}
+                  className="relative"
+                >
+                  <Bell className="h-4 w-4" />
+                  <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+                </Button>
+              )}
               <Button
                 onClick={() => setActiveTab('log-symptoms')}
                 className="bg-blue-600 hover:bg-blue-700"
@@ -65,7 +144,7 @@ const Index = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-[400px]">
+          <TabsList className="grid w-full grid-cols-6 lg:w-[600px]">
             <TabsTrigger value="dashboard" className="flex items-center space-x-2">
               <Activity className="h-4 w-4" />
               <span className="hidden sm:inline">Dashboard</span>
@@ -74,9 +153,20 @@ const Index = () => {
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Log</span>
             </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center space-x-2">
-              <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Learn</span>
+            <TabsTrigger value="medications" className="flex items-center space-x-2">
+              <Pill className="h-4 w-4" />
+              <span className="hidden sm:inline">Meds</span>
+            </TabsTrigger>
+            <TabsTrigger value="reminders" className="flex items-center space-x-2 relative">
+              <Bell className="h-4 w-4" />
+              <span className="hidden sm:inline">Reminders</span>
+              {hasActiveReminders && (
+                <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="family" className="flex items-center space-x-2">
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">Family</span>
             </TabsTrigger>
             <TabsTrigger value="profile" className="flex items-center space-x-2">
               <User className="h-4 w-4" />
@@ -101,16 +191,32 @@ const Index = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="insights" className="space-y-6">
-            <div className="text-center py-12">
-              <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Medical Insights Coming Soon
-              </h3>
-              <p className="text-gray-600 max-w-md mx-auto">
-                We're building an AI-powered system to help you understand your symptoms and conditions in plain language.
-              </p>
-            </div>
+          <TabsContent value="medications" className="space-y-6">
+            <MedicationTracker
+              medications={medications}
+              onMedicationAdd={handleMedicationAdd}
+              onMedicationUpdate={handleMedicationUpdate}
+            />
+          </TabsContent>
+
+          <TabsContent value="reminders" className="space-y-6">
+            <MedicationReminder
+              medications={medications}
+              onDoseTaken={handleDoseTaken}
+              onDoseMissed={handleDoseMissed}
+              onSnoozeReminder={handleSnoozeReminder}
+            />
+          </TabsContent>
+
+          <TabsContent value="family" className="space-y-6">
+            <FamilyDashboard
+              familyMembers={familyMembers}
+              symptoms={symptoms}
+              medications={medications}
+              onFamilyMemberAdd={handleFamilyMemberAdd}
+              onFamilyMemberUpdate={handleFamilyMemberUpdate}
+              onShareSettingsUpdate={handleShareSettingsUpdate}
+            />
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
@@ -139,16 +245,23 @@ const Index = () => {
                   </div>
                   
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Current Medications</label>
+                    <label className="text-sm font-medium text-gray-700">Active Medications</label>
                     <div className="flex flex-wrap gap-2 mt-1">
-                      {userProfile.medications.map((medication) => (
+                      {medications.filter(med => !med.endDate || med.endDate > new Date()).map((medication) => (
                         <span
-                          key={medication}
+                          key={medication.id}
                           className="px-2 py-1 bg-green-100 text-green-800 text-sm rounded-full"
                         >
-                          {medication}
+                          {medication.name}
                         </span>
                       ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Family Members</label>
+                    <div className="text-sm text-gray-600">
+                      {familyMembers.length} family member{familyMembers.length !== 1 ? 's' : ''} connected
                     </div>
                   </div>
                   
