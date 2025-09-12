@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Check } from 'lucide-react';
+import { ArrowLeft, Check, Sparkles } from 'lucide-react';
 import { systemicSymptoms, SystemicCategory } from '@/data/systemicSymptoms';
 import { SymptomSuggestion, Symptom } from '@/types/health';
 import IntensitySelector from './IntensitySelector';
@@ -38,7 +38,6 @@ const SystemicSymptomLogger: React.FC<SystemicSymptomLoggerProps> = ({
   const handleSuggestionSelect = (suggestion: SymptomSuggestion) => {
     setSelectedSuggestion(suggestion);
     if (suggestion.id === 'custom') {
-      // Handle custom symptom input
       setCurrentStep('intensity');
     } else {
       setCurrentStep('intensity');
@@ -67,7 +66,6 @@ const SystemicSymptomLogger: React.FC<SystemicSymptomLoggerProps> = ({
     onSymptomAdd(newSymptom);
     showSuccess(`${symptomType} logged in ${selectedCategory.name}`);
     
-    // Reset form
     resetForm();
   };
 
@@ -109,34 +107,52 @@ const SystemicSymptomLogger: React.FC<SystemicSymptomLoggerProps> = ({
   };
 
   const renderCategories = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Changes in Your Body Systems
-        </h2>
-        <p className="text-gray-600">
-          Select the type of changes you're experiencing
+        <div className="flex items-center justify-center mb-4">
+          <Sparkles className="h-8 w-8 text-blue-500 animate-pulse mr-3" />
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            System Changes
+          </h2>
+        </div>
+        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          Track changes in your body's systems beyond specific locations
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {systemicSymptoms.map((category) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {systemicSymptoms.map((category, index) => (
           <Card
             key={category.id}
-            className="cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-102 border-2 hover:border-blue-300"
+            className="group cursor-pointer transition-all duration-500 hover:shadow-2xl hover:scale-105 border-0 bg-gradient-to-br from-white to-slate-50 overflow-hidden"
             onClick={() => handleCategorySelect(category)}
+            style={{ 
+              animationDelay: `${index * 100}ms`,
+              animation: 'fadeInUp 0.6s ease-out forwards'
+            }}
           >
-            <CardContent className="p-6 text-center">
-              <div className="text-4xl mb-3">{category.icon}</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {category.name}
-              </h3>
-              <p className="text-sm text-gray-600">
-                {category.description}
-              </p>
-              <div className="mt-3 text-xs text-blue-600">
-                {category.suggestions.length} symptoms available
+            <CardContent className="p-8 text-center relative">
+              {/* Premium background effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <div className="relative z-10">
+                <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
+                  {category.icon}
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-blue-600 transition-colors">
+                  {category.name}
+                </h3>
+                <p className="text-sm text-slate-600 mb-4 leading-relaxed">
+                  {category.description}
+                </p>
+                <div className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  {category.suggestions.length} options
+                </div>
               </div>
+              
+              {/* Subtle border glow on hover */}
+              <div className="absolute inset-0 rounded-lg border-2 border-transparent group-hover:border-blue-200 transition-colors duration-300" />
             </CardContent>
           </Card>
         ))}
@@ -153,18 +169,18 @@ const SystemicSymptomLogger: React.FC<SystemicSymptomLoggerProps> = ({
     const visualSuggestions = filteredSuggestions.filter(s => s.category === 'visual');
     const measurableSuggestions = filteredSuggestions.filter(s => s.category === 'measurable');
 
-    const getCategoryColor = (category: string) => {
+    const getCategoryGradient = (category: string) => {
       switch (category) {
         case 'common':
-          return 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-800';
+          return 'from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-blue-200 text-blue-800';
         case 'condition-specific':
-          return 'bg-purple-50 hover:bg-purple-100 border-purple-200 text-purple-800';
+          return 'from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 border-purple-200 text-purple-800';
         case 'visual':
-          return 'bg-green-50 hover:bg-green-100 border-green-200 text-green-800';
+          return 'from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 border-green-200 text-green-800';
         case 'measurable':
-          return 'bg-orange-50 hover:bg-orange-100 border-orange-200 text-orange-800';
+          return 'from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 border-orange-200 text-orange-800';
         default:
-          return 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-800';
+          return 'from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border-gray-200 text-gray-800';
       }
     };
 
@@ -172,33 +188,39 @@ const SystemicSymptomLogger: React.FC<SystemicSymptomLoggerProps> = ({
       if (groupSuggestions.length === 0) return null;
 
       return (
-        <div className="space-y-2">
-          <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+        <div className="space-y-4">
+          <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center">
+            <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
             {title}
           </h4>
-          <div className="grid grid-cols-1 gap-2">
-            {groupSuggestions.map((suggestion) => (
+          <div className="grid grid-cols-1 gap-3">
+            {groupSuggestions.map((suggestion, index) => (
               <Button
                 key={suggestion.id}
                 variant="outline"
                 onClick={() => handleSuggestionSelect(suggestion)}
                 className={cn(
-                  "justify-start text-left h-auto p-3 transition-all duration-200",
-                  getCategoryColor(suggestion.category),
-                  selectedSuggestion?.id === suggestion.id && "ring-2 ring-offset-1 ring-gray-800 scale-102"
+                  "justify-start text-left h-auto p-4 transition-all duration-300 bg-gradient-to-r border-2",
+                  getCategoryGradient(suggestion.category),
+                  selectedSuggestion?.id === suggestion.id && "ring-2 ring-blue-400 ring-offset-2 scale-105 shadow-lg",
+                  "hover:scale-102 hover:shadow-md"
                 )}
+                style={{ 
+                  animationDelay: `${index * 50}ms`,
+                  animation: 'fadeInLeft 0.4s ease-out forwards'
+                }}
               >
                 <div className="flex items-center justify-between w-full">
-                  <span className="font-medium">{suggestion.text}</span>
-                  <div className="flex space-x-1">
+                  <span className="font-semibold">{suggestion.text}</span>
+                  <div className="flex space-x-2">
                     {suggestion.requiresPhoto && (
-                      <Badge variant="secondary" className="text-xs">📷 Photo</Badge>
+                      <Badge variant="secondary" className="text-xs bg-white/80">📷</Badge>
                     )}
                     {suggestion.requiresMeasurement && (
-                      <Badge variant="secondary" className="text-xs">📏 Measure</Badge>
+                      <Badge variant="secondary" className="text-xs bg-white/80">📏</Badge>
                     )}
                     {suggestion.conditions && (
-                      <Badge variant="secondary" className="text-xs">Condition-specific</Badge>
+                      <Badge variant="secondary" className="text-xs bg-white/80">🎯</Badge>
                     )}
                   </div>
                 </div>
@@ -210,44 +232,45 @@ const SystemicSymptomLogger: React.FC<SystemicSymptomLoggerProps> = ({
     };
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-8">
         <div className="text-center">
-          <div className="text-3xl mb-2">{selectedCategory.icon}</div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-1">
+          <div className="text-4xl mb-3">{selectedCategory.icon}</div>
+          <h3 className="text-2xl font-bold text-slate-800 mb-2">
             {selectedCategory.name}
           </h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-slate-600 max-w-md mx-auto">
             Select the specific change you're experiencing
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-8">
           {renderSuggestionGroup(commonSuggestions, 'Common Changes')}
           {renderSuggestionGroup(conditionSpecific, 'Based on Your Conditions')}
           {renderSuggestionGroup(visualSuggestions, 'Visual Changes')}
           {renderSuggestionGroup(measurableSuggestions, 'Measurable Changes')}
         </div>
 
-        <div className="pt-2 border-t border-gray-200">
+        <div className="pt-6 border-t border-slate-200">
           <Button
             variant="ghost"
             onClick={() => handleSuggestionSelect({ id: 'custom', text: 'Something else...', category: 'common' })}
-            className="w-full text-gray-600 hover:text-gray-800"
+            className="w-full text-slate-600 hover:text-slate-800 hover:bg-slate-100 py-4 text-lg"
           >
-            + Something else...
+            <Sparkles className="w-4 h-4 mr-2" />
+            Something else...
           </Button>
         </div>
 
         {selectedSuggestion?.id === 'custom' && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+          <div className="space-y-3 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
+            <label className="text-sm font-semibold text-slate-700">
               Describe the change:
             </label>
             <Textarea
               value={customSymptom}
               onChange={(e) => setCustomSymptom(e.target.value)}
               placeholder="e.g., unusual skin texture, new sleep pattern..."
-              className="min-h-[80px]"
+              className="min-h-[100px] border-blue-200 focus:border-blue-400 bg-white/80"
             />
           </div>
         )}
@@ -256,54 +279,61 @@ const SystemicSymptomLogger: React.FC<SystemicSymptomLoggerProps> = ({
   };
 
   const renderIntensity = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="text-center">
-        <div className="text-3xl mb-2">{selectedCategory?.icon}</div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+        <div className="text-4xl mb-3">{selectedCategory?.icon}</div>
+        <h3 className="text-2xl font-bold text-slate-800 mb-2">
           {selectedSuggestion?.text}
         </h3>
-        <p className="text-sm text-gray-600">
-          How much is this affecting you?
+        <p className="text-slate-600">
+          How much is this affecting your daily life?
         </p>
       </div>
-      <IntensitySelector
-        intensity={intensity}
-        onIntensityChange={handleIntensitySelect}
-      />
+      <div className="max-w-lg mx-auto">
+        <IntensitySelector
+          intensity={intensity}
+          onIntensityChange={handleIntensitySelect}
+        />
+      </div>
     </div>
   );
 
   const renderNotes = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="text-center">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-          Almost done!
-        </h3>
-        <p className="text-gray-600">
-          Add any additional details (optional)
+        <div className="flex items-center justify-center mb-4">
+          <Check className="h-8 w-8 text-green-500 mr-3" />
+          <h3 className="text-2xl font-bold text-slate-800">
+            Almost Complete!
+          </h3>
+        </div>
+        <p className="text-slate-600">
+          Add any additional details to help track this change
         </p>
       </div>
       
-      <div className="bg-gray-50 rounded-lg p-4">
-        <div className="text-sm text-gray-600 mb-2">Summary:</div>
-        <div className="font-medium">
-          {selectedSuggestion?.text} - Intensity: {intensity}/10
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
+          <div className="text-sm font-medium text-slate-600 mb-2">Summary:</div>
+          <div className="text-lg font-bold text-slate-800">
+            {selectedSuggestion?.text} - Impact Level: {intensity}/10
+          </div>
+          <div className="text-sm text-slate-600 mt-1">
+            Category: {selectedCategory?.name}
+          </div>
         </div>
-        <div className="text-sm text-gray-600">
-          Category: {selectedCategory?.name}
-        </div>
-      </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">
-          Additional details:
-        </label>
-        <Textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="When did you first notice this? What makes it better or worse? Any patterns you've observed..."
-          className="min-h-[100px]"
-        />
+        <div className="space-y-3">
+          <label className="text-sm font-semibold text-slate-700">
+            Additional details (optional):
+          </label>
+          <Textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="When did you first notice this? What makes it better or worse? Any patterns you've observed..."
+            className="min-h-[120px] border-blue-200 focus:border-blue-400 bg-white"
+          />
+        </div>
       </div>
     </div>
   );
@@ -335,44 +365,48 @@ const SystemicSymptomLogger: React.FC<SystemicSymptomLoggerProps> = ({
   };
 
   return (
-    <Card className={cn("w-full max-w-2xl mx-auto", className)}>
-      <CardHeader className="pb-4">
+    <Card className={cn("w-full max-w-4xl mx-auto bg-gradient-to-br from-white to-slate-50 border-0 shadow-2xl", className)}>
+      <CardHeader className="pb-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">System Changes</CardTitle>
+          <CardTitle className="text-xl font-bold flex items-center">
+            <Sparkles className="h-5 w-5 mr-2 animate-pulse" />
+            System Changes
+          </CardTitle>
           {currentStep !== 'categories' && (
-            <Button variant="ghost" size="sm" onClick={goBack}>
+            <Button variant="secondary" size="sm" onClick={goBack} className="bg-white/20 hover:bg-white/30 text-white border-white/30">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
           )}
         </div>
         
-        {/* Progress indicator */}
+        {/* Premium progress indicator */}
         <div className="flex space-x-2 mt-4">
           {['categories', 'symptoms', 'intensity', 'notes'].map((step, index) => (
             <div
               key={step}
-              className={`h-2 flex-1 rounded-full transition-colors ${
+              className={`h-2 flex-1 rounded-full transition-all duration-500 ${
                 currentStep === step
-                  ? 'bg-purple-500'
+                  ? 'bg-white shadow-lg'
                   : index < ['categories', 'symptoms', 'intensity', 'notes'].indexOf(currentStep)
-                  ? 'bg-green-500'
-                  : 'bg-gray-200'
+                  ? 'bg-white/80'
+                  : 'bg-white/30'
               }`}
             />
           ))}
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="p-8 bg-gradient-to-b from-white to-slate-50">
         {renderCurrentStep()}
 
-        {/* Action buttons */}
+        {/* Premium action buttons */}
         {currentStep !== 'categories' && (
-          <div className="flex justify-between pt-4">
+          <div className="flex justify-between pt-8 max-w-2xl mx-auto">
             <Button
               variant="outline"
               onClick={goBack}
+              className="px-8 py-3 border-slate-300 hover:bg-slate-100"
             >
               Back
             </Button>
@@ -381,7 +415,7 @@ const SystemicSymptomLogger: React.FC<SystemicSymptomLoggerProps> = ({
               <Button
                 onClick={handleSaveSymptom}
                 disabled={!canProceed()}
-                className="bg-green-600 hover:bg-green-700"
+                className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <Check className="h-4 w-4 mr-2" />
                 Save Change
@@ -393,8 +427,9 @@ const SystemicSymptomLogger: React.FC<SystemicSymptomLoggerProps> = ({
                   else if (currentStep === 'intensity') setCurrentStep('notes');
                 }}
                 disabled={!canProceed()}
+                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                Next
+                Continue
               </Button>
             )}
           </div>
