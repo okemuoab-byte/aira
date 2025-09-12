@@ -293,9 +293,7 @@ const BodyMap: React.FC<BodyMapProps> = ({
           )}
           onClick={(e) => handleBodyPartClick('chest', 'Chest', e)}
           onMouseEnter={() => setHoveredPart('chest')}
-          onMouseLeave={() => setHovere
-
-art(null)}
+          onMouseLeave={() => setHoveredPart(null)}
         />
 
         {/* Heart (inside chest) */}
