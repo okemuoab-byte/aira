@@ -65,6 +65,18 @@ export interface HealthcareVisit {
   referrals?: string[];
 }
 
+export interface FamilyHistoryCondition {
+  id: string;
+  condition: string;
+  familyMember: string; // e.g., 'mother', 'father', 'maternal grandmother', 'brother'
+  relationship: 'parent' | 'grandparent' | 'sibling' | 'aunt_uncle' | 'cousin';
+  ageOfOnset?: number;
+  severity?: 'mild' | 'moderate' | 'severe';
+  notes?: string;
+  isUserAffected: boolean; // Whether the user currently has this condition
+  riskLevel: 'low' | 'moderate' | 'high'; // Calculated based on relationship and family pattern
+}
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -84,6 +96,7 @@ export interface UserProfile {
   lastHealthcareVisit?: HealthcareVisit;
   conditions: string[];
   medications: Medication[];
+  familyHistory: FamilyHistoryCondition[];
   createdAt: Date;
   preferences: {
     photoReminders: boolean;

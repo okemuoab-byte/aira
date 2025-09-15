@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Activity, User, BookOpen, Pill, Users, Bell, Brain, Stethoscope, Calendar, FileText } from 'lucide-react';
+import { Plus, Activity, User, BookOpen, Pill, Users, Bell, Brain, Stethoscope, Calendar, FileText, Heart } from 'lucide-react';
 import HealthDashboard from '@/components/HealthDashboard';
 import SymptomLogger from '@/components/SymptomLogger';
 import MedicationTracker from '@/components/MedicationTracker';
 import MedicationReminder from '@/components/MedicationReminder';
 import FamilyDashboard from '@/components/FamilyDashboard';
+import FamilyHistorySection from '@/components/FamilyHistorySection';
 import HealthInsights from '@/components/HealthInsights';
-import { Symptom, UserProfile, Medication, FamilyMember, MedicationReminder as MedicationReminderType } from '@/types/health';
+import { Symptom, UserProfile, Medication, FamilyMember, MedicationReminder as MedicationReminderType, FamilyHistoryCondition } from '@/types/health';
 
 const Index = () => {
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
@@ -46,6 +47,95 @@ const Index = () => {
     },
     conditions: ['diabetes', 'arthritis'],
     medications: [],
+    familyHistory: [
+      {
+        id: '1',
+        condition: 'Type 2 Diabetes',
+        familyMember: 'Mother',
+        relationship: 'parent',
+        ageOfOnset: 52,
+        severity: 'moderate',
+        notes: 'Managed with medication and diet',
+        isUserAffected: true,
+        riskLevel: 'high'
+      },
+      {
+        id: '2',
+        condition: 'Type 2 Diabetes',
+        familyMember: 'Maternal Grandfather',
+        relationship: 'grandparent',
+        ageOfOnset: 65,
+        severity: 'severe',
+        notes: 'Required insulin in later years',
+        isUserAffected: true,
+        riskLevel: 'high'
+      },
+      {
+        id: '3',
+        condition: 'Heart Disease',
+        familyMember: 'Father',
+        relationship: 'parent',
+        ageOfOnset: 58,
+        severity: 'moderate',
+        notes: 'Had bypass surgery at 62',
+        isUserAffected: false,
+        riskLevel: 'high'
+      },
+      {
+        id: '4',
+        condition: 'Osteoarthritis',
+        familyMember: 'Mother',
+        relationship: 'parent',
+        ageOfOnset: 48,
+        severity: 'mild',
+        notes: 'Mainly affects hands and knees',
+        isUserAffected: true,
+        riskLevel: 'moderate'
+      },
+      {
+        id: '5',
+        condition: 'High Blood Pressure',
+        familyMember: 'Father',
+        relationship: 'parent',
+        ageOfOnset: 45,
+        severity: 'moderate',
+        notes: 'Well controlled with medication',
+        isUserAffected: false,
+        riskLevel: 'moderate'
+      },
+      {
+        id: '6',
+        condition: 'High Blood Pressure',
+        familyMember: 'Paternal Grandmother',
+        relationship: 'grandparent',
+        ageOfOnset: 55,
+        severity: 'mild',
+        isUserAffected: false,
+        riskLevel: 'moderate'
+      },
+      {
+        id: '7',
+        condition: 'Breast Cancer',
+        familyMember: 'Maternal Aunt',
+        relationship: 'aunt_uncle',
+        ageOfOnset: 42,
+        severity: 'severe',
+        notes: 'BRCA2 positive, successful treatment',
+        isUserAffected: false,
+        riskLevel: 'moderate'
+      },
+      {
+        id: '8',
+        condition: 'Glaucoma',
+        familyMember: 'Maternal Grandmother',
+        relationship: 'grandparent',
+        ageOfOnset: 70,
+        severity: 'mild',
+        notes: 'Detected during routine eye exam',
+        isUserAffected: false,
+        riskLevel: 'low'
+      }
+    ],
     createdAt: new Date('2023-06-01'),
     preferences: {
       photoReminders: true,
@@ -376,6 +466,18 @@ const Index = () => {
                         </p>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Family History Section */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <Heart className="h-5 w-5 mr-2 text-red-600" />
+                      Family Health History
+                    </h4>
+                    <FamilyHistorySection 
+                      familyHistory={userProfile.familyHistory}
+                      userConditions={userProfile.conditions}
+                    />
                   </div>
 
                   {/* Last Healthcare Visit */}
