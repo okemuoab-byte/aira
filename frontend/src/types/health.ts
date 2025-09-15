@@ -49,6 +49,21 @@ export interface SymptomProgression {
   frequencyPerWeek: number;
 }
 
+export interface HealthcareVisit {
+  id: string;
+  date: Date;
+  providerType: 'GP' | 'A&E' | 'Hospital' | 'Specialist' | 'Urgent Care' | 'Walk-in Clinic';
+  providerName?: string;
+  reasonForVisit: string;
+  summary: string;
+  diagnosis?: string;
+  treatmentPlan?: string;
+  followUpRequired?: boolean;
+  followUpDate?: Date;
+  prescriptions?: string[];
+  referrals?: string[];
+}
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -65,6 +80,7 @@ export interface UserProfile {
     unit: 'kg' | 'lbs';
     lastWeighed: Date;
   };
+  lastHealthcareVisit?: HealthcareVisit;
   conditions: string[];
   medications: Medication[];
   createdAt: Date;

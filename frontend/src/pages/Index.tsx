@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Activity, User, BookOpen, Pill, Users, Bell, Brain } from 'lucide-react';
+import { Plus, Activity, User, BookOpen, Pill, Users, Bell, Brain, Stethoscope, Calendar, FileText } from 'lucide-react';
 import HealthDashboard from '@/components/HealthDashboard';
 import SymptomLogger from '@/components/SymptomLogger';
 import MedicationTracker from '@/components/MedicationTracker';
@@ -29,6 +29,20 @@ const Index = () => {
       value: 68,
       unit: 'kg',
       lastWeighed: new Date('2024-01-15')
+    },
+    lastHealthcareVisit: {
+      id: '1',
+      date: new Date('2024-01-08'),
+      providerType: 'GP',
+      providerName: 'Dr. Smith - Riverside Medical Centre',
+      reasonForVisit: 'Routine diabetes check-up and joint pain assessment',
+      summary: 'Discussed ongoing management of Type 2 diabetes. HbA1c levels stable at 7.2%. Patient reported increased joint stiffness in hands and knees, particularly in the morning. Blood pressure slightly elevated (145/90). Reviewed current medications and adjusted metformin dosage.',
+      diagnosis: 'Type 2 Diabetes (stable), Osteoarthritis (hands, knees), Mild hypertension',
+      treatmentPlan: 'Continue current diabetes management. Increase metformin to 1000mg twice daily. Start gentle exercise program for joint mobility. Monitor blood pressure at home.',
+      followUpRequired: true,
+      followUpDate: new Date('2024-04-08'),
+      prescriptions: ['Metformin 1000mg twice daily', 'Ibuprofen gel for joint pain'],
+      referrals: ['Physiotherapy for joint mobility exercises']
     },
     conditions: ['diabetes', 'arthritis'],
     medications: [],
@@ -137,6 +151,36 @@ const Index = () => {
     const today = new Date();
     const diffTime = Math.abs(today.getTime() - lastWeighed.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  const getDaysSinceVisit = (visitDate: Date): number => {
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - visitDate.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  const getProviderIcon = (providerType: string) => {
+    switch (providerType) {
+      case 'GP': return '👨‍⚕️';
+      case 'A&E': return '🚨';
+      case 'Hospital': return '🏥';
+      case 'Specialist': return '🩺';
+      case 'Urgent Care': return '⚡';
+      case 'Walk-in Clinic': return '🚶‍♂️';
+      default: return '🏥';
+    }
+  };
+
+  const getProviderColor = (providerType: string) => {
+    switch (providerType) {
+      case 'GP': return 'from-blue-50 to-blue-100 border-blue-200 text-blue-800';
+      case 'A&E': return 'from-red-50 to-red-100 border-red-200 text-red-800';
+      case 'Hospital': return 'from-purple-50 to-purple-100 border-purple-200 text-purple-800';
+      case 'Specialist': return 'from-green-50 to-green-100 border-green-200 text-green-800';
+      case 'Urgent Care': return 'from-orange-50 to-orange-100 border-orange-200 text-orange-800';
+      case 'Walk-in Clinic': return 'from-teal-50 to-teal-100 border-teal-200 text-teal-800';
+      default: return 'from-gray-50 to-gray-100 border-gray-200 text-gray-800';
+    }
   };
 
   const hasActiveReminders = medications.some(med => med.reminderEnabled);
@@ -333,6 +377,102 @@ const Index = () => {
                       </div>
                     </div>
                   </div>
+
+                  {/* Last Healthcare Visit */}
+                  {userProfile.lastHealthcareVisit && (
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <Stethoscope className="h-5 w-5 mr-2 text-red-600" />
+                        Recent Healthcare Visit
+                      </h4>
+                      <div className={`bg-gradient-to-br ${getProviderColor(userProfile.lastHealthcareVisit.providerType)} p-6 rounded-lg border`}>
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="text-2xl">{getProviderIcon(userProfile.lastHealthcareVisit.providerType)}</div>
+                            <div>
+                              <h5 className="font-semibold text-lg">{userProfile.lastHealthcareVisit.providerType}</h5>
+                              {userProfile.lastHealthcareVisit.providerName && (
+                                <p className="text-sm opacity-80">{userProfile.lastHealthcareVisit.providerName}</p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">{userProfile.lastHealthcareVisit.date.toLocaleDateString()}</p>
+                            <p className="text-sm opacity-80">{getDaysSinceVisit(userProfile.lastHealthcareVisit.date)} days ago</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div>
+                            <h6 className="font-semibold mb-2 flex items-center">
+                              <FileText className="h-4 w-4 mr-2" />
+                              Reason for Visit
+                            </h6>
+                            <p className="text-sm leading-relaxed">{userProfile.lastHealthcareVisit.reasonForVisit}</p>
+                          </div>
+
+                          <div>
+                            <h6 className="font-semibold mb-2">Visit Summary</h6>
+                            <p className="text-sm leading-relaxed">{userProfile.lastHealthcareVisit.summary}</p>
+                          </div>
+
+                          {userProfile.lastHealthcareVisit.diagnosis && (
+                            <div>
+                              <h6 className="font-semibold mb-2">Diagnosis</h6>
+                              <p className="text-sm leading-relaxed">{userProfile.lastHealthcareVisit.diagnosis}</p>
+                            </div>
+                          )}
+
+                          {userProfile.lastHealthcareVisit.treatmentPlan && (
+                            <div>
+                              <h6 className="font-semibold mb-2">Treatment Plan</h6>
+                              <p className="text-sm leading-relaxed">{userProfile.lastHealthcareVisit.treatmentPlan}</p>
+                            </div>
+                          )}
+
+                          {userProfile.lastHealthcareVisit.prescriptions && userProfile.lastHealthcareVisit.prescriptions.length > 0 && (
+                            <div>
+                              <h6 className="font-semibold mb-2">New Prescriptions</h6>
+                              <ul className="text-sm space-y-1">
+                                {userProfile.lastHealthcareVisit.prescriptions.map((prescription, index) => (
+                                  <li key={index} className="flex items-center">
+                                    <Pill className="h-3 w-3 mr-2" />
+                                    {prescription}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {userProfile.lastHealthcareVisit.referrals && userProfile.lastHealthcareVisit.referrals.length > 0 && (
+                            <div>
+                              <h6 className="font-semibold mb-2">Referrals</h6>
+                              <ul className="text-sm space-y-1">
+                                {userProfile.lastHealthcareVisit.referrals.map((referral, index) => (
+                                  <li key={index} className="flex items-center">
+                                    <Stethoscope className="h-3 w-3 mr-2" />
+                                    {referral}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {userProfile.lastHealthcareVisit.followUpRequired && userProfile.lastHealthcareVisit.followUpDate && (
+                            <div className="bg-white/50 p-3 rounded-lg border border-white/50">
+                              <h6 className="font-semibold mb-1 flex items-center">
+                                <Calendar className="h-4 w-4 mr-2" />
+                                Follow-up Required
+                              </h6>
+                              <p className="text-sm">
+                                Next appointment: {userProfile.lastHealthcareVisit.followUpDate.toLocaleDateString()}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Health Information */}
                   <div>
