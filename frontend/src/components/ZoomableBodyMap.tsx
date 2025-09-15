@@ -488,11 +488,206 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     </div>
   );
 
+  // LEVEL 2: Respiratory System Detail
+  const renderRespiratorySystem = () => (
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">Breathing & Lung Areas</h2>
+        <p className="text-slate-600">Tap the specific area affecting your breathing</p>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {[
+          { id: 'throat', name: 'Throat', icon: '🫁' },
+          { id: 'upper-chest', name: 'Upper Chest', icon: '🫁' },
+          { id: 'left-lung', name: 'Left Lung', icon: '🫁' },
+          { id: 'right-lung', name: 'Right Lung', icon: '🫁' },
+          { id: 'chest', name: 'Chest', icon: '🫁' },
+          { id: 'airways', name: 'Airways', icon: '💨' }
+        ].map((part) => {
+          const intensity = getSymptomIntensity(part.id);
+          return (
+            <Card
+              key={part.id}
+              className={cn(
+                "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
+                intensity > 0 ? "border-blue-300 shadow-blue-200/50" : "border-slate-300"
+              )}
+              onClick={(e) => handleBodyPartClick(part.id, part.name, e)}
+            >
+              <CardContent className={cn(
+                "p-4 text-center bg-gradient-to-br",
+                intensity > 0 ? "from-blue-100 to-blue-200" : "from-slate-100 to-slate-200"
+              )}>
+                <div className="text-2xl mb-2">{part.icon}</div>
+                <h4 className="font-semibold text-slate-800">{part.name}</h4>
+                {intensity > 0 && (
+                  <div className="text-xs mt-2 font-medium text-slate-600">
+                    Intensity: {intensity}/10
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  // LEVEL 2: Cardiovascular System Detail
+  const renderCardiovascularSystem = () => (
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">Heart & Circulation</h2>
+        <p className="text-slate-600">Tap the area related to your heart or circulation</p>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {[
+          { id: 'heart', name: 'Heart', icon: '❤️' },
+          { id: 'chest-heart', name: 'Chest (Heart Area)', icon: '💓' },
+          { id: 'circulation', name: 'Circulation', icon: '🩸' },
+          { id: 'pulse', name: 'Pulse/Rhythm', icon: '📈' }
+        ].map((part) => {
+          const intensity = getSymptomIntensity(part.id);
+          return (
+            <Card
+              key={part.id}
+              className={cn(
+                "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
+                intensity > 0 ? "border-red-300 shadow-red-200/50" : "border-slate-300"
+              )}
+              onClick={(e) => handleBodyPartClick(part.id, part.name, e)}
+            >
+              <CardContent className={cn(
+                "p-4 text-center bg-gradient-to-br",
+                intensity > 0 ? "from-red-100 to-red-200" : "from-slate-100 to-slate-200"
+              )}>
+                <div className="text-2xl mb-2">{part.icon}</div>
+                <h4 className="font-semibold text-slate-800">{part.name}</h4>
+                {intensity > 0 && (
+                  <div className="text-xs mt-2 font-medium text-slate-600">
+                    Intensity: {intensity}/10
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  // LEVEL 2: Digestive System Detail
+  const renderDigestiveSystem = () => (
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">Stomach & Digestion</h2>
+        <p className="text-slate-600">Tap the area of your digestive system</p>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {[
+          { id: 'stomach', name: 'Stomach', icon: '🫃' },
+          { id: 'upper-abdomen', name: 'Upper Abdomen', icon: '🫄' },
+          { id: 'lower-abdomen', name: 'Lower Abdomen', icon: '🫄' },
+          { id: 'abdomen', name: 'Abdomen (General)', icon: '🫄' },
+          { id: 'intestines', name: 'Intestines', icon: '🌀' },
+          { id: 'liver', name: 'Liver Area', icon: '🫘' }
+        ].map((part) => {
+          const intensity = getSymptomIntensity(part.id);
+          return (
+            <Card
+              key={part.id}
+              className={cn(
+                "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
+                intensity > 0 ? "border-green-300 shadow-green-200/50" : "border-slate-300"
+              )}
+              onClick={(e) => handleBodyPartClick(part.id, part.name, e)}
+            >
+              <CardContent className={cn(
+                "p-4 text-center bg-gradient-to-br",
+                intensity > 0 ? "from-green-100 to-green-200" : "from-slate-100 to-slate-200"
+              )}>
+                <div className="text-2xl mb-2">{part.icon}</div>
+                <h4 className="font-semibold text-slate-800">{part.name}</h4>
+                {intensity > 0 && (
+                  <div className="text-xs mt-2 font-medium text-slate-600">
+                    Intensity: {intensity}/10
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  // LEVEL 2: Musculoskeletal System Detail
+  const renderMusculoskeletalSystem = () => (
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">Arms, Legs & Joints</h2>
+        <p className="text-slate-600">Tap the muscle, joint, or bone area</p>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { id: 'neck', name: 'Neck', icon: '🦴' },
+          { id: 'left-shoulder', name: 'Left Shoulder', icon: '💪' },
+          { id: 'right-shoulder', name: 'Right Shoulder', icon: '💪' },
+          { id: 'back', name: 'Back/Spine', icon: '🦴' },
+          { id: 'left-arm', name: 'Left Arm', icon: '💪' },
+          { id: 'right-arm', name: 'Right Arm', icon: '💪' },
+          { id: 'left-hand', name: 'Left Hand', icon: '✋' },
+          { id: 'right-hand', name: 'Right Hand', icon: '✋' },
+          { id: 'left-leg', name: 'Left Leg', icon: '🦵' },
+          { id: 'right-leg', name: 'Right Leg', icon: '🦵' },
+          { id: 'left-knee', name: 'Left Knee', icon: '🦴' },
+          { id: 'right-knee', name: 'Right Knee', icon: '🦴' },
+          { id: 'left-foot', name: 'Left Foot', icon: '🦶' },
+          { id: 'right-foot', name: 'Right Foot', icon: '🦶' },
+          { id: 'left-ankle', name: 'Left Ankle', icon: '🦴' },
+          { id: 'right-ankle', name: 'Right Ankle', icon: '🦴' }
+        ].map((part) => {
+          const intensity = getSymptomIntensity(part.id);
+          return (
+            <Card
+              key={part.id}
+              className={cn(
+                "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
+                intensity > 0 ? "border-orange-300 shadow-orange-200/50" : "border-slate-300"
+              )}
+              onClick={(e) => handleBodyPartClick(part.id, part.name, e)}
+            >
+              <CardContent className={cn(
+                "p-4 text-center bg-gradient-to-br",
+                intensity > 0 ? "from-orange-100 to-orange-200" : "from-slate-100 to-slate-200"
+              )}>
+                <div className="text-2xl mb-2">{part.icon}</div>
+                <h4 className="font-semibold text-slate-800 text-sm">{part.name}</h4>
+                {intensity > 0 && (
+                  <div className="text-xs mt-2 font-medium text-slate-600">
+                    {intensity}/10
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   const getCurrentView = () => {
     switch (currentZoom) {
       case 'overview': return renderOverview();
       case 'head-system': return renderHeadSystem();
-      // Add more cases as needed
+      case 'respiratory-system': return renderRespiratorySystem();
+      case 'cardiovascular-system': return renderCardiovascularSystem();
+      case 'digestive-system': return renderDigestiveSystem();
+      case 'musculoskeletal-system': return renderMusculoskeletalSystem();
       default: return renderOverview();
     }
   };
@@ -504,7 +699,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
       'respiratory-system': 'Breathing & Lung Areas',
       'cardiovascular-system': 'Heart & Circulation',
       'digestive-system': 'Stomach & Digestion',
-      'musculoskeletal-system': 'Muscles & Joints',
+      'musculoskeletal-system': 'Arms, Legs & Joints',
       'head-detail': 'Head Detail',
       'chest-detail': 'Chest Detail',
       'abdomen-detail': 'Abdomen Detail',
