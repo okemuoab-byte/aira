@@ -311,6 +311,14 @@ const Index = () => {
                 </Button>
               )}
               <Button
+                variant="outline"
+                onClick={() => setActiveTab('profile')}
+                className="bg-white/50 backdrop-blur-sm hover:bg-white/80 border-gray-200"
+              >
+                <User className="h-4 w-4 mr-2" />
+                Profile
+              </Button>
+              <Button
                 onClick={() => setActiveTab('log-symptoms')}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg"
               >
