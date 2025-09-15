@@ -333,7 +333,7 @@ const Index = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-[600px] bg-white/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-5 lg:w-[500px] bg-white/50 backdrop-blur-sm">
             <TabsTrigger value="log-symptoms" className="flex items-center space-x-2">
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Log</span>
@@ -356,10 +356,6 @@ const Index = () => {
             <TabsTrigger value="family" className="flex items-center space-x-2">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Family</span>
-            </TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center space-x-2">
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Profile</span>
             </TabsTrigger>
           </TabsList>
 
