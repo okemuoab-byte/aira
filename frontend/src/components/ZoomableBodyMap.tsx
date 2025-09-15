@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Home, Sparkles, RotateCcw, Eye, Activity, Brain, Heart, Lungs, Utensils, Zap, User } from 'lucide-react';
+import { ArrowLeft, Home, Sparkles, RotateCcw, Eye, Activity, Brain, Heart, Wind, Utensils, Zap, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Symptom } from '@/types/health';
 
@@ -127,7 +127,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     {
       id: 'respiratory-system',
       name: 'Respiratory',
-      icon: Lungs,
+      icon: Wind,
       color: 'from-blue-500 to-cyan-600',
       bgColor: 'from-blue-50 to-cyan-50',
       parts: ['lungs', 'left-lung', 'right-lung', 'chest', 'throat', 'upper-chest'],
@@ -308,7 +308,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     <div className="max-w-4xl mx-auto p-6">
       <div className="text-center mb-8">
         <div className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-cyan-600">
-          <Lungs className="h-10 w-10 text-white" />
+          <Wind className="h-10 w-10 text-white" />
         </div>
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Respiratory System</h2>
         <p className="text-slate-600">Select the specific area affecting your breathing</p>
