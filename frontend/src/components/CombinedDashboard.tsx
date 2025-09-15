@@ -17,7 +17,8 @@ import {
   CheckCircle,
   Zap,
   TrendingDown,
-  Minus
+  Minus,
+  MapPin
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ZoomableBodyMap from './ZoomableBodyMap';
@@ -112,6 +113,23 @@ const CombinedDashboard: React.FC<CombinedDashboardProps> = ({
     } else {
       return `You're having a challenging day with stronger symptoms. Consider reaching out to your healthcare provider if this continues. ❤️`;
     }
+  };
+
+  const getMostAffectedArea = () => {
+    if (timeframeSymptoms.length === 0) return { name: 'None', count: 0 };
+    
+    const bodyPartCounts: Record<string, number> = {};
+    timeframeSymptoms.forEach(symptom => {
+      bodyPartCounts[symptom.bodyPartName] = (bodyPartCounts[symptom.bodyPartName] || 0) + 1;
+    });
+
+    const mostAffected = Object.entries(bodyPartCounts)
+      .sort(([,a], [,b]) => b - a)[0];
+
+    return {
+      name: mostAffected[0],
+      count: mostAffected[1]
+    };
   };
 
   const analyzeHealthPatterns = (): HealthPattern[] => {
@@ -281,6 +299,8 @@ const CombinedDashboard: React.FC<CombinedDashboardProps> = ({
     );
   };
 
+  const mostAffectedArea = getMostAffectedArea();
+
   return (
     <div className={cn("space-y-8", className)}>
       {/* Welcome Header */}
@@ -315,8 +335,9 @@ const CombinedDashboard: React.FC<CombinedDashboardProps> = ({
         </Tabs>
       </div>
 
-      {/* Enhanced Health Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Enhanced Health Summary Cards - Updated Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Row 1: Today and This Period */}
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold flex items-center text-blue-700">
@@ -343,20 +364,21 @@ const CombinedDashboard: React.FC<CombinedDashboardProps> = ({
           </CardContent>
         </Card>
 
+        {/* Row 2: Most Affected Area and Medications */}
         <Card className="bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 shadow-lg hover:shadow-xl transition-all duration-300">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold flex items-center text-pink-700">
-              <AlertCircle className="h-4 w-4 mr-2" />
-              Avg Intensity
+              <MapPin className="h-4 w-4 mr-2" />
+              Most Affected Area
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-pink-800">
-              {timeframeSymptoms.length > 0 
-                ? Math.round(timeframeSymptoms.reduce((sum, s) => sum + s.intensity, 0) / timeframeSymptoms.length)
-                : 0}/10
+            <div className="text-2xl font-bold text-pink-800 truncate">
+              {mostAffectedArea.name}
             </div>
-            <p className="text-sm text-pink-600">this {selectedTimeframe}</p>
+            <p className="text-sm text-pink-600">
+              {mostAffectedArea.count > 0 ? `${mostAffectedArea.count} symptoms` : 'No symptoms'}
+            </p>
           </CardContent>
         </Card>
 
