@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, TrendingUp, AlertCircle, Activity, Heart, Brain } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import ZoomableBodyMap from './ZoomableBodyMap';
 import { Symptom } from '@/types/health';
 import { format, isToday, isYesterday, subDays } from 'date-fns';
