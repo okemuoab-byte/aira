@@ -22,6 +22,7 @@ export interface Symptom {
   measurements?: SymptomMeasurement[];
   triggers?: string[];
   treatments?: string[];
+  foodHistory?: string[]; // Foods consumed in last 24-48 hours
 }
 
 export interface SymptomPhoto {
@@ -137,6 +138,7 @@ export interface SymptomSuggestion {
   conditions?: string[];
   requiresPhoto?: boolean;
   requiresMeasurement?: boolean;
+  requiresFoodHistory?: boolean;
 }
 
 export interface FamilyMember {

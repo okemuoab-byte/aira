@@ -17,7 +17,7 @@ export const systemicSymptoms: SystemicCategory[] = [
     suggestions: [
       { id: 'rash', text: 'New rash or skin irritation', category: 'visual', requiresPhoto: true },
       { id: 'skin-color-change', text: 'Change in skin color', category: 'visual', requiresPhoto: true },
-      { id: 'dry-skin', text: 'Unusually dry or flaky skin', category: 'common' },
+      { id: 'dry-skin', text: 'Unusually dry or flaky skin', category: 'visual', requiresPhoto: true },
       { id: 'itching', text: 'Itching or scratching', category: 'common' },
       { id: 'skin-sensitivity', text: 'Increased skin sensitivity', category: 'common' },
       { id: 'bruising', text: 'Easy bruising or unusual bruises', category: 'visual', requiresPhoto: true },
@@ -57,7 +57,7 @@ export const systemicSymptoms: SystemicCategory[] = [
       { id: 'urgent-urination', text: 'Sudden urgent need to urinate', category: 'common' },
       { id: 'difficulty-urinating', text: 'Difficulty starting or stopping urination', category: 'common' },
       { id: 'urine-smell', text: 'Strong or unusual urine odor', category: 'common' },
-      { id: 'blood-in-urine', text: 'Blood in urine', category: 'visual', requiresPhoto: true },
+      { id: 'blood-in-urine', text: 'Blood in urine', category: 'visual', requiresPhoto: true, requiresFoodHistory: true },
       { id: 'cloudy-urine', text: 'Cloudy or foamy urine', category: 'visual', requiresPhoto: true },
       { id: 'incontinence', text: 'Loss of bladder control', category: 'common' },
       { id: 'reduced-urination', text: 'Urinating less than usual', category: 'common' }
@@ -74,7 +74,7 @@ export const systemicSymptoms: SystemicCategory[] = [
       { id: 'stool-color', text: 'Change in stool color', category: 'visual', requiresPhoto: true },
       { id: 'stool-consistency', text: 'Change in stool consistency', category: 'common' },
       { id: 'bowel-frequency', text: 'Change in bowel movement frequency', category: 'common' },
-      { id: 'blood-in-stool', text: 'Blood in stool', category: 'visual', requiresPhoto: true },
+      { id: 'blood-in-stool', text: 'Blood in stool', category: 'visual', requiresPhoto: true, requiresFoodHistory: true },
       { id: 'mucus-in-stool', text: 'Mucus in stool', category: 'visual', requiresPhoto: true },
       { id: 'bowel-urgency', text: 'Sudden urgent need for bowel movement', category: 'common' },
       { id: 'incomplete-evacuation', text: 'Feeling of incomplete bowel movement', category: 'common' },
@@ -118,3 +118,18 @@ export const systemicSymptoms: SystemicCategory[] = [
     ]
   }
 ];
+
+// Food items that can cause color changes in urine or stool
+export const colorChangingFoods = {
+  urine: [
+    'Beetroot', 'Blackberries', 'Rhubarb', 'Fava beans', 'Aloe vera',
+    'Food coloring (red/pink)', 'Certain medications', 'Vitamin B supplements',
+    'Carrots (large amounts)', 'Asparagus', 'Artificial food dyes'
+  ],
+  stool: [
+    'Beetroot', 'Tomatoes', 'Red peppers', 'Cranberries', 'Red food coloring',
+    'Iron supplements', 'Bismuth medications (Pepto-Bismol)', 'Blueberries',
+    'Black licorice', 'Dark leafy greens', 'Red meat', 'Artificial food dyes',
+    'Certain antibiotics', 'Blood sausage/black pudding'
+  ]
+};
