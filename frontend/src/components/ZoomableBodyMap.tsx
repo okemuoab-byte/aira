@@ -115,10 +115,10 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     onBodyPartClick(bodyPartId, bodyPartName, coordinates);
   };
 
-  // Enhanced body diagram with medical illustration quality
+  // Enhanced body diagram in anatomical position
   const renderOverview = () => (
     <div className="flex justify-center">
-      <svg width="500" height="700" viewBox="0 0 500 700" className="w-full h-auto max-w-lg drop-shadow-2xl">
+      <svg width="600" height="700" viewBox="0 0 600 700" className="w-full h-auto max-w-lg drop-shadow-2xl">
         <defs>
           {/* Medical-grade skin tone gradients */}
           <radialGradient id="skinToneGradient" cx="40%" cy="30%" r="60%">
@@ -224,35 +224,35 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
         
         {currentSide === 'front' ? (
           <>
-            {/* Realistic Human Body Outline - Front */}
-            <path d="M 250 50 
-                     C 280 50, 300 70, 310 95
-                     C 315 110, 315 125, 310 140
-                     C 305 155, 295 165, 285 175
-                     L 280 190
-                     C 275 200, 270 210, 265 220
-                     L 260 240
-                     C 255 260, 250 280, 245 300
-                     L 240 350
-                     C 235 380, 230 410, 225 440
-                     L 220 480
-                     C 215 520, 210 560, 205 600
-                     L 200 640
-                     C 195 660, 190 680, 185 700
-                     L 315 700
-                     C 310 680, 305 660, 300 640
-                     L 295 600
-                     C 290 560, 285 520, 280 480
-                     L 275 440
-                     C 270 410, 265 380, 260 350
-                     L 255 300
-                     C 250 280, 245 260, 240 240
-                     L 235 220
-                     C 230 210, 225 200, 220 190
-                     L 215 175
-                     C 205 165, 195 155, 190 140
-                     C 185 125, 185 110, 190 95
-                     C 200 70, 220 50, 250 50 Z"
+            {/* Anatomical Position Body Outline - Front */}
+            <path d="M 300 50 
+                     C 330 50, 350 70, 360 95
+                     C 365 110, 365 125, 360 140
+                     C 355 155, 345 165, 335 175
+                     L 330 190
+                     C 325 200, 320 210, 315 220
+                     L 310 240
+                     C 305 260, 300 280, 295 300
+                     L 290 350
+                     C 285 380, 280 410, 275 440
+                     L 270 480
+                     C 265 520, 260 560, 255 600
+                     L 250 640
+                     C 245 660, 240 680, 235 700
+                     L 365 700
+                     C 360 680, 355 660, 350 640
+                     L 345 600
+                     C 340 560, 335 520, 330 480
+                     L 325 440
+                     C 320 410, 315 380, 310 350
+                     L 305 300
+                     C 300 280, 295 260, 290 240
+                     L 285 220
+                     C 280 210, 275 200, 270 190
+                     L 265 175
+                     C 255 165, 245 155, 240 140
+                     C 235 125, 235 110, 240 95
+                     C 250 70, 270 50, 300 50 Z"
               fill="url(#skinToneGradient)" 
               stroke="#8b7355" 
               strokeWidth="2"
@@ -269,7 +269,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseLeave={() => setHoveredPart(null)}>
               
               {/* Realistic head shape */}
-              <ellipse cx="250" cy="85" rx="60" ry="75" 
+              <ellipse cx="300" cy="85" rx="60" ry="75" 
                 fill={getIntensityColor(getSystemIntensity(['head', 'brain', 'left-eye', 'right-eye', 'left-ear', 'right-ear']))}
                 stroke={getIntensityStroke(getSystemIntensity(['head', 'brain', 'left-eye', 'right-eye', 'left-ear', 'right-ear']))}
                 strokeWidth="3"
@@ -279,37 +279,37 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               
               {/* Detailed facial features */}
               {/* Eyes with realistic shape */}
-              <ellipse cx="235" cy="75" rx="12" ry="8" fill="#ffffff" stroke="#8b7355" strokeWidth="1" />
-              <ellipse cx="265" cy="75" rx="12" ry="8" fill="#ffffff" stroke="#8b7355" strokeWidth="1" />
-              <circle cx="235" cy="75" r="6" fill="#4a5568" />
-              <circle cx="265" cy="75" r="6" fill="#4a5568" />
-              <circle cx="237" cy="73" r="2" fill="#ffffff" opacity="0.9" />
-              <circle cx="267" cy="73" r="2" fill="#ffffff" opacity="0.9" />
+              <ellipse cx="285" cy="75" rx="12" ry="8" fill="#ffffff" stroke="#8b7355" strokeWidth="1" />
+              <ellipse cx="315" cy="75" rx="12" ry="8" fill="#ffffff" stroke="#8b7355" strokeWidth="1" />
+              <circle cx="285" cy="75" r="6" fill="#4a5568" />
+              <circle cx="315" cy="75" r="6" fill="#4a5568" />
+              <circle cx="287" cy="73" r="2" fill="#ffffff" opacity="0.9" />
+              <circle cx="317" cy="73" r="2" fill="#ffffff" opacity="0.9" />
               
               {/* Eyebrows */}
-              <path d="M 225 65 Q 235 62, 245 65" stroke="#8b5a3c" strokeWidth="3" fill="none" strokeLinecap="round" />
-              <path d="M 255 65 Q 265 62, 275 65" stroke="#8b5a3c" strokeWidth="3" fill="none" strokeLinecap="round" />
+              <path d="M 275 65 Q 285 62, 295 65" stroke="#8b5a3c" strokeWidth="3" fill="none" strokeLinecap="round" />
+              <path d="M 305 65 Q 315 62, 325 65" stroke="#8b5a3c" strokeWidth="3" fill="none" strokeLinecap="round" />
               
               {/* Nose with nostrils */}
-              <ellipse cx="250" cy="85" rx="6" ry="12" fill="#e8d5c4" stroke="#d4b896" strokeWidth="1" />
-              <ellipse cx="247" cy="90" rx="2" ry="3" fill="#d4b896" />
-              <ellipse cx="253" cy="90" rx="2" ry="3" fill="#d4b896" />
+              <ellipse cx="300" cy="85" rx="6" ry="12" fill="#e8d5c4" stroke="#d4b896" strokeWidth="1" />
+              <ellipse cx="297" cy="90" rx="2" ry="3" fill="#d4b896" />
+              <ellipse cx="303" cy="90" rx="2" ry="3" fill="#d4b896" />
               
               {/* Mouth with lips */}
-              <ellipse cx="250" cy="100" rx="12" ry="4" fill="#cd919e" stroke="#b8808d" strokeWidth="1" />
-              <path d="M 240 100 Q 250 105, 260 100" stroke="#b8808d" strokeWidth="1" fill="none" />
+              <ellipse cx="300" cy="100" rx="12" ry="4" fill="#cd919e" stroke="#b8808d" strokeWidth="1" />
+              <path d="M 290 100 Q 300 105, 310 100" stroke="#b8808d" strokeWidth="1" fill="none" />
               
               {/* Ears */}
-              <ellipse cx="195" cy="80" rx="8" ry="15" fill="url(#skinToneGradient)" stroke="#d4b896" strokeWidth="2" />
-              <ellipse cx="305" cy="80" rx="8" ry="15" fill="url(#skinToneGradient)" stroke="#d4b896" strokeWidth="2" />
+              <ellipse cx="245" cy="80" rx="8" ry="15" fill="url(#skinToneGradient)" stroke="#d4b896" strokeWidth="2" />
+              <ellipse cx="355" cy="80" rx="8" ry="15" fill="url(#skinToneGradient)" stroke="#d4b896" strokeWidth="2" />
               
               {/* Hair with realistic texture */}
-              <path d="M 195 60 Q 200 35, 230 25 Q 250 20, 270 25 Q 300 35, 305 60 
-                       Q 300 45, 285 35 Q 270 30, 250 30 Q 230 30, 215 35 Q 200 45, 195 60" 
+              <path d="M 245 60 Q 250 35, 280 25 Q 300 20, 320 25 Q 350 35, 355 60 
+                       Q 350 45, 335 35 Q 320 30, 300 30 Q 280 30, 265 35 Q 250 45, 245 60" 
                 fill="#8b5a3c" stroke="#6b4423" strokeWidth="1" />
               
               {/* Neck connection */}
-              <rect x="235" y="155" width="30" height="25" rx="15" 
+              <rect x="285" y="155" width="30" height="25" rx="15" 
                 fill="url(#skinToneGradient)" 
                 stroke="#d4b896" 
                 strokeWidth="2" />
@@ -325,16 +325,16 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseLeave={() => setHoveredPart(null)}>
               
               {/* Chest cavity */}
-              <path d="M 200 180 
-                       C 190 185, 185 195, 185 210
-                       L 185 320
-                       C 185 335, 195 345, 210 350
-                       L 290 350
-                       C 305 345, 315 335, 315 320
-                       L 315 210
-                       C 315 195, 310 185, 300 180
-                       C 285 175, 270 175, 250 175
-                       C 230 175, 215 175, 200 180 Z"
+              <path d="M 250 180 
+                       C 240 185, 235 195, 235 210
+                       L 235 320
+                       C 235 335, 245 345, 260 350
+                       L 340 350
+                       C 355 345, 365 335, 365 320
+                       L 365 210
+                       C 365 195, 360 185, 350 180
+                       C 335 175, 320 175, 300 175
+                       C 280 175, 265 175, 250 180 Z"
                 fill={getIntensityColor(getSystemIntensity(['lungs', 'chest', 'throat']))}
                 stroke={getIntensityStroke(getSystemIntensity(['lungs', 'chest', 'throat']))}
                 strokeWidth="3"
@@ -345,15 +345,15 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               {/* Realistic lungs with lobes */}
               <g opacity="0.8">
                 {/* Left lung */}
-                <path d="M 210 200 
-                         C 195 205, 190 220, 190 240
-                         L 190 310
-                         C 190 325, 200 335, 215 340
-                         L 235 340
-                         C 245 335, 250 325, 250 310
-                         L 250 240
-                         C 250 220, 245 205, 235 200
-                         C 225 195, 215 195, 210 200 Z"
+                <path d="M 260 200 
+                         C 245 205, 240 220, 240 240
+                         L 240 310
+                         C 240 325, 250 335, 265 340
+                         L 285 340
+                         C 295 335, 300 325, 300 310
+                         L 300 240
+                         C 300 220, 295 205, 285 200
+                         C 275 195, 265 195, 260 200 Z"
                   fill="url(#lungGradient)"
                   stroke="#0ea5e9"
                   strokeWidth="2"
@@ -361,16 +361,16 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                 />
                 
                 {/* Right lung */}
-                <path d="M 265 200 
-                         C 255 195, 245 195, 240 200
-                         C 235 205, 230 220, 230 240
-                         L 230 310
-                         C 230 325, 240 335, 255 340
-                         L 285 340
-                         C 300 335, 310 325, 310 310
-                         L 310 240
-                         C 310 220, 305 205, 290 200
-                         C 280 195, 270 195, 265 200 Z"
+                <path d="M 315 200 
+                         C 305 195, 295 195, 290 200
+                         C 285 205, 280 220, 280 240
+                         L 280 310
+                         C 280 325, 290 335, 305 340
+                         L 335 340
+                         C 350 335, 360 325, 360 310
+                         L 360 240
+                         C 360 220, 355 205, 340 200
+                         C 330 195, 320 195, 315 200 Z"
                   fill="url(#lungGradient)"
                   stroke="#0ea5e9"
                   strokeWidth="2"
@@ -378,33 +378,33 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                 />
                 
                 {/* Lung texture/alveoli representation */}
-                <circle cx="220" cy="250" r="3" fill="rgba(14, 165, 233, 0.3)" />
-                <circle cx="230" cy="270" r="2" fill="rgba(14, 165, 233, 0.3)" />
-                <circle cx="215" cy="290" r="2.5" fill="rgba(14, 165, 233, 0.3)" />
                 <circle cx="270" cy="250" r="3" fill="rgba(14, 165, 233, 0.3)" />
                 <circle cx="280" cy="270" r="2" fill="rgba(14, 165, 233, 0.3)" />
-                <circle cx="285" cy="290" r="2.5" fill="rgba(14, 165, 233, 0.3)" />
+                <circle cx="265" cy="290" r="2.5" fill="rgba(14, 165, 233, 0.3)" />
+                <circle cx="320" cy="250" r="3" fill="rgba(14, 165, 233, 0.3)" />
+                <circle cx="330" cy="270" r="2" fill="rgba(14, 165, 233, 0.3)" />
+                <circle cx="335" cy="290" r="2.5" fill="rgba(14, 165, 233, 0.3)" />
               </g>
               
               {/* Trachea and bronchi */}
-              <rect x="242" y="160" width="16" height="50" rx="8" 
+              <rect x="292" y="160" width="16" height="50" rx="8" 
                 fill="rgba(168, 85, 247, 0.7)"
                 stroke="rgba(147, 51, 234, 0.9)"
                 strokeWidth="2"
               />
               
               {/* Bronchi branches */}
-              <path d="M 250 210 L 230 230" stroke="rgba(147, 51, 234, 0.8)" strokeWidth="4" strokeLinecap="round" />
-              <path d="M 250 210 L 270 230" stroke="rgba(147, 51, 234, 0.8)" strokeWidth="4" strokeLinecap="round" />
+              <path d="M 300 210 L 280 230" stroke="rgba(147, 51, 234, 0.8)" strokeWidth="4" strokeLinecap="round" />
+              <path d="M 300 210 L 320 230" stroke="rgba(147, 51, 234, 0.8)" strokeWidth="4" strokeLinecap="round" />
               
               {/* Ribcage structure */}
               <g opacity="0.4">
-                <path d="M 200 190 Q 250 180, 300 190" stroke="#8b7355" strokeWidth="2" fill="none" />
-                <path d="M 205 210 Q 250 200, 295 210" stroke="#8b7355" strokeWidth="2" fill="none" />
-                <path d="M 210 230 Q 250 220, 290 230" stroke="#8b7355" strokeWidth="2" fill="none" />
-                <path d="M 215 250 Q 250 240, 285 250" stroke="#8b7355" strokeWidth="2" fill="none" />
-                <path d="M 220 270 Q 250 260, 280 270" stroke="#8b7355" strokeWidth="2" fill="none" />
-                <path d="M 225 290 Q 250 280, 275 290" stroke="#8b7355" strokeWidth="2" fill="none" />
+                <path d="M 250 190 Q 300 180, 350 190" stroke="#8b7355" strokeWidth="2" fill="none" />
+                <path d="M 255 210 Q 300 200, 345 210" stroke="#8b7355" strokeWidth="2" fill="none" />
+                <path d="M 260 230 Q 300 220, 340 230" stroke="#8b7355" strokeWidth="2" fill="none" />
+                <path d="M 265 250 Q 300 240, 335 250" stroke="#8b7355" strokeWidth="2" fill="none" />
+                <path d="M 270 270 Q 300 260, 330 270" stroke="#8b7355" strokeWidth="2" fill="none" />
+                <path d="M 275 290 Q 300 280, 325 290" stroke="#8b7355" strokeWidth="2" fill="none" />
               </g>
             </g>
 
@@ -418,11 +418,11 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseLeave={() => setHoveredPart(null)}>
               
               {/* Anatomically correct heart shape */}
-              <path d="M 250 230 
-                       C 235 215, 210 215, 210 240 
-                       C 210 265, 250 305, 250 305 
-                       C 250 305, 290 265, 290 240 
-                       C 290 215, 265 215, 250 230 Z"
+              <path d="M 300 230 
+                       C 285 215, 260 215, 260 240 
+                       C 260 265, 300 305, 300 305 
+                       C 300 305, 340 265, 340 240 
+                       C 340 215, 315 215, 300 230 Z"
                 fill={getIntensityColor(getSystemIntensity(['heart']))}
                 stroke={getIntensityStroke(getSystemIntensity(['heart']))}
                 strokeWidth="3"
@@ -433,28 +433,28 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               {/* Heart chambers and structure */}
               <g opacity="0.7">
                 {/* Left atrium */}
-                <path d="M 235 235 C 225 230, 215 235, 215 250 C 215 265, 235 280, 235 280 L 235 235"
+                <path d="M 285 235 C 275 230, 265 235, 265 250 C 265 265, 285 280, 285 280 L 285 235"
                   fill="rgba(239, 68, 68, 0.4)" stroke="rgba(220, 38, 38, 0.6)" strokeWidth="1.5" />
                 
                 {/* Right atrium */}
-                <path d="M 265 235 C 275 230, 285 235, 285 250 C 285 265, 265 280, 265 280 L 265 235"
+                <path d="M 315 235 C 325 230, 335 235, 335 250 C 335 265, 315 280, 315 280 L 315 235"
                   fill="rgba(239, 68, 68, 0.5)" stroke="rgba(220, 38, 38, 0.7)" strokeWidth="1.5" />
                 
                 {/* Ventricles */}
-                <ellipse cx="240" cy="275" rx="15" ry="20" fill="rgba(220, 38, 38, 0.3)" stroke="rgba(185, 28, 28, 0.5)" strokeWidth="1" />
-                <ellipse cx="260" cy="275" rx="15" ry="20" fill="rgba(220, 38, 38, 0.4)" stroke="rgba(185, 28, 28, 0.6)" strokeWidth="1" />
+                <ellipse cx="290" cy="275" rx="15" ry="20" fill="rgba(220, 38, 38, 0.3)" stroke="rgba(185, 28, 28, 0.5)" strokeWidth="1" />
+                <ellipse cx="310" cy="275" rx="15" ry="20" fill="rgba(220, 38, 38, 0.4)" stroke="rgba(185, 28, 28, 0.6)" strokeWidth="1" />
                 
                 {/* Aorta */}
-                <path d="M 250 230 Q 245 220, 240 210" stroke="rgba(220, 38, 38, 0.8)" strokeWidth="6" strokeLinecap="round" />
+                <path d="M 300 230 Q 295 220, 290 210" stroke="rgba(220, 38, 38, 0.8)" strokeWidth="6" strokeLinecap="round" />
                 
                 {/* Pulmonary arteries */}
-                <path d="M 255 235 Q 265 225, 275 220" stroke="rgba(59, 130, 246, 0.8)" strokeWidth="4" strokeLinecap="round" />
-                <path d="M 245 235 Q 235 225, 225 220" stroke="rgba(59, 130, 246, 0.8)" strokeWidth="4" strokeLinecap="round" />
+                <path d="M 305 235 Q 315 225, 325 220" stroke="rgba(59, 130, 246, 0.8)" strokeWidth="4" strokeLinecap="round" />
+                <path d="M 295 235 Q 285 225, 275 220" stroke="rgba(59, 130, 246, 0.8)" strokeWidth="4" strokeLinecap="round" />
               </g>
               
               {/* Heartbeat animation effect */}
               {hoveredPart === 'cardiovascular-system' && (
-                <circle cx="250" cy="260" r="40" 
+                <circle cx="300" cy="260" r="40" 
                   fill="none" 
                   stroke="rgba(239, 68, 68, 0.6)" 
                   strokeWidth="2" 
@@ -473,16 +473,16 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseLeave={() => setHoveredPart(null)}>
               
               {/* Abdominal cavity */}
-              <path d="M 210 350 
-                       C 200 355, 195 365, 195 380
-                       L 195 460
-                       C 195 475, 205 485, 220 490
-                       L 280 490
-                       C 295 485, 305 475, 305 460
-                       L 305 380
-                       C 305 365, 300 355, 290 350
-                       C 275 345, 260 345, 250 345
-                       C 240 345, 225 345, 210 350 Z"
+              <path d="M 260 350 
+                       C 250 355, 245 365, 245 380
+                       L 245 460
+                       C 245 475, 255 485, 270 490
+                       L 330 490
+                       C 345 485, 355 475, 355 460
+                       L 355 380
+                       C 355 365, 350 355, 340 350
+                       C 325 345, 310 345, 300 345
+                       C 290 345, 275 345, 260 350 Z"
                 fill={getIntensityColor(getSystemIntensity(['stomach', 'abdomen', 'intestines']))}
                 stroke={getIntensityStroke(getSystemIntensity(['stomach', 'abdomen', 'intestines']))}
                 strokeWidth="3"
@@ -491,13 +491,13 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Realistic stomach */}
-              <path d="M 220 365 
-                       C 210 370, 205 380, 210 395
-                       C 215 410, 230 415, 250 415
-                       C 270 415, 285 410, 290 395
-                       C 295 380, 290 370, 280 365
-                       C 270 360, 250 360, 235 360
-                       C 225 360, 220 365, 220 365 Z"
+              <path d="M 270 365 
+                       C 260 370, 255 380, 260 395
+                       C 265 410, 280 415, 300 415
+                       C 320 415, 335 410, 340 395
+                       C 345 380, 340 370, 330 365
+                       C 320 360, 300 360, 285 360
+                       C 275 360, 270 365, 270 365 Z"
                 fill="url(#digestiveGradient)"
                 stroke="#16a34a"
                 strokeWidth="2"
@@ -505,7 +505,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Liver (partial view) */}
-              <ellipse cx="280" cy="370" rx="20" ry="15" 
+              <ellipse cx="330" cy="370" rx="20" ry="15" 
                 fill="rgba(133, 77, 14, 0.6)"
                 stroke="rgba(120, 53, 15, 0.8)"
                 strokeWidth="2"
@@ -514,24 +514,24 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               
               {/* Small intestine coils */}
               <g opacity="0.8">
-                <path d="M 230 430 Q 250 420, 270 430 Q 280 450, 270 470 Q 250 480, 230 470 Q 220 450, 230 430"
+                <path d="M 280 430 Q 300 420, 320 430 Q 330 450, 320 470 Q 300 480, 280 470 Q 270 450, 280 430"
                   fill="rgba(168, 85, 247, 0.5)"
                   stroke="rgba(147, 51, 234, 0.7)"
                   strokeWidth="2"
                 />
-                <path d="M 240 445 Q 250 440, 260 445 Q 265 455, 260 465 Q 250 470, 240 465 Q 235 455, 240 445"
+                <path d="M 290 445 Q 300 440, 310 445 Q 315 455, 310 465 Q 300 470, 290 465 Q 285 455, 290 445"
                   fill="rgba(168, 85, 247, 0.4)"
                   stroke="rgba(147, 51, 234, 0.6)"
                   strokeWidth="1.5"
                 />
                 
                 {/* Intestinal texture */}
-                <circle cx="245" cy="450" r="2" fill="rgba(147, 51, 234, 0.3)" />
-                <circle cx="255" cy="460" r="1.5" fill="rgba(147, 51, 234, 0.3)" />
+                <circle cx="295" cy="450" r="2" fill="rgba(147, 51, 234, 0.3)" />
+                <circle cx="305" cy="460" r="1.5" fill="rgba(147, 51, 234, 0.3)" />
               </g>
             </g>
 
-            {/* 5. LEFT ARM - Realistic anatomy */}
+            {/* 5. LEFT ARM - Anatomical Position (Extended) */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
@@ -540,16 +540,16 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('left-arm')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Upper arm with muscle definition */}
-              <path d="M 185 190 
-                       C 175 195, 170 205, 170 220
-                       L 170 280
-                       C 170 295, 175 305, 185 310
-                       L 195 310
-                       C 205 305, 210 295, 210 280
-                       L 210 220
-                       C 210 205, 205 195, 195 190
-                       C 190 185, 190 185, 185 190 Z"
+              {/* Upper arm extended at 45 degrees */}
+              <path d="M 235 190 
+                       C 220 200, 210 215, 200 235
+                       L 180 290
+                       C 175 305, 180 320, 190 330
+                       L 200 335
+                       C 210 340, 220 335, 225 320
+                       L 245 265
+                       C 250 250, 245 235, 235 225
+                       C 235 210, 235 200, 235 190 Z"
                 fill={getIntensityColor(getSystemIntensity(['left-arm', 'left-shoulder']))}
                 stroke={getIntensityStroke(getSystemIntensity(['left-arm', 'left-shoulder']))}
                 strokeWidth="3"
@@ -558,7 +558,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Shoulder joint */}
-              <circle cx="190" cy="200" r="18" 
+              <circle cx="240" cy="200" r="18" 
                 fill="url(#skinToneGradient)"
                 stroke="#d4b896"
                 strokeWidth="2"
@@ -566,22 +566,22 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Elbow joint */}
-              <ellipse cx="190" cy="310" rx="12" ry="8" 
+              <ellipse cx="190" cy="330" rx="12" ry="8" 
                 fill="rgba(139, 115, 85, 0.6)" 
                 stroke="rgba(120, 100, 75, 0.8)" 
                 strokeWidth="2" 
               />
               
-              {/* Forearm */}
-              <path d="M 185 310 
-                       C 180 315, 175 325, 175 340
-                       L 175 400
-                       C 175 415, 180 425, 190 430
-                       L 200 430
-                       C 210 425, 215 415, 215 400
-                       L 215 340
-                       C 215 325, 210 315, 200 310
-                       C 195 305, 190 305, 185 310 Z"
+              {/* Forearm extended */}
+              <path d="M 185 330 
+                       C 175 340, 165 355, 155 375
+                       L 135 430
+                       C 130 445, 135 460, 145 470
+                       L 155 475
+                       C 165 480, 175 475, 180 460
+                       L 200 405
+                       C 205 390, 200 375, 190 365
+                       C 190 350, 190 340, 185 330 Z"
                 fill="url(#skinToneGradient)"
                 stroke="#d4b896"
                 strokeWidth="2"
@@ -589,7 +589,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Realistic hand */}
-              <ellipse cx="192" cy="450" rx="18" ry="25" 
+              <ellipse cx="142" cy="490" rx="18" ry="25" 
                 fill={getIntensityColor(getSymptomIntensity('left-hand'))}
                 stroke={getIntensityStroke(getSymptomIntensity('left-hand'))}
                 strokeWidth="2"
@@ -598,21 +598,21 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               
               {/* Detailed fingers with joints */}
               <g opacity="0.9">
-                <rect x="185" y="470" width="3" height="12" rx="1.5" fill="#d4b896" />
-                <rect x="189" y="475" width="3" height="15" rx="1.5" fill="#d4b896" />
-                <rect x="193" y="473" width="3" height="13" rx="1.5" fill="#d4b896" />
-                <rect x="197" y="470" width="3" height="10" rx="1.5" fill="#d4b896" />
-                <rect x="180" y="465" width="3" height="8" rx="1.5" fill="#d4b896" />
+                <rect x="135" y="510" width="3" height="12" rx="1.5" fill="#d4b896" />
+                <rect x="139" y="515" width="3" height="15" rx="1.5" fill="#d4b896" />
+                <rect x="143" y="513" width="3" height="13" rx="1.5" fill="#d4b896" />
+                <rect x="147" y="510" width="3" height="10" rx="1.5" fill="#d4b896" />
+                <rect x="130" y="505" width="3" height="8" rx="1.5" fill="#d4b896" />
                 
                 {/* Finger joints */}
-                <circle cx="186.5" cy="476" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="190.5" cy="481" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="194.5" cy="479" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="198.5" cy="476" r="1" fill="rgba(139, 115, 85, 0.5)" />
+                <circle cx="136.5" cy="516" r="1" fill="rgba(139, 115, 85, 0.5)" />
+                <circle cx="140.5" cy="521" r="1" fill="rgba(139, 115, 85, 0.5)" />
+                <circle cx="144.5" cy="519" r="1" fill="rgba(139, 115, 85, 0.5)" />
+                <circle cx="148.5" cy="516" r="1" fill="rgba(139, 115, 85, 0.5)" />
               </g>
             </g>
 
-            {/* 6. RIGHT ARM - Mirror of left arm */}
+            {/* 6. RIGHT ARM - Anatomical Position (Extended) */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
@@ -621,16 +621,16 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('right-arm')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Upper arm */}
-              <path d="M 315 190 
-                       C 325 195, 330 205, 330 220
-                       L 330 280
-                       C 330 295, 325 305, 315 310
-                       L 305 310
-                       C 295 305, 290 295, 290 280
-                       L 290 220
-                       C 290 205, 295 195, 305 190
-                       C 310 185, 310 185, 315 190 Z"
+              {/* Upper arm extended at 45 degrees */}
+              <path d="M 365 190 
+                       C 380 200, 390 215, 400 235
+                       L 420 290
+                       C 425 305, 420 320, 410 330
+                       L 400 335
+                       C 390 340, 380 335, 375 320
+                       L 355 265
+                       C 350 250, 355 235, 365 225
+                       C 365 210, 365 200, 365 190 Z"
                 fill={getIntensityColor(getSystemIntensity(['right-arm', 'right-shoulder']))}
                 stroke={getIntensityStroke(getSystemIntensity(['right-arm', 'right-shoulder']))}
                 strokeWidth="3"
@@ -639,7 +639,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Shoulder joint */}
-              <circle cx="310" cy="200" r="18" 
+              <circle cx="360" cy="200" r="18" 
                 fill="url(#skinToneGradient)"
                 stroke="#d4b896"
                 strokeWidth="2"
@@ -647,22 +647,22 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Elbow joint */}
-              <ellipse cx="310" cy="310" rx="12" ry="8" 
+              <ellipse cx="410" cy="330" rx="12" ry="8" 
                 fill="rgba(139, 115, 85, 0.6)" 
                 stroke="rgba(120, 100, 75, 0.8)" 
                 strokeWidth="2" 
               />
               
-              {/* Forearm */}
-              <path d="M 315 310 
-                       C 320 315, 325 325, 325 340
-                       L 325 400
-                       C 325 415, 320 425, 310 430
-                       L 300 430
-                       C 290 425, 285 415, 285 400
-                       L 285 340
-                       C 285 325, 290 315, 300 310
-                       C 305 305, 310 305, 315 310 Z"
+              {/* Forearm extended */}
+              <path d="M 415 330 
+                       C 425 340, 435 355, 445 375
+                       L 465 430
+                       C 470 445, 465 460, 455 470
+                       L 445 475
+                       C 435 480, 425 475, 420 460
+                       L 400 405
+                       C 395 390, 400 375, 410 365
+                       C 410 350, 410 340, 415 330 Z"
                 fill="url(#skinToneGradient)"
                 stroke="#d4b896"
                 strokeWidth="2"
@@ -670,7 +670,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Hand */}
-              <ellipse cx="308" cy="450" rx="18" ry="25" 
+              <ellipse cx="458" cy="490" rx="18" ry="25" 
                 fill={getIntensityColor(getSymptomIntensity('right-hand'))}
                 stroke={getIntensityStroke(getSymptomIntensity('right-hand'))}
                 strokeWidth="2"
@@ -679,17 +679,17 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               
               {/* Fingers */}
               <g opacity="0.9">
-                <rect x="312" y="470" width="3" height="12" rx="1.5" fill="#d4b896" />
-                <rect x="308" y="475" width="3" height="15" rx="1.5" fill="#d4b896" />
-                <rect x="304" y="473" width="3" height="13" rx="1.5" fill="#d4b896" />
-                <rect x="300" y="470" width="3" height="10" rx="1.5" fill="#d4b896" />
-                <rect x="317" y="465" width="3" height="8" rx="1.5" fill="#d4b896" />
+                <rect x="462" y="510" width="3" height="12" rx="1.5" fill="#d4b896" />
+                <rect x="458" y="515" width="3" height="15" rx="1.5" fill="#d4b896" />
+                <rect x="454" y="513" width="3" height="13" rx="1.5" fill="#d4b896" />
+                <rect x="450" y="510" width="3" height="10" rx="1.5" fill="#d4b896" />
+                <rect x="467" y="505" width="3" height="8" rx="1.5" fill="#d4b896" />
                 
                 {/* Finger joints */}
-                <circle cx="313.5" cy="476" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="309.5" cy="481" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="305.5" cy="479" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="301.5" cy="476" r="1" fill="rgba(139, 115, 85, 0.5)" />
+                <circle cx="463.5" cy="516" r="1" fill="rgba(139, 115, 85, 0.5)" />
+                <circle cx="459.5" cy="521" r="1" fill="rgba(139, 115, 85, 0.5)" />
+                <circle cx="455.5" cy="519" r="1" fill="rgba(139, 115, 85, 0.5)" />
+                <circle cx="451.5" cy="516" r="1" fill="rgba(139, 115, 85, 0.5)" />
               </g>
             </g>
 
@@ -703,15 +703,15 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseLeave={() => setHoveredPart(null)}>
               
               {/* Thigh */}
-              <path d="M 220 490 
-                       C 215 495, 210 505, 210 520
-                       L 210 580
-                       C 210 595, 215 605, 225 610
-                       L 235 610
-                       C 245 605, 250 595, 250 580
-                       L 250 520
-                       C 250 505, 245 495, 235 490
-                       C 230 485, 225 485, 220 490 Z"
+              <path d="M 270 490 
+                       C 265 495, 260 505, 260 520
+                       L 260 580
+                       C 260 595, 265 605, 275 610
+                       L 285 610
+                       C 295 605, 300 595, 300 580
+                       L 300 520
+                       C 300 505, 295 495, 285 490
+                       C 280 485, 275 485, 270 490 Z"
                 fill={getIntensityColor(getSystemIntensity(['left-leg', 'left-knee']))}
                 stroke={getIntensityStroke(getSystemIntensity(['left-leg', 'left-knee']))}
                 strokeWidth="3"
@@ -720,27 +720,27 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Knee joint with patella */}
-              <ellipse cx="230" cy="610" rx="15" ry="10" 
+              <ellipse cx="280" cy="610" rx="15" ry="10" 
                 fill="rgba(139, 115, 85, 0.6)" 
                 stroke="rgba(120, 100, 75, 0.8)" 
                 strokeWidth="2" 
               />
-              <ellipse cx="230" cy="608" rx="8" ry="6" 
+              <ellipse cx="280" cy="608" rx="8" ry="6" 
                 fill="rgba(160, 135, 105, 0.8)" 
                 stroke="rgba(139, 115, 85, 0.9)" 
                 strokeWidth="1" 
               />
               
               {/* Shin/calf */}
-              <path d="M 225 620 
-                       C 220 625, 215 635, 215 650
-                       L 215 680
-                       C 215 695, 220 705, 230 710
-                       L 240 710
-                       C 250 705, 255 695, 255 680
-                       L 255 650
-                       C 255 635, 250 625, 240 620
-                       C 235 615, 230 615, 225 620 Z"
+              <path d="M 275 620 
+                       C 270 625, 265 635, 265 650
+                       L 265 680
+                       C 265 695, 270 705, 280 710
+                       L 290 710
+                       C 300 705, 305 695, 305 680
+                       L 305 650
+                       C 305 635, 300 625, 290 620
+                       C 285 615, 280 615, 275 620 Z"
                 fill="url(#skinToneGradient)"
                 stroke="#d4b896"
                 strokeWidth="2"
@@ -748,14 +748,14 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Ankle */}
-              <ellipse cx="232" cy="710" rx="10" ry="6" 
+              <ellipse cx="282" cy="710" rx="10" ry="6" 
                 fill="rgba(139, 115, 85, 0.5)" 
                 stroke="rgba(120, 100, 75, 0.7)" 
                 strokeWidth="2" 
               />
               
               {/* Realistic foot */}
-              <ellipse cx="232" cy="730" rx="15" ry="28" 
+              <ellipse cx="282" cy="730" rx="15" ry="28" 
                 fill={getIntensityColor(getSymptomIntensity('left-foot'))}
                 stroke={getIntensityStroke(getSymptomIntensity('left-foot'))}
                 strokeWidth="2"
@@ -764,11 +764,11 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               
               {/* Toes */}
               <g opacity="0.8">
-                <ellipse cx="232" cy="755" rx="3" ry="6" fill="#d4b896" />
-                <ellipse cx="228" cy="752" rx="2.5" ry="5" fill="#d4b896" />
-                <ellipse cx="236" cy="752" rx="2.5" ry="5" fill="#d4b896" />
-                <ellipse cx="224" cy="748" rx="2" ry="4" fill="#d4b896" />
-                <ellipse cx="240" cy="748" rx="2" ry="4" fill="#d4b896" />
+                <ellipse cx="282" cy="755" rx="3" ry="6" fill="#d4b896" />
+                <ellipse cx="278" cy="752" rx="2.5" ry="5" fill="#d4b896" />
+                <ellipse cx="286" cy="752" rx="2.5" ry="5" fill="#d4b896" />
+                <ellipse cx="274" cy="748" rx="2" ry="4" fill="#d4b896" />
+                <ellipse cx="290" cy="748" rx="2" ry="4" fill="#d4b896" />
               </g>
             </g>
 
@@ -782,15 +782,15 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseLeave={() => setHoveredPart(null)}>
               
               {/* Thigh */}
-              <path d="M 280 490 
-                       C 285 495, 290 505, 290 520
-                       L 290 580
-                       C 290 595, 285 605, 275 610
-                       L 265 610
-                       C 255 605, 250 595, 250 580
-                       L 250 520
-                       C 250 505, 255 495, 265 490
-                       C 270 485, 275 485, 280 490 Z"
+              <path d="M 330 490 
+                       C 335 495, 340 505, 340 520
+                       L 340 580
+                       C 340 595, 335 605, 325 610
+                       L 315 610
+                       C 305 605, 300 595, 300 580
+                       L 300 520
+                       C 300 505, 305 495, 315 490
+                       C 320 485, 325 485, 330 490 Z"
                 fill={getIntensityColor(getSystemIntensity(['right-leg', 'right-knee']))}
                 stroke={getIntensityStroke(getSystemIntensity(['right-leg', 'right-knee']))}
                 strokeWidth="3"
@@ -799,27 +799,27 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Knee joint */}
-              <ellipse cx="270" cy="610" rx="15" ry="10" 
+              <ellipse cx="320" cy="610" rx="15" ry="10" 
                 fill="rgba(139, 115, 85, 0.6)" 
                 stroke="rgba(120, 100, 75, 0.8)" 
                 strokeWidth="2" 
               />
-              <ellipse cx="270" cy="608" rx="8" ry="6" 
+              <ellipse cx="320" cy="608" rx="8" ry="6" 
                 fill="rgba(160, 135, 105, 0.8)" 
                 stroke="rgba(139, 115, 85, 0.9)" 
                 strokeWidth="1" 
               />
               
               {/* Shin/calf */}
-              <path d="M 275 620 
-                       C 280 625, 285 635, 285 650
-                       L 285 680
-                       C 285 695, 280 705, 270 710
-                       L 260 710
-                       C 250 705, 245 695, 245 680
-                       L 245 650
-                       C 245 635, 250 625, 260 620
-                       C 265 615, 270 615, 275 620 Z"
+              <path d="M 325 620 
+                       C 330 625, 335 635, 335 650
+                       L 335 680
+                       C 335 695, 330 705, 320 710
+                       L 310 710
+                       C 300 705, 295 695, 295 680
+                       L 295 650
+                       C 295 635, 300 625, 310 620
+                       C 315 615, 320 615, 325 620 Z"
                 fill="url(#skinToneGradient)"
                 stroke="#d4b896"
                 strokeWidth="2"
@@ -827,14 +827,14 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Ankle */}
-              <ellipse cx="268" cy="710" rx="10" ry="6" 
+              <ellipse cx="318" cy="710" rx="10" ry="6" 
                 fill="rgba(139, 115, 85, 0.5)" 
                 stroke="rgba(120, 100, 75, 0.7)" 
                 strokeWidth="2" 
               />
               
               {/* Foot */}
-              <ellipse cx="268" cy="730" rx="15" ry="28" 
+              <ellipse cx="318" cy="730" rx="15" ry="28" 
                 fill={getIntensityColor(getSymptomIntensity('right-foot'))}
                 stroke={getIntensityStroke(getSymptomIntensity('right-foot'))}
                 strokeWidth="2"
@@ -843,47 +843,47 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               
               {/* Toes */}
               <g opacity="0.8">
-                <ellipse cx="268" cy="755" rx="3" ry="6" fill="#d4b896" />
-                <ellipse cx="272" cy="752" rx="2.5" ry="5" fill="#d4b896" />
-                <ellipse cx="264" cy="752" rx="2.5" ry="5" fill="#d4b896" />
-                <ellipse cx="276" cy="748" rx="2" ry="4" fill="#d4b896" />
-                <ellipse cx="260" cy="748" rx="2" ry="4" fill="#d4b896" />
+                <ellipse cx="318" cy="755" rx="3" ry="6" fill="#d4b896" />
+                <ellipse cx="322" cy="752" rx="2.5" ry="5" fill="#d4b896" />
+                <ellipse cx="314" cy="752" rx="2.5" ry="5" fill="#d4b896" />
+                <ellipse cx="326" cy="748" rx="2" ry="4" fill="#d4b896" />
+                <ellipse cx="310" cy="748" rx="2" ry="4" fill="#d4b896" />
               </g>
             </g>
 
           </>
         ) : (
-          // BACK VIEW - Enhanced with realistic anatomy
+          // BACK VIEW - Enhanced with anatomical position
           <>
-            {/* Realistic Back Body Outline */}
-            <path d="M 250 50 
-                     C 280 50, 300 70, 310 95
-                     C 315 110, 315 125, 310 140
-                     C 305 155, 295 165, 285 175
-                     L 280 190
-                     C 275 200, 270 210, 265 220
-                     L 260 240
-                     C 255 260, 250 280, 245 300
-                     L 240 350
-                     C 235 380, 230 410, 225 440
-                     L 220 480
-                     C 215 520, 210 560, 205 600
-                     L 200 640
-                     C 195 660, 190 680, 185 700
-                     L 315 700
-                     C 310 680, 305 660, 300 640
-                     L 295 600
-                     C 290 560, 285 520, 280 480
-                     L 275 440
-                     C 270 410, 265 380, 260 350
-                     L 255 300
-                     C 250 280, 245 260, 240 240
-                     L 235 220
-                     C 230 210, 225 200, 220 190
-                     L 215 175
-                     C 205 165, 195 155, 190 140
-                     C 185 125, 185 110, 190 95
-                     C 200 70, 220 50, 250 50 Z"
+            {/* Anatomical Position Back Body Outline */}
+            <path d="M 300 50 
+                     C 330 50, 350 70, 360 95
+                     C 365 110, 365 125, 360 140
+                     C 355 155, 345 165, 335 175
+                     L 330 190
+                     C 325 200, 320 210, 315 220
+                     L 310 240
+                     C 305 260, 300 280, 295 300
+                     L 290 350
+                     C 285 380, 280 410, 275 440
+                     L 270 480
+                     C 265 520, 260 560, 255 600
+                     L 250 640
+                     C 245 660, 240 680, 235 700
+                     L 365 700
+                     C 360 680, 355 660, 350 640
+                     L 345 600
+                     C 340 560, 335 520, 330 480
+                     L 325 440
+                     C 320 410, 315 380, 310 350
+                     L 305 300
+                     C 300 280, 295 260, 290 240
+                     L 285 220
+                     C 280 210, 275 200, 270 190
+                     L 265 175
+                     C 255 165, 245 155, 240 140
+                     C 235 125, 235 110, 240 95
+                     C 250 70, 270 50, 300 50 Z"
               fill="url(#skinToneGradient)" 
               stroke="#8b7355" 
               strokeWidth="2"
@@ -891,7 +891,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
             />
 
             {/* BACK OF HEAD */}
-            <ellipse cx="250" cy="85" rx="60" ry="75" 
+            <ellipse cx="300" cy="85" rx="60" ry="75" 
               fill={getIntensityColor(getSymptomIntensity('head'))}
               stroke={getIntensityStroke(getSymptomIntensity('head'))}
               strokeWidth="3"
@@ -903,8 +903,8 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
             />
 
             {/* Hair back view */}
-            <path d="M 195 60 Q 200 35, 230 25 Q 250 20, 270 25 Q 300 35, 305 60 
-                     Q 300 45, 285 35 Q 270 30, 250 30 Q 230 30, 215 35 Q 200 45, 195 60" 
+            <path d="M 245 60 Q 250 35, 280 25 Q 300 20, 320 25 Q 350 35, 355 60 
+                     Q 350 45, 335 35 Q 320 30, 300 30 Q 280 30, 265 35 Q 250 45, 245 60" 
               fill="#8b5a3c" stroke="#6b4423" strokeWidth="1" />
 
             {/* BACK & SPINE - Enhanced anatomical detail */}
@@ -916,16 +916,16 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('back')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <path d="M 200 180 
-                       C 190 185, 185 195, 185 210
-                       L 185 480
-                       C 185 495, 195 505, 210 510
-                       L 290 510
-                       C 305 505, 315 495, 315 480
-                       L 315 210
-                       C 315 195, 310 185, 300 180
-                       C 285 175, 270 175, 250 175
-                       C 230 175, 215 175, 200 180 Z"
+              <path d="M 250 180 
+                       C 240 185, 235 195, 235 210
+                       L 235 480
+                       C 235 495, 245 505, 260 510
+                       L 340 510
+                       C 355 505, 365 495, 365 480
+                       L 365 210
+                       C 365 195, 360 185, 350 180
+                       C 335 175, 320 175, 300 175
+                       C 280 175, 265 175, 250 180 Z"
                 fill={getIntensityColor(getSymptomIntensity('back'))}
                 stroke={getIntensityStroke(getSymptomIntensity('back'))}
                 strokeWidth="3"
@@ -934,12 +934,12 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               />
               
               {/* Detailed spine with realistic curvature */}
-              <path d="M 250 190 
-                       Q 248 220, 250 250
-                       Q 252 280, 250 310
-                       Q 248 340, 250 370
-                       Q 252 400, 250 430
-                       Q 248 460, 250 490"
+              <path d="M 300 190 
+                       Q 298 220, 300 250
+                       Q 302 280, 300 310
+                       Q 298 340, 300 370
+                       Q 302 400, 300 430
+                       Q 298 460, 300 490"
                 stroke="rgba(139, 115, 85, 0.9)" 
                 strokeWidth="6"
                 strokeLinecap="round"
@@ -948,7 +948,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               
               {/* Individual vertebrae with realistic spacing */}
               {[200, 215, 230, 245, 260, 275, 290, 305, 320, 335, 350, 365, 380, 395, 410, 425, 440, 455, 470, 485].map((y, i) => (
-                <ellipse key={i} cx="250" cy={y} rx="5" ry="3" 
+                <ellipse key={i} cx="300" cy={y} rx="5" ry="3" 
                   fill="rgba(139, 115, 85, 0.8)" 
                   stroke="rgba(120, 100, 75, 0.9)" 
                   strokeWidth="1"
@@ -956,52 +956,52 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               ))}
               
               {/* Realistic shoulder blade anatomy */}
-              <path d="M 210 220 
-                       C 200 225, 195 235, 195 250
-                       L 195 290
-                       C 195 305, 200 315, 210 320
-                       L 230 320
-                       C 240 315, 245 305, 245 290
-                       L 245 250
-                       C 245 235, 240 225, 230 220
-                       C 220 215, 220 215, 210 220 Z"
+              <path d="M 260 220 
+                       C 250 225, 245 235, 245 250
+                       L 245 290
+                       C 245 305, 250 315, 260 320
+                       L 280 320
+                       C 290 315, 295 305, 295 290
+                       L 295 250
+                       C 295 235, 290 225, 280 220
+                       C 270 215, 270 215, 260 220 Z"
                 fill="rgba(139, 115, 85, 0.4)" 
                 stroke="rgba(120, 100, 75, 0.6)" 
                 strokeWidth="2"
-                transform="rotate(-10 222.5 270)"
+                transform="rotate(-10 272.5 270)"
               />
               
-              <path d="M 270 220 
-                       C 280 225, 285 235, 285 250
-                       L 285 290
-                       C 285 305, 280 315, 270 320
-                       L 250 320
-                       C 240 315, 235 305, 235 290
-                       L 235 250
-                       C 235 235, 240 225, 250 220
-                       C 260 215, 260 215, 270 220 Z"
+              <path d="M 320 220 
+                       C 330 225, 335 235, 335 250
+                       L 335 290
+                       C 335 305, 330 315, 320 320
+                       L 300 320
+                       C 290 315, 285 305, 285 290
+                       L 285 250
+                       C 285 235, 290 225, 300 220
+                       C 310 215, 310 215, 320 220 Z"
                 fill="rgba(139, 115, 85, 0.4)" 
                 stroke="rgba(120, 100, 75, 0.6)" 
                 strokeWidth="2"
-                transform="rotate(10 260 270)"
+                transform="rotate(10 310 270)"
               />
               
               {/* Muscle definition lines */}
-              <path d="M 220 240 Q 250 235, 280 240" stroke="rgba(139, 115, 85, 0.3)" strokeWidth="1" fill="none" />
-              <path d="M 225 280 Q 250 275, 275 280" stroke="rgba(139, 115, 85, 0.3)" strokeWidth="1" fill="none" />
-              <path d="M 230 320 Q 250 315, 270 320" stroke="rgba(139, 115, 85, 0.3)" strokeWidth="1" fill="none" />
+              <path d="M 270 240 Q 300 235, 330 240" stroke="rgba(139, 115, 85, 0.3)" strokeWidth="1" fill="none" />
+              <path d="M 275 280 Q 300 275, 325 280" stroke="rgba(139, 115, 85, 0.3)" strokeWidth="1" fill="none" />
+              <path d="M 280 320 Q 300 315, 320 320" stroke="rgba(139, 115, 85, 0.3)" strokeWidth="1" fill="none" />
             </g>
 
-            {/* BACK ARMS - Enhanced */}
-            <path d="M 185 190 
-                     C 175 195, 170 205, 170 220
-                     L 170 400
-                     C 170 415, 175 425, 185 430
-                     L 195 430
-                     C 205 425, 210 415, 210 400
-                     L 210 220
-                     C 210 205, 205 195, 195 190
-                     C 190 185, 190 185, 185 190 Z"
+            {/* BACK ARMS - Anatomical Position */}
+            <path d="M 235 190 
+                     C 220 200, 210 215, 200 235
+                     L 180 290
+                     C 175 305, 180 320, 190 330
+                     L 200 335
+                     C 210 340, 220 335, 225 320
+                     L 245 265
+                     C 250 250, 245 235, 235 225
+                     C 235 210, 235 200, 235 190 Z"
               fill={getIntensityColor(getSymptomIntensity('left-arm'))}
               stroke={getIntensityStroke(getSymptomIntensity('left-arm'))}
               strokeWidth="3"
@@ -1010,15 +1010,15 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               filter="url(#organDepth)"
             />
             
-            <path d="M 315 190 
-                     C 325 195, 330 205, 330 220
-                     L 330 400
-                     C 330 415, 325 425, 315 430
-                     L 305 430
-                     C 295 425, 290 415, 290 400
-                     L 290 220
-                     C 290 205, 295 195, 305 190
-                     C 310 185, 310 185, 315 190 Z"
+            <path d="M 365 190 
+                     C 380 200, 390 215, 400 235
+                     L 420 290
+                     C 425 305, 420 320, 410 330
+                     L 400 335
+                     C 390 340, 380 335, 375 320
+                     L 355 265
+                     C 350 250, 355 235, 365 225
+                     C 365 210, 365 200, 365 190 Z"
               fill={getIntensityColor(getSymptomIntensity('right-arm'))}
               stroke={getIntensityStroke(getSymptomIntensity('right-arm'))}
               strokeWidth="3"
@@ -1028,15 +1028,15 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
             />
 
             {/* BACK LEGS - Enhanced */}
-            <path d="M 220 510 
-                     C 215 515, 210 525, 210 540
-                     L 210 680
-                     C 210 695, 215 705, 225 710
-                     L 235 710
-                     C 245 705, 250 695, 250 680
-                     L 250 540
-                     C 250 525, 245 515, 235 510
-                     C 230 505, 225 505, 220 510 Z"
+            <path d="M 270 510 
+                     C 265 515, 260 525, 260 540
+                     L 260 680
+                     C 260 695, 265 705, 275 710
+                     L 285 710
+                     C 295 705, 300 695, 300 680
+                     L 300 540
+                     C 300 525, 295 515, 285 510
+                     C 280 505, 275 505, 270 510 Z"
               fill={getIntensityColor(getSymptomIntensity('left-leg'))}
               stroke={getIntensityStroke(getSymptomIntensity('left-leg'))}
               strokeWidth="3"
@@ -1045,15 +1045,16 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               filter="url(#organDepth)"
             />
             
-            <path d="M 280 510 
-                     C 285 515, 290 525, 290 540
-                     L 290 680
-                     C 290 695, 285 705, 275 710
-                     L 265 710
-                     C 255 705, 250 695, 250 680
-                     L 250 540
-                     C 250 525, 255  515, 265 510
-                     C 270 505, 275 505, 280 510 Z"
+            <path d="M 330 510 
+                     C 335 515, 340 525, 340 540
+                     L 340 680
+                     C 340 695, 335 705, 325 710
+                     L 315 710
+                     C 305 705, 300 695, 300 680
+                     
+                     L 300 540
+                     C 300 525, 305 515, 315 510
+                     C 320 505, 325 505, 330 510 Z"
               fill={getIntensityColor(getSymptomIntensity('right-leg'))}
               stroke={getIntensityStroke(getSymptomIntensity('right-leg'))}
               strokeWidth="3"
