@@ -169,8 +169,8 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
           </filter>
 
           <filter id="hoverGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
-            <feFlood floodColor="#3b82f6" floodOpacity="0.4"/>
+            <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+            <feFlood floodColor="#3b82f6" floodOpacity="0.6"/>
             <feComposite in="SourceGraphic" in2="coloredBlur" operator="over"/>
           </filter>
 
@@ -219,31 +219,32 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('head-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <ellipse cx="250" cy="100" rx="65" ry="75" 
+              <ellipse cx="250" cy="100" rx="70" ry="80" 
                 fill={getIntensityColor(getSystemIntensity(['head', 'brain', 'left-eye', 'right-eye', 'left-ear', 'right-ear']))}
                 stroke={getIntensityStroke(getSystemIntensity(['head', 'brain', 'left-eye', 'right-eye', 'left-ear', 'right-ear']))}
-                strokeWidth="4"
+                strokeWidth="5"
                 filter={hoveredPart === 'head-system' ? "url(#hoverGlow)" : "url(#systemHighlight)"}
                 className="transition-all duration-300"
               />
               
-              {/* Enhanced facial features */}
-              <ellipse cx="230" cy="90" rx="8" ry="6" fill="#1e293b" opacity="0.8" />
-              <ellipse cx="270" cy="90" rx="8" ry="6" fill="#1e293b" opacity="0.8" />
-              <circle cx="232" cy="88" r="2" fill="#ffffff" opacity="0.9" />
-              <circle cx="272" cy="88" r="2" fill="#ffffff" opacity="0.9" />
-              <path d="M 235 110 Q 250 118, 265 110" stroke="#1e293b" strokeWidth="3" fill="none" strokeLinecap="round" />
+              {/* Enhanced facial features for better recognition */}
+              <ellipse cx="230" cy="90" rx="10" ry="8" fill="#1e293b" opacity="0.9" />
+              <ellipse cx="270" cy="90" rx="10" ry="8" fill="#1e293b" opacity="0.9" />
+              <circle cx="232" cy="88" r="3" fill="#ffffff" opacity="0.9" />
+              <circle cx="272" cy="88" r="3" fill="#ffffff" opacity="0.9" />
+              <ellipse cx="250" cy="105" rx="8" ry="12" fill="#d4a574" opacity="0.8" />
+              <path d="M 235 115 Q 250 125, 265 115" stroke="#1e293b" strokeWidth="4" fill="none" strokeLinecap="round" />
+              
+              {/* Hair outline for better head recognition */}
+              <path d="M 185 85 Q 190 60, 220 50 Q 250 45, 280 50 Q 310 60, 315 85 Q 310 75, 280 70 Q 250 65, 220 70 Q 190 75, 185 85" 
+                fill="#8b5a3c" opacity="0.7" />
               
               {/* Hover indicator */}
               {hoveredPart === 'head-system' && !readOnly && (
-                <circle cx="320" cy="80" r="8" fill="#3b82f6" opacity="0.8" className="animate-pulse">
-                  <animate attributeName="r" values="6;10;6" dur="2s" repeatCount="indefinite"/>
+                <circle cx="320" cy="80" r="10" fill="#3b82f6" opacity="0.8" className="animate-pulse">
+                  <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite"/>
                 </circle>
               )}
-              
-              <text x="250" y="200" textAnchor="middle" className="text-base font-bold fill-slate-700 pointer-events-none">
-                Head & Brain
-              </text>
             </g>
 
             {/* 2. RESPIRATORY SYSTEM - Enhanced */}
@@ -255,57 +256,59 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('respiratory-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <rect x="190" y="210" width="120" height="130" rx="25" 
+              <rect x="185" y="200" width="130" height="140" rx="30" 
                 fill={getIntensityColor(getSystemIntensity(['lungs', 'chest', 'throat']))}
                 stroke={getIntensityStroke(getSystemIntensity(['lungs', 'chest', 'throat']))}
-                strokeWidth="4"
+                strokeWidth="5"
                 filter={hoveredPart === 'respiratory-system' ? "url(#hoverGlow)" : "url(#systemHighlight)"}
                 className="transition-all duration-300"
               />
               
-              {/* Enhanced lung representations */}
-              <ellipse cx="220" cy="270" rx="22" ry="45" 
-                fill="rgba(59, 130, 246, 0.4)"
-                stroke="rgba(59, 130, 246, 0.8)"
-                strokeWidth="3"
+              {/* Enhanced lung representations - more anatomically accurate */}
+              <ellipse cx="215" cy="270" rx="28" ry="50" 
+                fill="rgba(59, 130, 246, 0.5)"
+                stroke="rgba(59, 130, 246, 0.9)"
+                strokeWidth="4"
               />
-              <ellipse cx="280" cy="270" rx="22" ry="45" 
-                fill="rgba(59, 130, 246, 0.4)"
-                stroke="rgba(59, 130, 246, 0.8)"
-                strokeWidth="3"
+              <ellipse cx="285" cy="270" rx="28" ry="50" 
+                fill="rgba(59, 130, 246, 0.5)"
+                stroke="rgba(59, 130, 246, 0.9)"
+                strokeWidth="4"
               />
+              
+              {/* Ribcage outline for better chest recognition */}
+              <path d="M 190 220 Q 250 210, 310 220" stroke="rgba(139, 69, 19, 0.6)" strokeWidth="3" fill="none" />
+              <path d="M 195 240 Q 250 230, 305 240" stroke="rgba(139, 69, 19, 0.6)" strokeWidth="3" fill="none" />
+              <path d="M 200 260 Q 250 250, 300 260" stroke="rgba(139, 69, 19, 0.6)" strokeWidth="3" fill="none" />
+              <path d="M 205 280 Q 250 270, 295 280" stroke="rgba(139, 69, 19, 0.6)" strokeWidth="3" fill="none" />
               
               {/* Breathing animation */}
               {hoveredPart === 'respiratory-system' && (
                 <>
-                  <ellipse cx="220" cy="270" rx="22" ry="45" 
-                    fill="rgba(59, 130, 246, 0.2)"
-                    stroke="rgba(59, 130, 246, 0.6)"
-                    strokeWidth="2"
+                  <ellipse cx="215" cy="270" rx="28" ry="50" 
+                    fill="rgba(59, 130, 246, 0.3)"
+                    stroke="rgba(59, 130, 246, 0.7)"
+                    strokeWidth="3"
                     className="animate-pulse"
                   />
-                  <ellipse cx="280" cy="270" rx="22" ry="45" 
-                    fill="rgba(59, 130, 246, 0.2)"
-                    stroke="rgba(59, 130, 246, 0.6)"
-                    strokeWidth="2"
+                  <ellipse cx="285" cy="270" rx="28" ry="50" 
+                    fill="rgba(59, 130, 246, 0.3)"
+                    stroke="rgba(59, 130, 246, 0.7)"
+                    strokeWidth="3"
                     className="animate-pulse"
                   />
                 </>
               )}
               
-              {/* Throat connection */}
-              <rect x="240" y="190" width="20" height="35" rx="10" 
-                fill="rgba(168, 85, 247, 0.6)"
+              {/* Throat/trachea connection */}
+              <rect x="240" y="180" width="20" height="40" rx="10" 
+                fill="rgba(168, 85, 247, 0.7)"
                 stroke="rgba(168, 85, 247, 0.9)"
-                strokeWidth="2"
+                strokeWidth="3"
               />
-              
-              <text x="250" y="370" textAnchor="middle" className="text-base font-bold fill-slate-700 pointer-events-none">
-                Chest & Lungs
-              </text>
             </g>
 
-            {/* 3. HEART SYSTEM - Enhanced */}
+            {/* 3. HEART SYSTEM - Enhanced and more prominent */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-110"
@@ -314,27 +317,29 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('cardiovascular-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <path d="M 240 250 C 230 240, 210 240, 210 260 C 210 280, 240 310, 240 310 C 240 310, 270 280, 270 260 C 270 240, 250 240, 240 250 Z"
+              <path d="M 235 240 C 220 225, 195 225, 195 250 C 195 275, 235 315, 235 315 C 235 315, 275 275, 275 250 C 275 225, 250 225, 235 240 Z"
                 fill={getIntensityColor(getSystemIntensity(['heart']))}
                 stroke={getIntensityStroke(getSystemIntensity(['heart']))}
-                strokeWidth="4"
+                strokeWidth="5"
                 filter={hoveredPart === 'cardiovascular-system' ? "url(#hoverGlow)" : "url(#systemHighlight)"}
                 className="transition-all duration-300"
               />
               
+              {/* Heart chambers for better recognition */}
+              <path d="M 235 250 C 225 245, 210 245, 210 260 C 210 275, 235 295, 235 295 C 235 295, 235 250, 235 250"
+                fill="rgba(239, 68, 68, 0.3)" stroke="rgba(239, 68, 68, 0.6)" strokeWidth="2" />
+              <path d="M 235 250 C 245 245, 260 245, 260 260 C 260 275, 235 295, 235 295 C 235 295, 235 250, 235 250"
+                fill="rgba(239, 68, 68, 0.4)" stroke="rgba(239, 68, 68, 0.7)" strokeWidth="2" />
+              
               {/* Heartbeat animation */}
               {hoveredPart === 'cardiovascular-system' && (
-                <path d="M 240 250 C 230 240, 210 240, 210 260 C 210 280, 240 310, 240 310 C 240 310, 270 280, 270 260 C 270 240, 250 240, 240 250 Z"
-                  fill="rgba(239, 68, 68, 0.3)"
-                  stroke="rgba(239, 68, 68, 0.8)"
-                  strokeWidth="2"
+                <path d="M 235 240 C 220 225, 195 225, 195 250 C 195 275, 235 315, 235 315 C 235 315, 275 275, 275 250 C 275 225, 250 225, 235 240 Z"
+                  fill="rgba(239, 68, 68, 0.4)"
+                  stroke="rgba(239, 68, 68, 0.9)"
+                  strokeWidth="3"
                   className="animate-pulse"
                 />
               )}
-              
-              <text x="190" y="340" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Heart
-              </text>
             </g>
 
             {/* 4. DIGESTIVE SYSTEM - Enhanced */}
@@ -346,31 +351,32 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('digestive-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <rect x="210" y="360" width="80" height="110" rx="20" 
+              <rect x="205" y="350" width="90" height="120" rx="25" 
                 fill={getIntensityColor(getSystemIntensity(['stomach', 'abdomen', 'intestines']))}
                 stroke={getIntensityStroke(getSystemIntensity(['stomach', 'abdomen', 'intestines']))}
-                strokeWidth="4"
+                strokeWidth="5"
                 filter={hoveredPart === 'digestive-system' ? "url(#hoverGlow)" : "url(#systemHighlight)"}
                 className="transition-all duration-300"
               />
               
-              {/* Enhanced stomach representation */}
-              <ellipse cx="240" cy="390" rx="25" ry="18" 
-                fill="rgba(34, 197, 94, 0.5)"
-                stroke="rgba(34, 197, 94, 0.8)"
-                strokeWidth="3"
+              {/* Enhanced stomach representation - more anatomically positioned */}
+              <ellipse cx="235" cy="380" rx="30" ry="22" 
+                fill="rgba(34, 197, 94, 0.6)"
+                stroke="rgba(34, 197, 94, 0.9)"
+                strokeWidth="4"
               />
               
-              {/* Intestines representation */}
-              <path d="M 220 420 Q 250 410, 270 420 Q 280 435, 270 450 Q 250 460, 220 450 Q 210 435, 220 420"
+              {/* Intestines representation - more detailed */}
+              <path d="M 220 420 Q 250 410, 280 420 Q 290 440, 280 460 Q 250 470, 220 460 Q 210 440, 220 420"
+                fill="rgba(168, 85, 247, 0.5)"
+                stroke="rgba(168, 85, 247, 0.8)"
+                strokeWidth="3"
+              />
+              <path d="M 225 440 Q 250 435, 275 440 Q 280 450, 275 460 Q 250 465, 225 460 Q 220 450, 225 440"
                 fill="rgba(168, 85, 247, 0.4)"
                 stroke="rgba(168, 85, 247, 0.7)"
                 strokeWidth="2"
               />
-              
-              <text x="250" y="500" textAnchor="middle" className="text-base font-bold fill-slate-700 pointer-events-none">
-                Stomach & Belly
-              </text>
             </g>
 
             {/* 5. LEFT ARM - Enhanced */}
@@ -382,30 +388,37 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('left-arm')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <rect x="120" y="220" width="40" height="160" rx="20" 
+              <rect x="115" y="210" width="45" height="170" rx="22" 
                 fill={getIntensityColor(getSystemIntensity(['left-arm', 'left-shoulder', 'left-hand']))}
                 stroke={getIntensityStroke(getSystemIntensity(['left-arm', 'left-shoulder', 'left-hand']))}
-                strokeWidth="4"
+                strokeWidth="5"
                 filter={hoveredPart === 'left-arm' ? "url(#hoverGlow)" : "url(#systemHighlight)"}
                 className="transition-all duration-300"
               />
               
-              {/* Enhanced hand */}
-              <ellipse cx="140" cy="400" rx="18" ry="25" 
-                fill={getIntensityColor(getSymptomIntensity('left-hand'))}
-                stroke={getIntensityStroke(getSymptomIntensity('left-hand'))}
+              {/* Shoulder connection */}
+              <ellipse cx="160" cy="220" rx="20" ry="15" 
+                fill={getIntensityColor(getSymptomIntensity('left-shoulder'))}
+                stroke={getIntensityStroke(getSymptomIntensity('left-shoulder'))}
                 strokeWidth="3"
               />
               
-              {/* Fingers */}
-              <rect x="135" y="420" width="3" height="12" rx="1.5" fill="rgba(139, 69, 19, 0.6)" />
-              <rect x="139" y="425" width="3" height="15" rx="1.5" fill="rgba(139, 69, 19, 0.6)" />
-              <rect x="143" y="423" width="3" height="13" rx="1.5" fill="rgba(139, 69, 19, 0.6)" />
-              <rect x="147" y="420" width="3" height="10" rx="1.5" fill="rgba(139, 69, 19, 0.6)" />
+              {/* Elbow joint */}
+              <ellipse cx="137" cy="295" rx="15" ry="10" fill="rgba(139, 69, 19, 0.5)" stroke="rgba(139, 69, 19, 0.7)" strokeWidth="2" />
               
-              <text x="90" y="310" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Left Arm
-              </text>
+              {/* Enhanced hand with more detail */}
+              <ellipse cx="137" cy="400" rx="22" ry="30" 
+                fill={getIntensityColor(getSymptomIntensity('left-hand'))}
+                stroke={getIntensityStroke(getSymptomIntensity('left-hand'))}
+                strokeWidth="4"
+              />
+              
+              {/* Detailed fingers */}
+              <rect x="130" y="425" width="4" height="15" rx="2" fill="rgba(139, 69, 19, 0.7)" />
+              <rect x="135" y="430" width="4" height="18" rx="2" fill="rgba(139, 69, 19, 0.7)" />
+              <rect x="140" y="428" width="4" height="16" rx="2" fill="rgba(139, 69, 19, 0.7)" />
+              <rect x="145" y="425" width="4" height="12" rx="2" fill="rgba(139, 69, 19, 0.7)" />
+              <rect x="125" y="420" width="4" height="10" rx="2" fill="rgba(139, 69, 19, 0.7)" />
             </g>
 
             {/* 6. RIGHT ARM - Enhanced */}
@@ -417,30 +430,37 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('right-arm')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <rect x="340" y="220" width="40" height="160" rx="20" 
+              <rect x="340" y="210" width="45" height="170" rx="22" 
                 fill={getIntensityColor(getSystemIntensity(['right-arm', 'right-shoulder', 'right-hand']))}
                 stroke={getIntensityStroke(getSystemIntensity(['right-arm', 'right-shoulder', 'right-hand']))}
-                strokeWidth="4"
+                strokeWidth="5"
                 filter={hoveredPart === 'right-arm' ? "url(#hoverGlow)" : "url(#systemHighlight)"}
                 className="transition-all duration-300"
               />
               
-              {/* Enhanced hand */}
-              <ellipse cx="360" cy="400" rx="18" ry="25" 
-                fill={getIntensityColor(getSymptomIntensity('right-hand'))}
-                stroke={getIntensityStroke(getSymptomIntensity('right-hand'))}
+              {/* Shoulder connection */}
+              <ellipse cx="340" cy="220" rx="20" ry="15" 
+                fill={getIntensityColor(getSymptomIntensity('right-shoulder'))}
+                stroke={getIntensityStroke(getSymptomIntensity('right-shoulder'))}
                 strokeWidth="3"
               />
               
-              {/* Fingers */}
-              <rect x="350" y="420" width="3" height="10" rx="1.5" fill="rgba(139, 69, 19, 0.6)" />
-              <rect x="354" y="423" width="3" height="13" rx="1.5" fill="rgba(139, 69, 19, 0.6)" />
-              <rect x="358" y="425" width="3" height="15" rx="1.5" fill="rgba(139, 69, 19, 0.6)" />
-              <rect x="362" y="420" width="3" height="12" rx="1.5" fill="rgba(139, 69, 19, 0.6)" />
+              {/* Elbow joint */}
+              <ellipse cx="362" cy="295" rx="15" ry="10" fill="rgba(139, 69, 19, 0.5)" stroke="rgba(139, 69, 19, 0.7)" strokeWidth="2" />
               
-              <text x="410" y="310" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Right Arm
-              </text>
+              {/* Enhanced hand with more detail */}
+              <ellipse cx="362" cy="400" rx="22" ry="30" 
+                fill={getIntensityColor(getSymptomIntensity('right-hand'))}
+                stroke={getIntensityStroke(getSymptomIntensity('right-hand'))}
+                strokeWidth="4"
+              />
+              
+              {/* Detailed fingers */}
+              <rect x="351" y="425" width="4" height="12" rx="2" fill="rgba(139, 69, 19, 0.7)" />
+              <rect x="356" y="428" width="4" height="16" rx="2" fill="rgba(139, 69, 19, 0.7)" />
+              <rect x="361" y="430" width="4" height="18" rx="2" fill="rgba(139, 69, 19, 0.7)" />
+              <rect x="366" y="425" width="4" height="15" rx="2" fill="rgba(139, 69, 19, 0.7)" />
+              <rect x="371" y="420" width="4" height="10" rx="2" fill="rgba(139, 69, 19, 0.7)" />
             </g>
 
             {/* 7. LEFT LEG - Enhanced */}
@@ -452,27 +472,26 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('left-leg')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <rect x="215" y="480" width="35" height="180" rx="17" 
+              <rect x="210" y="470" width="40" height="190" rx="20" 
                 fill={getIntensityColor(getSystemIntensity(['left-leg', 'left-knee', 'left-foot']))}
                 stroke={getIntensityStroke(getSystemIntensity(['left-leg', 'left-knee', 'left-foot']))}
-                strokeWidth="4"
+                strokeWidth="5"
                 filter={hoveredPart === 'left-leg' ? "url(#hoverGlow)" : "url(#systemHighlight)"}
                 className="transition-all duration-300"
               />
               
-              {/* Knee joint */}
-              <ellipse cx="232" cy="580" rx="12" ry="8" fill="rgba(139, 69, 19, 0.4)" stroke="rgba(139, 69, 19, 0.6)" strokeWidth="2" />
+              {/* Knee joint - more prominent */}
+              <ellipse cx="230" cy="570" rx="15" ry="12" fill="rgba(139, 69, 19, 0.5)" stroke="rgba(139, 69, 19, 0.8)" strokeWidth="3" />
               
-              {/* Enhanced foot */}
-              <ellipse cx="232" cy="680" rx="15" ry="30" 
+              {/* Enhanced foot with ankle */}
+              <ellipse cx="230" cy="680" rx="18" ry="35" 
                 fill={getIntensityColor(getSymptomIntensity('left-foot'))}
                 stroke={getIntensityStroke(getSymptomIntensity('left-foot'))}
-                strokeWidth="3"
+                strokeWidth="4"
               />
               
-              <text x="180" y="580" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Left Leg
-              </text>
+              {/* Ankle joint */}
+              <ellipse cx="230" cy="650" rx="12" ry="8" fill="rgba(139, 69, 19, 0.4)" stroke="rgba(139, 69, 19, 0.6)" strokeWidth="2" />
             </g>
 
             {/* 8. RIGHT LEG - Enhanced */}
@@ -484,27 +503,26 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('right-leg')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <rect x="250" y="480" width="35" height="180" rx="17" 
+              <rect x="250" y="470" width="40" height="190" rx="20" 
                 fill={getIntensityColor(getSystemIntensity(['right-leg', 'right-knee', 'right-foot']))}
                 stroke={getIntensityStroke(getSystemIntensity(['right-leg', 'right-knee', 'right-foot']))}
-                strokeWidth="4"
+                strokeWidth="5"
                 filter={hoveredPart === 'right-leg' ? "url(#hoverGlow)" : "url(#systemHighlight)"}
                 className="transition-all duration-300"
               />
               
-              {/* Knee joint */}
-              <ellipse cx="267" cy="580" rx="12" ry="8" fill="rgba(139, 69, 19, 0.4)" stroke="rgba(139, 69, 19, 0.6)" strokeWidth="2" />
+              {/* Knee joint - more prominent */}
+              <ellipse cx="270" cy="570" rx="15" ry="12" fill="rgba(139, 69, 19, 0.5)" stroke="rgba(139, 69, 19, 0.8)" strokeWidth="3" />
               
-              {/* Enhanced foot */}
-              <ellipse cx="267" cy="680" rx="15" ry="30" 
+              {/* Enhanced foot with ankle */}
+              <ellipse cx="270" cy="680" rx="18" ry="35" 
                 fill={getIntensityColor(getSymptomIntensity('right-foot'))}
                 stroke={getIntensityStroke(getSymptomIntensity('right-foot'))}
-                strokeWidth="3"
+                strokeWidth="4"
               />
               
-              <text x="320" y="580" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Right Leg
-              </text>
+              {/* Ankle joint */}
+              <ellipse cx="270" cy="650" rx="12" ry="8" fill="rgba(139, 69, 19, 0.4)" stroke="rgba(139, 69, 19, 0.6)" strokeWidth="2" />
             </g>
 
           </>
@@ -538,7 +556,19 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               filter="url(#softGlow)"
             />
 
-            {/* BACK & SPINE - Enhanced */}
+            {/* BACK OF HEAD */}
+            <ellipse cx="250" cy="100" rx="70" ry="80" 
+              fill={getIntensityColor(getSymptomIntensity('head'))}
+              stroke={getIntensityStroke(getSymptomIntensity('head'))}
+              strokeWidth="5"
+              filter={hoveredPart === 'head' ? "url(#hoverGlow)" : "url(#systemHighlight)"}
+              className={cn("transition-all duration-300", !readOnly && "cursor-pointer")}
+              onClick={(e) => !readOnly && handleBodyPartClick('head', 'Back of Head', e)}
+              onMouseEnter={() => setHoveredPart('head')}
+              onMouseLeave={() => setHoveredPart(null)}
+            />
+
+            {/* BACK & SPINE - Enhanced with more anatomical detail */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
@@ -547,34 +577,78 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('back')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <rect x="200" y="210" width="100" height="300" rx="30" 
+              <rect x="195" y="200" width="110" height="320" rx="35" 
                 fill={getIntensityColor(getSymptomIntensity('back'))}
                 stroke={getIntensityStroke(getSymptomIntensity('back'))}
-                strokeWidth="4"
+                strokeWidth="5"
                 filter={hoveredPart === 'back' ? "url(#hoverGlow)" : "url(#systemHighlight)"}
                 className="transition-all duration-300"
               />
               
               {/* Enhanced spine representation */}
-              <line x1="250" y1="220" x2="250" y2="500" 
+              <line x1="250" y1="210" x2="250" y2="510" 
                 stroke="rgba(139, 69, 19, 0.9)" 
-                strokeWidth="6"
+                strokeWidth="8"
                 strokeLinecap="round"
               />
               
-              {/* Enhanced vertebrae */}
-              {[230, 250, 270, 290, 310, 330, 350, 370, 390, 410, 430, 450, 470, 490].map((y, i) => (
-                <circle key={i} cx="250" cy={y} r="4" 
-                  fill="rgba(139, 69, 19, 0.7)" 
+              {/* Enhanced vertebrae - more detailed */}
+              {[220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500].map((y, i) => (
+                <ellipse key={i} cx="250" cy={y} rx="6" ry="4" 
+                  fill="rgba(139, 69, 19, 0.8)" 
                   stroke="rgba(139, 69, 19, 0.9)" 
-                  strokeWidth="1"
+                  strokeWidth="2"
                 />
               ))}
               
-              <text x="250" y="550" textAnchor="middle" className="text-xl font-bold fill-slate-700 pointer-events-none">
-                Back & Spine
-              </text>
+              {/* Shoulder blade outlines */}
+              <ellipse cx="220" cy="250" rx="25" ry="40" 
+                fill="rgba(139, 69, 19, 0.3)" 
+                stroke="rgba(139, 69, 19, 0.5)" 
+                strokeWidth="2"
+                transform="rotate(-15 220 250)"
+              />
+              <ellipse cx="280" cy="250" rx="25" ry="40" 
+                fill="rgba(139, 69, 19, 0.3)" 
+                stroke="rgba(139, 69, 19, 0.5)" 
+                strokeWidth="2"
+                transform="rotate(15 280 250)"
+              />
             </g>
+
+            {/* BACK ARMS */}
+            <rect x="115" y="210" width="45" height="170" rx="22" 
+              fill={getIntensityColor(getSymptomIntensity('left-arm'))}
+              stroke={getIntensityStroke(getSymptomIntensity('left-arm'))}
+              strokeWidth="5"
+              className={cn("transition-all duration-300", !readOnly && "cursor-pointer")}
+              onClick={(e) => !readOnly && handleBodyPartClick('left-arm', 'Left Arm (Back)', e)}
+            />
+            
+            <rect x="340" y="210" width="45" height="170" rx="22" 
+              fill={getIntensityColor(getSymptomIntensity('right-arm'))}
+              stroke={getIntensityStroke(getSymptomIntensity('right-arm'))}
+              strokeWidth="5"
+              className={cn("transition-all duration-300", !readOnly && "cursor-pointer")}
+              onClick={(e) => !readOnly && handleBodyPartClick('right-arm', 'Right Arm (Back)', e)}
+            />
+
+            {/* BACK LEGS */}
+            <rect x="210" y="470" width="40" height="190" rx="20" 
+              fill={getIntensityColor(getSymptomIntensity('left-leg'))}
+              stroke={getIntensityStroke(getSymptomIntensity('left-leg'))}
+              strokeWidth="5"
+              className={cn("transition-all duration-300", !readOnly && "cursor-pointer")}
+              onClick={(e) => !readOnly && handleBodyPartClick('left-leg', 'Left Leg (Back)', e)}
+            />
+            
+            <rect x="250" y="470" width="40" height="190" rx="20" 
+              fill={getIntensityColor(getSymptomIntensity('right-leg'))}
+              stroke={getIntensityStroke(getSymptomIntensity('right-leg'))}
+              strokeWidth="5"
+              className={cn("transition-all duration-300", !readOnly && "cursor-pointer")}
+              onClick={(e) => !readOnly && handleBodyPartClick('right-leg', 'Right Leg (Back)', e)}
+            />
           </>
         )}
       </svg>
@@ -733,12 +807,14 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {[
-          { id: 'stomach', name: 'Stomach', icon: '🫃' },
+          { id: 'upper-stomach', name: 'Upper Stomach', icon: '🫃' },
+          { id: 'lower-stomach', name: 'Lower Stomach', icon: '🫃' },
           { id: 'upper-abdomen', name: 'Upper Abdomen', icon: '🫄' },
           { id: 'lower-abdomen', name: 'Lower Abdomen', icon: '🫄' },
-          { id: 'abdomen', name: 'Abdomen (General)', icon: '🫄' },
+          { id: 'left-side-abdomen', name: 'Left Side Abdomen', icon: '🫄' },
+          { id: 'right-side-abdomen', name: 'Right Side Abdomen', icon: '🫄' },
           { id: 'intestines', name: 'Intestines', icon: '🌀' },
-          { id: 'liver', name: 'Liver Area', icon: '🫘' }
+          { id: 'liver-area', name: 'Liver Area', icon: '🫘' }
         ].map((part) => {
           const intensity = getSymptomIntensity(part.id);
           return (
@@ -861,7 +937,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     
     switch (currentZoom) {
       case 'overview':
-        return '👆 Tap any colored body area to explore specific parts for symptom logging';
+        return '👆 Tap any body area to explore specific parts for symptom logging';
       case 'head-system':
       case 'respiratory-system':
       case 'cardiovascular-system':
