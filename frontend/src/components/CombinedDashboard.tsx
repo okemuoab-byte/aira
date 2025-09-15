@@ -335,9 +335,9 @@ const CombinedDashboard: React.FC<CombinedDashboardProps> = ({
         </Tabs>
       </div>
 
-      {/* Enhanced Health Summary Cards - Updated Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Row 1: Today and This Period */}
+      {/* Enhanced Health Summary Cards - Updated to 2x2 Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Row 1: Today and This Period as 2 halves */}
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold flex items-center text-blue-700">
