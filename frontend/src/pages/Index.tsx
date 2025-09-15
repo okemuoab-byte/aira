@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Activity, User, BookOpen, Pill, Users, Bell, Brain, Stethoscope, Calendar, FileText, Heart } from 'lucide-react';
-import HealthDashboard from '@/components/HealthDashboard';
+import CombinedDashboard from '@/components/CombinedDashboard';
 import SymptomLogger from '@/components/SymptomLogger';
 import MedicationTracker from '@/components/MedicationTracker';
 import MedicationReminder from '@/components/MedicationReminder';
 import FamilyDashboard from '@/components/FamilyDashboard';
 import FamilyHistorySection from '@/components/FamilyHistorySection';
-import HealthInsights from '@/components/HealthInsights';
 import { Symptom, UserProfile, Medication, FamilyMember, MedicationReminder as MedicationReminderType, FamilyHistoryCondition } from '@/types/health';
 
 const Index = () => {
@@ -16,7 +15,7 @@ const Index = () => {
   const [medications, setMedications] = useState<Medication[]>([]);
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [medicationReminders, setMedicationReminders] = useState<MedicationReminderType[]>([]);
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [activeTab, setActiveTab] = useState<string>('log-symptoms'); // Changed default to log-symptoms
   const [userProfile] = useState<UserProfile>({
     id: '1',
     name: 'Sarah',
@@ -152,7 +151,7 @@ const Index = () => {
       id: Date.now().toString()
     };
     setSymptoms(prev => [symptom, ...prev]);
-    setActiveTab('dashboard');
+    setActiveTab('overview'); // Switch to overview after logging
   };
 
   const handleMedicationAdd = (newMedication: Omit<Medication, 'id'>) => {
@@ -326,18 +325,14 @@ const Index = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:w-[700px] bg-white/50 backdrop-blur-sm">
-            <TabsTrigger value="dashboard" className="flex items-center space-x-2">
-              <Activity className="h-4 w-4" />
-              <span className="hidden sm:inline">Dashboard</span>
-            </TabsTrigger>
+          <TabsList className="grid w-full grid-cols-6 lg:w-[600px] bg-white/50 backdrop-blur-sm">
             <TabsTrigger value="log-symptoms" className="flex items-center space-x-2">
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Log</span>
             </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center space-x-2">
+            <TabsTrigger value="overview" className="flex items-center space-x-2">
               <Brain className="h-4 w-4" />
-              <span className="hidden sm:inline">Insights</span>
+              <span className="hidden sm:inline">Overview</span>
             </TabsTrigger>
             <TabsTrigger value="medications" className="flex items-center space-x-2">
               <Pill className="h-4 w-4" />
@@ -360,13 +355,6 @@ const Index = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="dashboard" className="space-y-6">
-            <HealthDashboard 
-              symptoms={symptoms} 
-              userName={userProfile.name}
-            />
-          </TabsContent>
-
           <TabsContent value="log-symptoms" className="space-y-6">
             <div className="flex justify-center">
               <SymptomLogger
@@ -377,8 +365,12 @@ const Index = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="insights" className="space-y-6">
-            <HealthInsights symptoms={symptoms} />
+          <TabsContent value="overview" className="space-y-6">
+            <CombinedDashboard 
+              symptoms={symptoms}
+              medications={medications}
+              userName={userProfile.name}
+            />
           </TabsContent>
 
           <TabsContent value="medications" className="space-y-6">
