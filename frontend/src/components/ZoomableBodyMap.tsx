@@ -49,20 +49,20 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     return Math.max(...systemParts.map(part => getSymptomIntensity(part)));
   };
 
-  const getIntensityFill = (intensity: number): string => {
-    if (intensity === 0) return 'rgba(148, 163, 184, 0.3)'; // Neutral gray
-    if (intensity <= 3) return 'rgba(34, 197, 94, 0.6)'; // Green - mild
-    if (intensity <= 6) return 'rgba(234, 179, 8, 0.7)'; // Yellow - moderate
-    if (intensity <= 8) return 'rgba(249, 115, 22, 0.8)'; // Orange - strong
-    return 'rgba(239, 68, 68, 0.9)'; // Red - severe
+  const getIntensityColor = (intensity: number): string => {
+    if (intensity === 0) return '#e2e8f0'; // Light gray
+    if (intensity <= 3) return '#86efac'; // Light green
+    if (intensity <= 6) return '#fde047'; // Light yellow
+    if (intensity <= 8) return '#fb923c'; // Light orange
+    return '#f87171'; // Light red
   };
 
   const getIntensityStroke = (intensity: number): string => {
-    if (intensity === 0) return 'rgba(148, 163, 184, 0.5)';
-    if (intensity <= 3) return 'rgba(34, 197, 94, 0.8)';
-    if (intensity <= 6) return 'rgba(234, 179, 8, 0.9)';
-    if (intensity <= 8) return 'rgba(249, 115, 22, 1)';
-    return 'rgba(239, 68, 68, 1)';
+    if (intensity === 0) return '#94a3b8'; // Gray
+    if (intensity <= 3) return '#22c55e'; // Green
+    if (intensity <= 6) return '#eab308'; // Yellow
+    if (intensity <= 8) return '#f97316'; // Orange
+    return '#ef4444'; // Red
   };
 
   const handleZoomIn = (zoomLevel: ZoomLevel) => {
@@ -115,297 +115,318 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     onBodyPartClick(bodyPartId, bodyPartName, coordinates);
   };
 
-  // Enhanced gradients and filters for better visuals
-  const renderGradients = () => (
-    <defs>
-      <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#f8fafc" />
-        <stop offset="50%" stopColor="#e2e8f0" />
-        <stop offset="100%" stopColor="#cbd5e1" />
-      </linearGradient>
-      
-      <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-        <feMerge> 
-          <feMergeNode in="coloredBlur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-
-      <filter id="systemHighlight" x="-20%" y="-20%" width="140%" height="140%">
-        <feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.3"/>
-      </filter>
-
-      <pattern id="systemPattern" patternUnits="userSpaceOnUse" width="4" height="4">
-        <rect width="4" height="4" fill="rgba(255,255,255,0.1)"/>
-        <circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.2)"/>
-      </pattern>
-    </defs>
-  );
-
-  // LEVEL 1: Visual Body Overview with Separated Systems
+  // Clean body diagram with distinct clickable areas
   const renderOverview = () => (
     <div className="flex justify-center">
-      <svg width="500" height="700" viewBox="0 0 500 700" className="w-full h-auto max-w-md">
-        {renderGradients()}
+      <svg width="400" height="600" viewBox="0 0 400 600" className="w-full h-auto max-w-sm">
+        <defs>
+          <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="2" dy="2" stdDeviation="3" floodOpacity="0.3"/>
+          </filter>
+        </defs>
         
         {currentSide === 'front' ? (
           <>
-            {/* HEAD & NERVOUS SYSTEM */}
-            <g className={cn("transition-all duration-300", !readOnly && "cursor-pointer")} 
+            {/* BASE BODY OUTLINE - Light gray, non-clickable */}
+            <path d="M 200 50 
+                     C 170 50, 150 70, 150 100
+                     L 150 120
+                     C 130 130, 120 140, 120 160
+                     L 120 200
+                     C 120 220, 130 240, 140 250
+                     L 140 350
+                     C 140 370, 150 380, 160 390
+                     L 160 500
+                     C 160 520, 170 530, 180 540
+                     L 180 580
+                     L 220 580
+                     L 220 540
+                     C 230 530, 240 520, 240 500
+                     L 240 390
+                     C 250 380, 260 370, 260 350
+                     L 260 250
+                     C 270 240, 280 220, 280 200
+                     L 280 160
+                     C 280 140, 270 130, 250 120
+                     L 250 100
+                     C 250 70, 230 50, 200 50 Z"
+              fill="#f1f5f9" 
+              stroke="#cbd5e1" 
+              strokeWidth="2"
+            />
+
+            {/* 1. HEAD & BRAIN SYSTEM */}
+            <g className={cn("transition-all duration-200", !readOnly && "cursor-pointer")} 
                onClick={() => !readOnly && handleZoomIn('head-system')}
                onMouseEnter={() => setHoveredPart('head-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Head outline */}
-              <ellipse cx="250" cy="100" rx="60" ry="75" 
-                fill={getIntensityFill(getSystemIntensity(['head', 'brain', 'left-eye', 'right-eye', 'left-ear', 'right-ear']))}
+              <ellipse cx="200" cy="80" rx="45" ry="55" 
+                fill={getIntensityColor(getSystemIntensity(['head', 'brain', 'left-eye', 'right-eye', 'left-ear', 'right-ear']))}
                 stroke={getIntensityStroke(getSystemIntensity(['head', 'brain', 'left-eye', 'right-eye', 'left-ear', 'right-ear']))}
                 strokeWidth="3"
-                filter="url(#systemHighlight)"
-                className="hover:brightness-110 transition-all duration-200"
+                filter="url(#dropShadow)"
+                className={cn(
+                  "transition-all duration-200",
+                  hoveredPart === 'head-system' && "brightness-110 scale-105"
+                )}
               />
               
-              {/* Brain representation */}
-              <path d="M 220 80 Q 250 60, 280 80 Q 290 100, 280 120 Q 250 140, 220 120 Q 210 100, 220 80 Z"
-                fill="rgba(139, 69, 19, 0.3)"
-                stroke="rgba(139, 69, 19, 0.6)"
-                strokeWidth="1"
-              />
+              {/* Simple facial features */}
+              <circle cx="185" cy="75" r="3" fill="#1e293b" />
+              <circle cx="215" cy="75" r="3" fill="#1e293b" />
+              <path d="M 190 90 Q 200 95, 210 90" stroke="#1e293b" strokeWidth="2" fill="none" />
               
-              {/* Eyes */}
-              <ellipse cx="235" cy="95" rx="8" ry="6" fill="rgba(59, 130, 246, 0.7)" />
-              <ellipse cx="265" cy="95" rx="8" ry="6" fill="rgba(59, 130, 246, 0.7)" />
-              
-              {/* System label */}
-              <text x="250" y="200" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
+              <text x="200" y="155" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
                 Head & Brain
               </text>
-              
-              {hoveredPart === 'head-system' && !readOnly && (
-                <circle cx="320" cy="80" r="6" fill="rgba(99, 102, 241, 0.8)" className="animate-pulse" />
-              )}
             </g>
 
-            {/* RESPIRATORY SYSTEM */}
-            <g className={cn("transition-all duration-300", !readOnly && "cursor-pointer")} 
+            {/* 2. RESPIRATORY SYSTEM */}
+            <g className={cn("transition-all duration-200", !readOnly && "cursor-pointer")} 
                onClick={() => !readOnly && handleZoomIn('respiratory-system')}
                onMouseEnter={() => setHoveredPart('respiratory-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Chest cavity */}
-              <rect x="200" y="180" width="100" height="120" rx="25" 
-                fill={getIntensityFill(getSystemIntensity(['lungs', 'chest', 'throat']))}
+              <rect x="160" y="170" width="80" height="90" rx="15" 
+                fill={getIntensityColor(getSystemIntensity(['lungs', 'chest', 'throat']))}
                 stroke={getIntensityStroke(getSystemIntensity(['lungs', 'chest', 'throat']))}
                 strokeWidth="3"
-                filter="url(#systemHighlight)"
-                className="hover:brightness-110 transition-all duration-200"
+                filter="url(#dropShadow)"
+                className={cn(
+                  "transition-all duration-200",
+                  hoveredPart === 'respiratory-system' && "brightness-110 scale-105"
+                )}
               />
               
-              {/* Lung representations */}
-              <ellipse cx="230" cy="240" rx="25" ry="40" 
-                fill="rgba(59, 130, 246, 0.4)"
-                stroke="rgba(59, 130, 246, 0.7)"
-                strokeWidth="2"
-              />
-              <ellipse cx="270" cy="240" rx="25" ry="40" 
-                fill="rgba(59, 130, 246, 0.4)"
-                stroke="rgba(59, 130, 246, 0.7)"
-                strokeWidth="2"
-              />
+              {/* Lung shapes */}
+              <ellipse cx="180" cy="210" rx="15" ry="25" fill="rgba(59, 130, 246, 0.3)" />
+              <ellipse cx="220" cy="210" rx="15" ry="25" fill="rgba(59, 130, 246, 0.3)" />
               
-              {/* Throat */}
-              <rect x="240" y="175" width="20" height="25" rx="10" 
-                fill="rgba(168, 85, 247, 0.5)"
-                stroke="rgba(168, 85, 247, 0.8)"
-                strokeWidth="2"
-              />
-              
-              <text x="250" y="330" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Breathing & Lungs
+              <text x="200" y="285" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
+                Chest & Lungs
               </text>
-              
-              {hoveredPart === 'respiratory-system' && !readOnly && (
-                <circle cx="320" cy="220" r="6" fill="rgba(14, 165, 233, 0.8)" className="animate-pulse" />
-              )}
             </g>
 
-            {/* CARDIOVASCULAR SYSTEM */}
-            <g className={cn("transition-all duration-300", !readOnly && "cursor-pointer")} 
+            {/* 3. HEART SYSTEM */}
+            <g className={cn("transition-all duration-200", !readOnly && "cursor-pointer")} 
                onClick={() => !readOnly && handleZoomIn('cardiovascular-system')}
                onMouseEnter={() => setHoveredPart('cardiovascular-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Heart */}
-              <path d="M 240 220 C 235 215, 225 215, 225 225 C 225 235, 240 250, 240 250 C 240 250, 255 235, 255 225 C 255 215, 245 215, 240 220 Z"
-                fill={getIntensityFill(getSystemIntensity(['heart']))}
+              <path d="M 190 200 C 185 195, 175 195, 175 205 C 175 215, 190 230, 190 230 C 190 230, 205 215, 205 205 C 205 195, 195 195, 190 200 Z"
+                fill={getIntensityColor(getSystemIntensity(['heart']))}
                 stroke={getIntensityStroke(getSystemIntensity(['heart']))}
                 strokeWidth="3"
-                filter="url(#systemHighlight)"
-                className="hover:brightness-110 transition-all duration-200"
+                filter="url(#dropShadow)"
+                className={cn(
+                  "transition-all duration-200",
+                  hoveredPart === 'cardiovascular-system' && "brightness-110 scale-110"
+                )}
               />
               
-              <text x="240" y="270" textAnchor="middle" className="text-xs font-bold fill-slate-700 pointer-events-none">
+              <text x="150" y="250" textAnchor="middle" className="text-xs font-semibold fill-slate-700">
                 Heart
               </text>
-              
-              {hoveredPart === 'cardiovascular-system' && !readOnly && (
-                <circle cx="270" cy="225" r="4" fill="rgba(239, 68, 68, 0.8)" className="animate-pulse" />
-              )}
             </g>
 
-            {/* DIGESTIVE SYSTEM */}
-            <g className={cn("transition-all duration-300", !readOnly && "cursor-pointer")} 
+            {/* 4. DIGESTIVE SYSTEM */}
+            <g className={cn("transition-all duration-200", !readOnly && "cursor-pointer")} 
                onClick={() => !readOnly && handleZoomIn('digestive-system')}
                onMouseEnter={() => setHoveredPart('digestive-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Abdomen */}
-              <rect x="210" y="310" width="80" height="100" rx="20" 
-                fill={getIntensityFill(getSystemIntensity(['stomach', 'abdomen', 'intestines']))}
+              <rect x="170" y="280" width="60" height="80" rx="12" 
+                fill={getIntensityColor(getSystemIntensity(['stomach', 'abdomen', 'intestines']))}
                 stroke={getIntensityStroke(getSystemIntensity(['stomach', 'abdomen', 'intestines']))}
                 strokeWidth="3"
-                filter="url(#systemHighlight)"
-                className="hover:brightness-110 transition-all duration-200"
+                filter="url(#dropShadow)"
+                className={cn(
+                  "transition-all duration-200",
+                  hoveredPart === 'digestive-system' && "brightness-110 scale-105"
+                )}
               />
               
-              {/* Stomach representation */}
-              <ellipse cx="240" cy="340" rx="20" ry="15" 
-                fill="rgba(34, 197, 94, 0.4)"
-                stroke="rgba(34, 197, 94, 0.7)"
-                strokeWidth="2"
-              />
+              {/* Stomach shape */}
+              <ellipse cx="190" cy="310" rx="15" ry="12" fill="rgba(34, 197, 94, 0.3)" />
               
-              {/* Intestines representation */}
-              <path d="M 220 370 Q 250 360, 270 370 Q 280 380, 270 390 Q 250 400, 220 390 Q 210 380, 220 370"
-                fill="rgba(168, 85, 247, 0.3)"
-                stroke="rgba(168, 85, 247, 0.6)"
-                strokeWidth="2"
-              />
-              
-              <text x="250" y="440" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Stomach & Digestion
+              <text x="200" y="385" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
+                Stomach & Belly
               </text>
-              
-              {hoveredPart === 'digestive-system' && !readOnly && (
-                <circle cx="310" cy="350" r="6" fill="rgba(34, 197, 94, 0.8)" className="animate-pulse" />
-              )}
             </g>
 
-            {/* MUSCULOSKELETAL SYSTEM */}
-            <g className={cn("transition-all duration-300", !readOnly && "cursor-pointer")} 
+            {/* 5. LEFT ARM */}
+            <g className={cn("transition-all duration-200", !readOnly && "cursor-pointer")} 
                onClick={() => !readOnly && handleZoomIn('musculoskeletal-system')}
-               onMouseEnter={() => setHoveredPart('musculoskeletal-system')}
+               onMouseEnter={() => setHoveredPart('left-arm')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Arms */}
-              <rect x="150" y="190" width="35" height="150" rx="17" 
-                fill={getIntensityFill(getSystemIntensity(['left-arm', 'left-shoulder', 'left-hand']))}
+              <rect x="100" y="180" width="30" height="120" rx="15" 
+                fill={getIntensityColor(getSystemIntensity(['left-arm', 'left-shoulder', 'left-hand']))}
                 stroke={getIntensityStroke(getSystemIntensity(['left-arm', 'left-shoulder', 'left-hand']))}
                 strokeWidth="3"
-                filter="url(#systemHighlight)"
-                className="hover:brightness-110 transition-all duration-200"
-              />
-              <rect x="315" y="190" width="35" height="150" rx="17" 
-                fill={getIntensityFill(getSystemIntensity(['right-arm', 'right-shoulder', 'right-hand']))}
-                stroke={getIntensityStroke(getSystemIntensity(['right-arm', 'right-shoulder', 'right-hand']))}
-                strokeWidth="3"
-                filter="url(#systemHighlight)"
-                className="hover:brightness-110 transition-all duration-200"
+                filter="url(#dropShadow)"
+                className={cn(
+                  "transition-all duration-200",
+                  hoveredPart === 'left-arm' && "brightness-110 scale-105"
+                )}
               />
               
-              {/* Hands */}
-              <ellipse cx="167" cy="360" rx="15" ry="20" 
-                fill={getIntensityFill(getSymptomIntensity('left-hand'))}
+              {/* Hand */}
+              <ellipse cx="115" cy="320" rx="12" ry="18" 
+                fill={getIntensityColor(getSymptomIntensity('left-hand'))}
                 stroke={getIntensityStroke(getSymptomIntensity('left-hand'))}
                 strokeWidth="2"
               />
-              <ellipse cx="333" cy="360" rx="15" ry="20" 
-                fill={getIntensityFill(getSymptomIntensity('right-hand'))}
+              
+              <text x="80" y="250" textAnchor="middle" className="text-xs font-semibold fill-slate-700">
+                Left Arm
+              </text>
+            </g>
+
+            {/* 6. RIGHT ARM */}
+            <g className={cn("transition-all duration-200", !readOnly && "cursor-pointer")} 
+               onClick={() => !readOnly && handleZoomIn('musculoskeletal-system')}
+               onMouseEnter={() => setHoveredPart('right-arm')}
+               onMouseLeave={() => setHoveredPart(null)}>
+              
+              <rect x="270" y="180" width="30" height="120" rx="15" 
+                fill={getIntensityColor(getSystemIntensity(['right-arm', 'right-shoulder', 'right-hand']))}
+                stroke={getIntensityStroke(getSystemIntensity(['right-arm', 'right-shoulder', 'right-hand']))}
+                strokeWidth="3"
+                filter="url(#dropShadow)"
+                className={cn(
+                  "transition-all duration-200",
+                  hoveredPart === 'right-arm' && "brightness-110 scale-105"
+                )}
+              />
+              
+              {/* Hand */}
+              <ellipse cx="285" cy="320" rx="12" ry="18" 
+                fill={getIntensityColor(getSymptomIntensity('right-hand'))}
                 stroke={getIntensityStroke(getSymptomIntensity('right-hand'))}
                 strokeWidth="2"
               />
               
-              {/* Legs */}
-              <rect x="220" y="420" width="30" height="180" rx="15" 
-                fill={getIntensityFill(getSystemIntensity(['left-leg', 'left-knee', 'left-foot']))}
+              <text x="320" y="250" textAnchor="middle" className="text-xs font-semibold fill-slate-700">
+                Right Arm
+              </text>
+            </g>
+
+            {/* 7. LEFT LEG */}
+            <g className={cn("transition-all duration-200", !readOnly && "cursor-pointer")} 
+               onClick={() => !readOnly && handleZoomIn('musculoskeletal-system')}
+               onMouseEnter={() => setHoveredPart('left-leg')}
+               onMouseLeave={() => setHoveredPart(null)}>
+              
+              <rect x="175" y="400" width="25" height="140" rx="12" 
+                fill={getIntensityColor(getSystemIntensity(['left-leg', 'left-knee', 'left-foot']))}
                 stroke={getIntensityStroke(getSystemIntensity(['left-leg', 'left-knee', 'left-foot']))}
                 strokeWidth="3"
-                filter="url(#systemHighlight)"
-                className="hover:brightness-110 transition-all duration-200"
-              />
-              <rect x="250" y="420" width="30" height="180" rx="15" 
-                fill={getIntensityFill(getSystemIntensity(['right-leg', 'right-knee', 'right-foot']))}
-                stroke={getIntensityStroke(getSystemIntensity(['right-leg', 'right-knee', 'right-foot']))}
-                strokeWidth="3"
-                filter="url(#systemHighlight)"
-                className="hover:brightness-110 transition-all duration-200"
+                filter="url(#dropShadow)"
+                className={cn(
+                  "transition-all duration-200",
+                  hoveredPart === 'left-leg' && "brightness-110 scale-105"
+                )}
               />
               
-              {/* Feet */}
-              <ellipse cx="235" cy="620" rx="12" ry="25" 
-                fill={getIntensityFill(getSymptomIntensity('left-foot'))}
+              {/* Foot */}
+              <ellipse cx="187" cy="560" rx="10" ry="20" 
+                fill={getIntensityColor(getSymptomIntensity('left-foot'))}
                 stroke={getIntensityStroke(getSymptomIntensity('left-foot'))}
                 strokeWidth="2"
               />
-              <ellipse cx="265" cy="620" rx="12" ry="25" 
-                fill={getIntensityFill(getSymptomIntensity('right-foot'))}
+              
+              <text x="150" y="480" textAnchor="middle" className="text-xs font-semibold fill-slate-700">
+                Left Leg
+              </text>
+            </g>
+
+            {/* 8. RIGHT LEG */}
+            <g className={cn("transition-all duration-200", !readOnly && "cursor-pointer")} 
+               onClick={() => !readOnly && handleZoomIn('musculoskeletal-system')}
+               onMouseEnter={() => setHoveredPart('right-leg')}
+               onMouseLeave={() => setHoveredPart(null)}>
+              
+              <rect x="200" y="400" width="25" height="140" rx="12" 
+                fill={getIntensityColor(getSystemIntensity(['right-leg', 'right-knee', 'right-foot']))}
+                stroke={getIntensityStroke(getSystemIntensity(['right-leg', 'right-knee', 'right-foot']))}
+                strokeWidth="3"
+                filter="url(#dropShadow)"
+                className={cn(
+                  "transition-all duration-200",
+                  hoveredPart === 'right-leg' && "brightness-110 scale-105"
+                )}
+              />
+              
+              {/* Foot */}
+              <ellipse cx="212" cy="560" rx="10" ry="20" 
+                fill={getIntensityColor(getSymptomIntensity('right-foot'))}
                 stroke={getIntensityStroke(getSymptomIntensity('right-foot'))}
                 strokeWidth="2"
               />
               
-              <text x="120" y="280" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Arms &
+              <text x="250" y="480" textAnchor="middle" className="text-xs font-semibold fill-slate-700">
+                Right Leg
               </text>
-              <text x="120" y="300" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Hands
-              </text>
-              
-              <text x="380" y="280" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Arms &
-              </text>
-              <text x="380" y="300" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Hands
-              </text>
-              
-              <text x="250" y="670" textAnchor="middle" className="text-sm font-bold fill-slate-700 pointer-events-none">
-                Legs & Feet
-              </text>
-              
-              {hoveredPart === 'musculoskeletal-system' && !readOnly && (
-                <circle cx="190" cy="250" r="6" fill="rgba(249, 115, 22, 0.8)" className="animate-pulse" />
-              )}
             </g>
+
           </>
         ) : (
-          // Back view - simplified
+          // BACK VIEW - Clean and simple
           <>
-            {/* Back/Spine System */}
-            <g className={cn("transition-all duration-300", !readOnly && "cursor-pointer")} 
+            {/* BASE BACK OUTLINE */}
+            <path d="M 200 50 
+                     C 170 50, 150 70, 150 100
+                     L 150 120
+                     C 130 130, 120 140, 120 160
+                     L 120 200
+                     C 120 220, 130 240, 140 250
+                     L 140 350
+                     C 140 370, 150 380, 160 390
+                     L 160 500
+                     C 160 520, 170 530, 180 540
+                     L 180 580
+                     L 220 580
+                     L 220 540
+                     C 230 530, 240 520, 240 500
+                     L 240 390
+                     C 250 380, 260 370, 260 350
+                     L 260 250
+                     C 270 240, 280 220, 280 200
+                     L 280 160
+                     C 280 140, 270 130, 250 120
+                     L 250 100
+                     C 250 70, 230 50, 200 50 Z"
+              fill="#f1f5f9" 
+              stroke="#cbd5e1" 
+              strokeWidth="2"
+            />
+
+            {/* BACK & SPINE */}
+            <g className={cn("transition-all duration-200", !readOnly && "cursor-pointer")} 
                onClick={(e) => !readOnly && handleBodyPartClick('back', 'Back & Spine', e)}
                onMouseEnter={() => setHoveredPart('back')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <rect x="200" y="180" width="100" height="300" rx="30" 
-                fill={getIntensityFill(getSymptomIntensity('back'))}
+              <rect x="170" y="170" width="60" height="200" rx="15" 
+                fill={getIntensityColor(getSymptomIntensity('back'))}
                 stroke={getIntensityStroke(getSymptomIntensity('back'))}
                 strokeWidth="3"
-                filter="url(#systemHighlight)"
-                className="hover:brightness-110 transition-all duration-200"
+                filter="url(#dropShadow)"
+                className={cn(
+                  "transition-all duration-200",
+                  hoveredPart === 'back' && "brightness-110 scale-105"
+                )}
               />
               
-              {/* Spine representation */}
-              <line x1="250" y1="190" x2="250" y2="470" 
-                stroke="rgba(139, 69, 19, 0.8)" 
-                strokeWidth="4"
+              {/* Spine line */}
+              <line x1="200" y1="180" x2="200" y2="360" 
+                stroke="#64748b" 
+                strokeWidth="3"
               />
               
-              {/* Vertebrae dots */}
-              {[200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460].map((y, i) => (
-                <circle key={i} cx="250" cy={y} r="3" fill="rgba(139, 69, 19, 0.6)" />
-              ))}
-              
-              <text x="250" y="520" textAnchor="middle" className="text-lg font-bold fill-slate-700 pointer-events-none">
+              <text x="200" y="400" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
                 Back & Spine
               </text>
             </g>
@@ -415,7 +436,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     </div>
   );
 
-  // LEVEL 2: Head System Detail (same as before but with visual improvements)
+  // LEVEL 2: Head System Detail
   const renderHeadSystem = () => (
     <div className="max-w-4xl mx-auto p-6">
       <div className="text-center mb-8">
@@ -467,57 +488,10 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     </div>
   );
 
-  // Add other system detail views here (respiratory, cardiovascular, etc.)
-  const renderRespiratorySystem = () => (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">Breathing & Lung Areas</h2>
-        <p className="text-slate-600">Tap the specific area affecting your breathing</p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {[
-          { id: 'throat', name: 'Throat', icon: '🫁' },
-          { id: 'upper-chest', name: 'Upper Chest', icon: '🫁' },
-          { id: 'left-lung', name: 'Left Lung', icon: '🫁' },
-          { id: 'right-lung', name: 'Right Lung', icon: '🫁' },
-          { id: 'chest', name: 'Chest', icon: '🫁' },
-          { id: 'airways', name: 'Airways', icon: '💨' }
-        ].map((part) => {
-          const intensity = getSymptomIntensity(part.id);
-          return (
-            <Card
-              key={part.id}
-              className={cn(
-                "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
-                intensity > 0 ? "border-blue-300 shadow-blue-200/50" : "border-slate-300"
-              )}
-              onClick={(e) => handleBodyPartClick(part.id, part.name, e)}
-            >
-              <CardContent className={cn(
-                "p-4 text-center bg-gradient-to-br",
-                intensity > 0 ? "from-blue-100 to-blue-200" : "from-slate-100 to-slate-200"
-              )}>
-                <div className="text-2xl mb-2">{part.icon}</div>
-                <h4 className="font-semibold text-slate-800">{part.name}</h4>
-                {intensity > 0 && (
-                  <div className="text-xs mt-2 font-medium text-slate-600">
-                    Intensity: {intensity}/10
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-    </div>
-  );
-
   const getCurrentView = () => {
     switch (currentZoom) {
       case 'overview': return renderOverview();
       case 'head-system': return renderHeadSystem();
-      case 'respiratory-system': return renderRespiratorySystem();
       // Add more cases as needed
       default: return renderOverview();
     }
@@ -547,7 +521,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     
     switch (currentZoom) {
       case 'overview':
-        return '👆 Tap any body area to explore specific parts for symptom logging';
+        return '👆 Tap any colored body area to explore specific parts for symptom logging';
       case 'head-system':
       case 'respiratory-system':
       case 'cardiovascular-system':
@@ -625,7 +599,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
           <div className="flex justify-center">
             <div className="flex items-center space-x-2 px-4 py-2 bg-white/80 rounded-full border border-blue-200/50 shadow-sm">
               <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-              <span className="text-xs font-medium text-slate-700">Visual Body Mapping</span>
+              <span className="text-xs font-medium text-slate-700">Clean Medical Mapping</span>
               <Sparkles className="w-3 h-3 text-blue-500" />
             </div>
           </div>
