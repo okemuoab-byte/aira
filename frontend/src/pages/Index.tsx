@@ -19,9 +19,20 @@ const Index = () => {
   const [userProfile] = useState<UserProfile>({
     id: '1',
     name: 'Sarah',
+    birthday: new Date('1978-03-15'),
+    gender: 'female',
+    height: {
+      value: 165,
+      unit: 'cm'
+    },
+    weight: {
+      value: 68,
+      unit: 'kg',
+      lastWeighed: new Date('2024-01-15')
+    },
     conditions: ['diabetes', 'arthritis'],
     medications: [],
-    createdAt: new Date(),
+    createdAt: new Date('2023-06-01'),
     preferences: {
       photoReminders: true,
       progressionAlerts: true,
@@ -93,6 +104,39 @@ const Index = () => {
     if (hour < 12) return 'Good morning';
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
+  };
+
+  const calculateAge = (birthday: Date): number => {
+    const today = new Date();
+    let age = today.getFullYear() - birthday.getFullYear();
+    const monthDiff = today.getMonth() - birthday.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthday.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
+
+  const formatHeight = (height: UserProfile['height']): string => {
+    if (height.unit === 'cm') {
+      return `${height.value} cm`;
+    } else if (height.unit === 'ft-in' && height.feet && height.inches !== undefined) {
+      return `${height.feet}'${height.inches}"`;
+    } else if (height.unit === 'inches') {
+      return `${height.value} inches`;
+    }
+    return `${height.value} ${height.unit}`;
+  };
+
+  const formatWeight = (weight: UserProfile['weight']): string => {
+    return `${weight.value} ${weight.unit}`;
+  };
+
+  const getDaysSinceWeighed = (lastWeighed: Date): number => {
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - lastWeighed.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
   const hasActiveReminders = medications.some(med => med.reminderEnabled);
@@ -232,59 +276,159 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
-            <div className="max-w-2xl mx-auto">
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-8 border border-blue-100">
-                <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                  <User className="h-6 w-6 mr-2 text-blue-600" />
-                  Your Profile
-                </h3>
-                
-                <div className="space-y-6">
-                  <div>
-                    <label className="text-sm font-semibold text-gray-700">Name</label>
-                    <p className="text-lg text-gray-900 font-medium">{userProfile.name}</p>
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-semibold text-gray-700">Health Conditions</label>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {userProfile.conditions.map((condition) => (
-                        <span
-                          key={condition}
-                          className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-medium"
-                        >
-                          {condition}
-                        </span>
-                      ))}
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-blue-100 overflow-hidden">
+                {/* Profile Header */}
+                <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 px-8 py-6 text-white">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                      <User className="h-8 w-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold">{userProfile.name}</h3>
+                      <p className="text-blue-100">
+                        {calculateAge(userProfile.birthday)} years old • {userProfile.gender}
+                      </p>
                     </div>
                   </div>
-                  
+                </div>
+
+                {/* Profile Content */}
+                <div className="p-8 space-y-8">
+                  {/* Personal Information */}
                   <div>
-                    <label className="text-sm font-semibold text-gray-700">Active Medications</label>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {medications.filter(med => !med.endDate || med.endDate > new Date()).map((medication) => (
-                        <span
-                          key={medication.id}
-                          className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full font-medium"
-                        >
-                          {medication.name}
-                        </span>
-                      ))}
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <User className="h-5 w-5 mr-2 text-blue-600" />
+                      Personal Information
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+                        <label className="text-sm font-semibold text-blue-700">Birthday</label>
+                        <p className="text-lg text-blue-900 font-medium">
+                          {userProfile.birthday.toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}
+                        </p>
+                        <p className="text-sm text-blue-600">Age: {calculateAge(userProfile.birthday)}</p>
+                      </div>
+
+                      <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
+                        <label className="text-sm font-semibold text-purple-700">Height</label>
+                        <p className="text-lg text-purple-900 font-medium">
+                          {formatHeight(userProfile.height)}
+                        </p>
+                      </div>
+
+                      <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+                        <label className="text-sm font-semibold text-green-700">Weight</label>
+                        <p className="text-lg text-green-900 font-medium">
+                          {formatWeight(userProfile.weight)}
+                        </p>
+                        <p className="text-sm text-green-600">
+                          Last weighed: {userProfile.weight.lastWeighed.toLocaleDateString()} 
+                          ({getDaysSinceWeighed(userProfile.weight.lastWeighed)} days ago)
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  
+
+                  {/* Health Information */}
                   <div>
-                    <label className="text-sm font-semibold text-gray-700">Family Members</label>
-                    <div className="text-sm text-gray-600 mt-1">
-                      {familyMembers.length} family member{familyMembers.length !== 1 ? 's' : ''} connected
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <Activity className="h-5 w-5 mr-2 text-green-600" />
+                      Health Information
+                    </h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-semibold text-gray-700">Health Conditions</label>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {userProfile.conditions.map((condition) => (
+                            <span
+                              key={condition}
+                              className="px-3 py-1 bg-orange-100 text-orange-800 text-sm rounded-full font-medium border border-orange-200"
+                            >
+                              {condition}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-semibold text-gray-700">Active Medications</label>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {medications.filter(med => !med.endDate || med.endDate > new Date()).length === 0 ? (
+                            <span className="text-gray-500 text-sm">No active medications</span>
+                          ) : (
+                            medications.filter(med => !med.endDate || med.endDate > new Date()).map((medication) => (
+                              <span
+                                key={medication.id}
+                                className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-medium border border-blue-200"
+                              >
+                                {medication.name}
+                              </span>
+                            ))
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  
+
+                  {/* Account Information */}
                   <div>
-                    <label className="text-sm font-semibold text-gray-700">Member Since</label>
-                    <p className="text-gray-900 font-medium">
-                      {userProfile.createdAt.toLocaleDateString()}
-                    </p>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <Users className="h-5 w-5 mr-2 text-purple-600" />
+                      Account Information
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-lg border border-gray-200">
+                        <label className="text-sm font-semibold text-gray-700">Member Since</label>
+                        <p className="text-lg text-gray-900 font-medium">
+                          {userProfile.createdAt.toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}
+                        </p>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 rounded-lg border border-indigo-200">
+                        <label className="text-sm font-semibold text-indigo-700">Family Members</label>
+                        <p className="text-lg text-indigo-900 font-medium">
+                          {familyMembers.length} connected
+                        </p>
+                        <p className="text-sm text-indigo-600">
+                          {familyMembers.filter(m => m.inviteStatus === 'accepted').length} active
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Health Stats */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <Brain className="h-5 w-5 mr-2 text-pink-600" />
+                      Health Journey Stats
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-4 rounded-lg border border-pink-200 text-center">
+                        <div className="text-2xl font-bold text-pink-800">{symptoms.length}</div>
+                        <div className="text-sm text-pink-600">Total Symptoms Logged</div>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border border-yellow-200 text-center">
+                        <div className="text-2xl font-bold text-yellow-800">{medications.length}</div>
+                        <div className="text-sm text-yellow-600">Medications Tracked</div>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-4 rounded-lg border border-teal-200 text-center">
+                        <div className="text-2xl font-bold text-teal-800">
+                          {Math.ceil((Date.now() - userProfile.createdAt.getTime()) / (1000 * 60 * 60 * 24))}
+                        </div>
+                        <div className="text-sm text-teal-600">Days on Health Journey</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

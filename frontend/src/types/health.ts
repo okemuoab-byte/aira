@@ -52,6 +52,19 @@ export interface SymptomProgression {
 export interface UserProfile {
   id: string;
   name: string;
+  birthday: Date;
+  gender: string; // e.g., 'female', 'male', 'non-binary', 'prefer not to say', etc.
+  height: {
+    value: number;
+    unit: 'cm' | 'ft-in' | 'inches';
+    feet?: number; // for ft-in format
+    inches?: number; // for ft-in format
+  };
+  weight: {
+    value: number;
+    unit: 'kg' | 'lbs';
+    lastWeighed: Date;
+  };
   conditions: string[];
   medications: Medication[];
   createdAt: Date;
