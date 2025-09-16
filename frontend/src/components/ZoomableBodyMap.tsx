@@ -115,31 +115,29 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     onBodyPartClick(bodyPartId, bodyPartName, coordinates);
   };
 
-  // Enhanced body diagram in anatomical position
+  // Enhanced human-like body diagram
   const renderOverview = () => (
     <div className="flex justify-center">
-      <svg width="600" height="700" viewBox="0 0 600 700" className="w-full h-auto max-w-lg drop-shadow-2xl">
+      <svg width="500" height="650" viewBox="0 0 500 650" className="w-full h-auto max-w-md drop-shadow-lg">
         <defs>
-          {/* Medical-grade skin tone gradients */}
-          <radialGradient id="skinToneGradient" cx="40%" cy="30%" r="60%">
-            <stop offset="0%" stopColor="#fdf2e9" />
-            <stop offset="30%" stopColor="#f4e4d1" />
-            <stop offset="70%" stopColor="#e8d5c4" />
-            <stop offset="100%" stopColor="#d4b896" />
+          {/* Natural skin tone gradients */}
+          <radialGradient id="skinToneGradient" cx="45%" cy="35%" r="65%">
+            <stop offset="0%" stopColor="#fef7ed" />
+            <stop offset="30%" stopColor="#fed7aa" />
+            <stop offset="70%" stopColor="#fdba74" />
+            <stop offset="100%" stopColor="#f97316" />
           </radialGradient>
 
           <linearGradient id="bodyContourGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f8f4f0" />
-            <stop offset="25%" stopColor="#f0e6d6" />
-            <stop offset="50%" stopColor="#e8d5c4" />
-            <stop offset="75%" stopColor="#d4b896" />
-            <stop offset="100%" stopColor="#c4a484" />
+            <stop offset="0%" stopColor="#fef7ed" />
+            <stop offset="50%" stopColor="#fed7aa" />
+            <stop offset="100%" stopColor="#fdba74" />
           </linearGradient>
 
-          {/* Symptom intensity gradients - more medical/clinical */}
+          {/* Symptom intensity gradients */}
           <radialGradient id="neutralGradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#fdf2e9" />
-            <stop offset="100%" stopColor="#f0e6d6" />
+            <stop offset="0%" stopColor="#fef7ed" />
+            <stop offset="100%" stopColor="#fed7aa" />
           </radialGradient>
 
           <radialGradient id="mildGradient" cx="50%" cy="50%" r="50%">
@@ -166,100 +164,56 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
             <stop offset="100%" stopColor="#fca5a5" />
           </radialGradient>
 
-          {/* Organ-specific gradients */}
-          <radialGradient id="lungGradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#e0f2fe" />
-            <stop offset="50%" stopColor="#bae6fd" />
-            <stop offset="100%" stopColor="#7dd3fc" />
-          </radialGradient>
-
-          <radialGradient id="heartGradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#fef2f2" />
-            <stop offset="50%" stopColor="#fecaca" />
-            <stop offset="100%" stopColor="#f87171" />
-          </radialGradient>
-
-          <radialGradient id="digestiveGradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#f0fdf4" />
-            <stop offset="50%" stopColor="#dcfce7" />
-            <stop offset="100%" stopColor="#86efac" />
-          </radialGradient>
-
-          {/* Advanced filters for depth and realism */}
-          <filter id="anatomicalShadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-            <feOffset dx="2" dy="4" result="offsetBlur"/>
-            <feFlood floodColor="#8b7355" floodOpacity="0.3"/>
-            <feComposite in="SourceGraphic" in2="offsetBlur" operator="over"/>
+          {/* Subtle shadow filters */}
+          <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="2" dy="3" stdDeviation="3" floodOpacity="0.2" floodColor="#92400e"/>
           </filter>
 
-          <filter id="organDepth" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="1" dy="2" stdDeviation="2" floodOpacity="0.4" floodColor="#6b5b47"/>
-            <feDropShadow dx="0" dy="1" stdDeviation="1" floodOpacity="0.2" floodColor="#4a3f35"/>
-          </filter>
-
-          <filter id="hoverHighlight" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
-            <feFlood floodColor="#3b82f6" floodOpacity="0.8"/>
-            <feComposite in="SourceGraphic" in2="coloredBlur" operator="over"/>
-          </filter>
-
-          <filter id="medicalGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <filter id="hoverGlow" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-            <feFlood floodColor="#ffffff" floodOpacity="0.6"/>
+            <feFlood floodColor="#3b82f6" floodOpacity="0.6"/>
             <feComposite in="SourceGraphic" in2="coloredBlur" operator="over"/>
           </filter>
-
-          {/* Anatomical texture patterns */}
-          <pattern id="muscleTexture" patternUnits="userSpaceOnUse" width="12" height="12">
-            <rect width="12" height="12" fill="rgba(139, 115, 85, 0.05)"/>
-            <path d="M 0 6 Q 6 3, 12 6 Q 6 9, 0 6" stroke="rgba(139, 115, 85, 0.1)" strokeWidth="0.5" fill="none"/>
-          </pattern>
-
-          <pattern id="organTexture" patternUnits="userSpaceOnUse" width="8" height="8">
-            <rect width="8" height="8" fill="rgba(255,255,255,0.1)"/>
-            <circle cx="4" cy="4" r="1.5" fill="rgba(255,255,255,0.15)"/>
-          </pattern>
         </defs>
         
         {currentSide === 'front' ? (
           <>
-            {/* Anatomical Position Body Outline - Front */}
-            <path d="M 300 50 
-                     C 330 50, 350 70, 360 95
-                     C 365 110, 365 125, 360 140
-                     C 355 155, 345 165, 335 175
-                     L 330 190
-                     C 325 200, 320 210, 315 220
-                     L 310 240
-                     C 305 260, 300 280, 295 300
-                     L 290 350
-                     C 285 380, 280 410, 275 440
-                     L 270 480
-                     C 265 520, 260 560, 255 600
-                     L 250 640
-                     C 245 660, 240 680, 235 700
-                     L 365 700
-                     C 360 680, 355 660, 350 640
-                     L 345 600
-                     C 340 560, 335 520, 330 480
-                     L 325 440
-                     C 320 410, 315 380, 310 350
-                     L 305 300
-                     C 300 280, 295 260, 290 240
-                     L 285 220
-                     C 280 210, 275 200, 270 190
-                     L 265 175
-                     C 255 165, 245 155, 240 140
-                     C 235 125, 235 110, 240 95
-                     C 250 70, 270 50, 300 50 Z"
+            {/* Human-like body outline - Front */}
+            <path d="M 250 40 
+                     C 275 40, 295 50, 310 70
+                     C 320 85, 320 100, 315 115
+                     C 310 130, 300 140, 290 150
+                     L 285 165
+                     C 280 175, 275 185, 270 195
+                     L 265 215
+                     C 260 235, 255 255, 250 275
+                     L 245 325
+                     C 240 355, 235 385, 230 415
+                     L 225 455
+                     C 220 495, 215 535, 210 575
+                     L 205 615
+                     C 200 635, 195 655, 190 675
+                     L 310 675
+                     C 305 655, 300 635, 295 615
+                     L 290 575
+                     C 285 535, 280 495, 275 455
+                     L 270 415
+                     C 265 385, 260 355, 255 325
+                     L 250 275
+                     C 245 255, 240 235, 235 215
+                     L 230 195
+                     C 225 185, 220 175, 215 165
+                     L 210 150
+                     C 200 140, 190 130, 185 115
+                     C 180 100, 180 85, 190 70
+                     C 205 50, 225 40, 250 40 Z"
               fill="url(#skinToneGradient)" 
-              stroke="#8b7355" 
-              strokeWidth="2"
-              filter="url(#anatomicalShadow)"
+              stroke="#d97706" 
+              strokeWidth="1.5"
+              filter="url(#softShadow)"
             />
 
-            {/* 1. HEAD & BRAIN SYSTEM - Medical illustration quality */}
+            {/* 1. HEAD - More human-like shape */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
@@ -268,54 +222,54 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('head-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Realistic head shape */}
-              <ellipse cx="300" cy="85" rx="60" ry="75" 
+              {/* Natural head shape */}
+              <path d="M 250 45
+                       C 280 45, 305 60, 315 85
+                       C 320 100, 320 115, 315 130
+                       C 310 145, 300 155, 285 160
+                       C 270 165, 250 165, 230 160
+                       C 215 155, 205 145, 200 130
+                       C 195 115, 195 100, 200 85
+                       C 210 60, 235 45, 250 45 Z"
                 fill={getIntensityColor(getSystemIntensity(['head', 'brain', 'left-eye', 'right-eye', 'left-ear', 'right-ear']))}
                 stroke={getIntensityStroke(getSystemIntensity(['head', 'brain', 'left-eye', 'right-eye', 'left-ear', 'right-ear']))}
-                strokeWidth="3"
-                filter={hoveredPart === 'head-system' ? "url(#hoverHighlight)" : "url(#organDepth)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'head-system' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
-              {/* Detailed facial features */}
-              {/* Eyes with realistic shape */}
-              <ellipse cx="285" cy="75" rx="12" ry="8" fill="#ffffff" stroke="#8b7355" strokeWidth="1" />
-              <ellipse cx="315" cy="75" rx="12" ry="8" fill="#ffffff" stroke="#8b7355" strokeWidth="1" />
-              <circle cx="285" cy="75" r="6" fill="#4a5568" />
-              <circle cx="315" cy="75" r="6" fill="#4a5568" />
-              <circle cx="287" cy="73" r="2" fill="#ffffff" opacity="0.9" />
-              <circle cx="317" cy="73" r="2" fill="#ffffff" opacity="0.9" />
+              {/* Facial features */}
+              <ellipse cx="235" cy="95" rx="8" ry="6" fill="#ffffff" stroke="#d97706" strokeWidth="0.5" />
+              <ellipse cx="265" cy="95" rx="8" ry="6" fill="#ffffff" stroke="#d97706" strokeWidth="0.5" />
+              <circle cx="235" cy="95" r="4" fill="#4a5568" />
+              <circle cx="265" cy="95" r="4" fill="#4a5568" />
+              <circle cx="237" cy="93" r="1.5" fill="#ffffff" opacity="0.9" />
+              <circle cx="267" cy="93" r="1.5" fill="#ffffff" opacity="0.9" />
               
-              {/* Eyebrows */}
-              <path d="M 275 65 Q 285 62, 295 65" stroke="#8b5a3c" strokeWidth="3" fill="none" strokeLinecap="round" />
-              <path d="M 305 65 Q 315 62, 325 65" stroke="#8b5a3c" strokeWidth="3" fill="none" strokeLinecap="round" />
+              {/* Nose */}
+              <path d="M 250 100 C 248 105, 248 110, 250 115 C 252 110, 252 105, 250 100" 
+                fill="#fdba74" stroke="#f97316" strokeWidth="0.5" />
               
-              {/* Nose with nostrils */}
-              <ellipse cx="300" cy="85" rx="6" ry="12" fill="#e8d5c4" stroke="#d4b896" strokeWidth="1" />
-              <ellipse cx="297" cy="90" rx="2" ry="3" fill="#d4b896" />
-              <ellipse cx="303" cy="90" rx="2" ry="3" fill="#d4b896" />
-              
-              {/* Mouth with lips */}
-              <ellipse cx="300" cy="100" rx="12" ry="4" fill="#cd919e" stroke="#b8808d" strokeWidth="1" />
-              <path d="M 290 100 Q 300 105, 310 100" stroke="#b8808d" strokeWidth="1" fill="none" />
+              {/* Mouth */}
+              <path d="M 240 120 Q 250 125, 260 120" stroke="#dc2626" strokeWidth="2" fill="none" strokeLinecap="round" />
               
               {/* Ears */}
-              <ellipse cx="245" cy="80" rx="8" ry="15" fill="url(#skinToneGradient)" stroke="#d4b896" strokeWidth="2" />
-              <ellipse cx="355" cy="80" rx="8" ry="15" fill="url(#skinToneGradient)" stroke="#d4b896" strokeWidth="2" />
+              <ellipse cx="195" cy="100" rx="6" ry="12" fill="url(#skinToneGradient)" stroke="#f97316" strokeWidth="1" />
+              <ellipse cx="305" cy="100" rx="6" ry="12" fill="url(#skinToneGradient)" stroke="#f97316" strokeWidth="1" />
               
-              {/* Hair with realistic texture */}
-              <path d="M 245 60 Q 250 35, 280 25 Q 300 20, 320 25 Q 350 35, 355 60 
-                       Q 350 45, 335 35 Q 320 30, 300 30 Q 280 30, 265 35 Q 250 45, 245 60" 
-                fill="#8b5a3c" stroke="#6b4423" strokeWidth="1" />
+              {/* Hair */}
+              <path d="M 200 70 Q 210 45, 240 40 Q 250 35, 260 40 Q 290 45, 300 70 
+                       Q 295 55, 280 50 Q 260 45, 250 45 Q 240 45, 220 50 Q 205 55, 200 70" 
+                fill="#8b4513" stroke="#654321" strokeWidth="0.5" />
               
-              {/* Neck connection */}
-              <rect x="285" y="155" width="30" height="25" rx="15" 
+              {/* Neck */}
+              <path d="M 235 160 Q 250 165, 265 160 L 265 180 Q 250 185, 235 180 Z" 
                 fill="url(#skinToneGradient)" 
-                stroke="#d4b896" 
-                strokeWidth="2" />
+                stroke="#f97316" 
+                strokeWidth="1" />
             </g>
 
-            {/* 2. RESPIRATORY SYSTEM - Anatomically accurate */}
+            {/* 2. CHEST/RESPIRATORY SYSTEM - Natural torso shape */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
@@ -324,91 +278,32 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('respiratory-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Chest cavity */}
-              <path d="M 250 180 
-                       C 240 185, 235 195, 235 210
-                       L 235 320
-                       C 235 335, 245 345, 260 350
-                       L 340 350
-                       C 355 345, 365 335, 365 320
-                       L 365 210
-                       C 365 195, 360 185, 350 180
-                       C 335 175, 320 175, 300 175
-                       C 280 175, 265 175, 250 180 Z"
+              {/* Natural chest/torso */}
+              <path d="M 215 180 
+                       C 205 185, 200 195, 200 210
+                       L 200 300
+                       C 200 315, 210 325, 225 330
+                       L 275 330
+                       C 290 325, 300 315, 300 300
+                       L 300 210
+                       C 300 195, 295 185, 285 180
+                       C 270 175, 255 175, 250 175
+                       C 245 175, 230 175, 215 180 Z"
                 fill={getIntensityColor(getSystemIntensity(['lungs', 'chest', 'throat']))}
                 stroke={getIntensityStroke(getSystemIntensity(['lungs', 'chest', 'throat']))}
-                strokeWidth="3"
-                filter={hoveredPart === 'respiratory-system' ? "url(#hoverHighlight)" : "url(#organDepth)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'respiratory-system' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
-              {/* Realistic lungs with lobes */}
-              <g opacity="0.8">
-                {/* Left lung */}
-                <path d="M 260 200 
-                         C 245 205, 240 220, 240 240
-                         L 240 310
-                         C 240 325, 250 335, 265 340
-                         L 285 340
-                         C 295 335, 300 325, 300 310
-                         L 300 240
-                         C 300 220, 295 205, 285 200
-                         C 275 195, 265 195, 260 200 Z"
-                  fill="url(#lungGradient)"
-                  stroke="#0ea5e9"
-                  strokeWidth="2"
-                  filter="url(#organDepth)"
-                />
-                
-                {/* Right lung */}
-                <path d="M 315 200 
-                         C 305 195, 295 195, 290 200
-                         C 285 205, 280 220, 280 240
-                         L 280 310
-                         C 280 325, 290 335, 305 340
-                         L 335 340
-                         C 350 335, 360 325, 360 310
-                         L 360 240
-                         C 360 220, 355 205, 340 200
-                         C 330 195, 320 195, 315 200 Z"
-                  fill="url(#lungGradient)"
-                  stroke="#0ea5e9"
-                  strokeWidth="2"
-                  filter="url(#organDepth)"
-                />
-                
-                {/* Lung texture/alveoli representation */}
-                <circle cx="270" cy="250" r="3" fill="rgba(14, 165, 233, 0.3)" />
-                <circle cx="280" cy="270" r="2" fill="rgba(14, 165, 233, 0.3)" />
-                <circle cx="265" cy="290" r="2.5" fill="rgba(14, 165, 233, 0.3)" />
-                <circle cx="320" cy="250" r="3" fill="rgba(14, 165, 233, 0.3)" />
-                <circle cx="330" cy="270" r="2" fill="rgba(14, 165, 233, 0.3)" />
-                <circle cx="335" cy="290" r="2.5" fill="rgba(14, 165, 233, 0.3)" />
-              </g>
-              
-              {/* Trachea and bronchi */}
-              <rect x="292" y="160" width="16" height="50" rx="8" 
-                fill="rgba(168, 85, 247, 0.7)"
-                stroke="rgba(147, 51, 234, 0.9)"
-                strokeWidth="2"
-              />
-              
-              {/* Bronchi branches */}
-              <path d="M 300 210 L 280 230" stroke="rgba(147, 51, 234, 0.8)" strokeWidth="4" strokeLinecap="round" />
-              <path d="M 300 210 L 320 230" stroke="rgba(147, 51, 234, 0.8)" strokeWidth="4" strokeLinecap="round" />
-              
-              {/* Ribcage structure */}
-              <g opacity="0.4">
-                <path d="M 250 190 Q 300 180, 350 190" stroke="#8b7355" strokeWidth="2" fill="none" />
-                <path d="M 255 210 Q 300 200, 345 210" stroke="#8b7355" strokeWidth="2" fill="none" />
-                <path d="M 260 230 Q 300 220, 340 230" stroke="#8b7355" strokeWidth="2" fill="none" />
-                <path d="M 265 250 Q 300 240, 335 250" stroke="#8b7355" strokeWidth="2" fill="none" />
-                <path d="M 270 270 Q 300 260, 330 270" stroke="#8b7355" strokeWidth="2" fill="none" />
-                <path d="M 275 290 Q 300 280, 325 290" stroke="#8b7355" strokeWidth="2" fill="none" />
-              </g>
+              {/* Subtle chest definition */}
+              <path d="M 220 200 Q 235 195, 250 200 Q 265 195, 280 200" 
+                stroke="rgba(249, 115, 22, 0.3)" strokeWidth="1" fill="none" />
+              <path d="M 225 220 Q 250 215, 275 220" 
+                stroke="rgba(249, 115, 22, 0.2)" strokeWidth="1" fill="none" />
             </g>
 
-            {/* 3. CARDIOVASCULAR SYSTEM - Realistic heart */}
+            {/* 3. HEART - Anatomically positioned */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-110"
@@ -417,53 +312,20 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('cardiovascular-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Anatomically correct heart shape */}
-              <path d="M 300 230 
-                       C 285 215, 260 215, 260 240 
-                       C 260 265, 300 305, 300 305 
-                       C 300 305, 340 265, 340 240 
-                       C 340 215, 315 215, 300 230 Z"
+              <path d="M 250 220 
+                       C 240 210, 225 210, 225 230 
+                       C 225 250, 250 280, 250 280 
+                       C 250 280, 275 250, 275 230 
+                       C 275 210, 260 210, 250 220 Z"
                 fill={getIntensityColor(getSystemIntensity(['heart']))}
                 stroke={getIntensityStroke(getSystemIntensity(['heart']))}
-                strokeWidth="3"
-                filter={hoveredPart === 'cardiovascular-system' ? "url(#hoverHighlight)" : "url(#organDepth)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'cardiovascular-system' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
-              
-              {/* Heart chambers and structure */}
-              <g opacity="0.7">
-                {/* Left atrium */}
-                <path d="M 285 235 C 275 230, 265 235, 265 250 C 265 265, 285 280, 285 280 L 285 235"
-                  fill="rgba(239, 68, 68, 0.4)" stroke="rgba(220, 38, 38, 0.6)" strokeWidth="1.5" />
-                
-                {/* Right atrium */}
-                <path d="M 315 235 C 325 230, 335 235, 335 250 C 335 265, 315 280, 315 280 L 315 235"
-                  fill="rgba(239, 68, 68, 0.5)" stroke="rgba(220, 38, 38, 0.7)" strokeWidth="1.5" />
-                
-                {/* Ventricles */}
-                <ellipse cx="290" cy="275" rx="15" ry="20" fill="rgba(220, 38, 38, 0.3)" stroke="rgba(185, 28, 28, 0.5)" strokeWidth="1" />
-                <ellipse cx="310" cy="275" rx="15" ry="20" fill="rgba(220, 38, 38, 0.4)" stroke="rgba(185, 28, 28, 0.6)" strokeWidth="1" />
-                
-                {/* Aorta */}
-                <path d="M 300 230 Q 295 220, 290 210" stroke="rgba(220, 38, 38, 0.8)" strokeWidth="6" strokeLinecap="round" />
-                
-                {/* Pulmonary arteries */}
-                <path d="M 305 235 Q 315 225, 325 220" stroke="rgba(59, 130, 246, 0.8)" strokeWidth="4" strokeLinecap="round" />
-                <path d="M 295 235 Q 285 225, 275 220" stroke="rgba(59, 130, 246, 0.8)" strokeWidth="4" strokeLinecap="round" />
-              </g>
-              
-              {/* Heartbeat animation effect */}
-              {hoveredPart === 'cardiovascular-system' && (
-                <circle cx="300" cy="260" r="40" 
-                  fill="none" 
-                  stroke="rgba(239, 68, 68, 0.6)" 
-                  strokeWidth="2" 
-                  className="animate-ping" 
-                />
-              )}
             </g>
 
-            {/* 4. DIGESTIVE SYSTEM - Realistic organs */}
+            {/* 4. ABDOMEN/DIGESTIVE SYSTEM - Natural waist curve */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
@@ -472,66 +334,28 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('digestive-system')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Abdominal cavity */}
-              <path d="M 260 350 
-                       C 250 355, 245 365, 245 380
-                       L 245 460
-                       C 245 475, 255 485, 270 490
-                       L 330 490
-                       C 345 485, 355 475, 355 460
-                       L 355 380
-                       C 355 365, 350 355, 340 350
-                       C 325 345, 310 345, 300 345
-                       C 290 345, 275 345, 260 350 Z"
+              <path d="M 225 330 
+                       C 215 335, 210 345, 210 360
+                       L 210 440
+                       C 210 455, 220 465, 235 470
+                       L 265 470
+                       C 280 465, 290 455, 290 440
+                       L 290 360
+                       C 290 345, 285 335, 275 330
+                       C 260 325, 250 325, 240 330 Z"
                 fill={getIntensityColor(getSystemIntensity(['stomach', 'abdomen', 'intestines']))}
                 stroke={getIntensityStroke(getSystemIntensity(['stomach', 'abdomen', 'intestines']))}
-                strokeWidth="3"
-                filter={hoveredPart === 'digestive-system' ? "url(#hoverHighlight)" : "url(#organDepth)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'digestive-system' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
-              {/* Realistic stomach */}
-              <path d="M 270 365 
-                       C 260 370, 255 380, 260 395
-                       C 265 410, 280 415, 300 415
-                       C 320 415, 335 410, 340 395
-                       C 345 380, 340 370, 330 365
-                       C 320 360, 300 360, 285 360
-                       C 275 360, 270 365, 270 365 Z"
-                fill="url(#digestiveGradient)"
-                stroke="#16a34a"
-                strokeWidth="2"
-                filter="url(#organDepth)"
-              />
-              
-              {/* Liver (partial view) */}
-              <ellipse cx="330" cy="370" rx="20" ry="15" 
-                fill="rgba(133, 77, 14, 0.6)"
-                stroke="rgba(120, 53, 15, 0.8)"
-                strokeWidth="2"
-                filter="url(#organDepth)"
-              />
-              
-              {/* Small intestine coils */}
-              <g opacity="0.8">
-                <path d="M 280 430 Q 300 420, 320 430 Q 330 450, 320 470 Q 300 480, 280 470 Q 270 450, 280 430"
-                  fill="rgba(168, 85, 247, 0.5)"
-                  stroke="rgba(147, 51, 234, 0.7)"
-                  strokeWidth="2"
-                />
-                <path d="M 290 445 Q 300 440, 310 445 Q 315 455, 310 465 Q 300 470, 290 465 Q 285 455, 290 445"
-                  fill="rgba(168, 85, 247, 0.4)"
-                  stroke="rgba(147, 51, 234, 0.6)"
-                  strokeWidth="1.5"
-                />
-                
-                {/* Intestinal texture */}
-                <circle cx="295" cy="450" r="2" fill="rgba(147, 51, 234, 0.3)" />
-                <circle cx="305" cy="460" r="1.5" fill="rgba(147, 51, 234, 0.3)" />
-              </g>
+              {/* Waist definition */}
+              <path d="M 225 350 Q 250 345, 275 350" 
+                stroke="rgba(249, 115, 22, 0.3)" strokeWidth="1" fill="none" />
             </g>
 
-            {/* 5. LEFT ARM - Anatomical Position (Extended) */}
+            {/* 5. LEFT ARM - Natural arm curves */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
@@ -540,79 +364,57 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('left-arm')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Upper arm extended at 45 degrees */}
-              <path d="M 235 190 
-                       C 220 200, 210 215, 200 235
-                       L 180 290
-                       C 175 305, 180 320, 190 330
-                       L 200 335
-                       C 210 340, 220 335, 225 320
-                       L 245 265
-                       C 250 250, 245 235, 235 225
-                       C 235 210, 235 200, 235 190 Z"
+              {/* Upper arm with natural curve */}
+              <path d="M 200 190 
+                       C 180 200, 165 220, 155 245
+                       L 140 295
+                       C 135 310, 140 325, 150 335
+                       L 160 340
+                       C 170 345, 180 340, 185 325
+                       L 200 275
+                       C 205 260, 200 245, 190 235
+                       C 190 220, 190 210, 200 190 Z"
                 fill={getIntensityColor(getSystemIntensity(['left-arm', 'left-shoulder']))}
                 stroke={getIntensityStroke(getSystemIntensity(['left-arm', 'left-shoulder']))}
-                strokeWidth="3"
-                filter={hoveredPart === 'left-arm' ? "url(#hoverHighlight)" : "url(#organDepth)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'left-arm' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
-              {/* Shoulder joint */}
-              <circle cx="240" cy="200" r="18" 
+              {/* Shoulder connection */}
+              <circle cx="205" cy="200" r="12" 
                 fill="url(#skinToneGradient)"
-                stroke="#d4b896"
-                strokeWidth="2"
-                filter="url(#organDepth)"
+                stroke="#f97316"
+                strokeWidth="1"
+                filter="url(#softShadow)"
               />
               
-              {/* Elbow joint */}
-              <ellipse cx="190" cy="330" rx="12" ry="8" 
-                fill="rgba(139, 115, 85, 0.6)" 
-                stroke="rgba(120, 100, 75, 0.8)" 
-                strokeWidth="2" 
-              />
-              
-              {/* Forearm extended */}
-              <path d="M 185 330 
-                       C 175 340, 165 355, 155 375
-                       L 135 430
-                       C 130 445, 135 460, 145 470
-                       L 155 475
-                       C 165 480, 175 475, 180 460
-                       L 200 405
-                       C 205 390, 200 375, 190 365
-                       C 190 350, 190 340, 185 330 Z"
+              {/* Forearm with natural taper */}
+              <path d="M 145 335 
+                       C 130 345, 120 360, 110 380
+                       L 95 430
+                       C 90 445, 95 460, 105 470
+                       L 115 475
+                       C 125 480, 135 475, 140 460
+                       L 155 410
+                       C 160 395, 155 380, 145 370
+                       C 145 355, 145 345, 145 335 Z"
                 fill="url(#skinToneGradient)"
-                stroke="#d4b896"
-                strokeWidth="2"
-                filter="url(#organDepth)"
+                stroke="#f97316"
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
               />
               
-              {/* Realistic hand */}
-              <ellipse cx="142" cy="490" rx="18" ry="25" 
+              {/* Hand */}
+              <ellipse cx="102" cy="490" rx="12" ry="18" 
                 fill={getIntensityColor(getSymptomIntensity('left-hand'))}
                 stroke={getIntensityStroke(getSymptomIntensity('left-hand'))}
-                strokeWidth="2"
-                filter="url(#organDepth)"
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
               />
-              
-              {/* Detailed fingers with joints */}
-              <g opacity="0.9">
-                <rect x="135" y="510" width="3" height="12" rx="1.5" fill="#d4b896" />
-                <rect x="139" y="515" width="3" height="15" rx="1.5" fill="#d4b896" />
-                <rect x="143" y="513" width="3" height="13" rx="1.5" fill="#d4b896" />
-                <rect x="147" y="510" width="3" height="10" rx="1.5" fill="#d4b896" />
-                <rect x="130" y="505" width="3" height="8" rx="1.5" fill="#d4b896" />
-                
-                {/* Finger joints */}
-                <circle cx="136.5" cy="516" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="140.5" cy="521" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="144.5" cy="519" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="148.5" cy="516" r="1" fill="rgba(139, 115, 85, 0.5)" />
-              </g>
             </g>
 
-            {/* 6. RIGHT ARM - Anatomical Position (Extended) */}
+            {/* 6. RIGHT ARM - Mirror of left with natural curves */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
@@ -621,79 +423,53 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('right-arm')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Upper arm extended at 45 degrees */}
-              <path d="M 365 190 
-                       C 380 200, 390 215, 400 235
-                       L 420 290
-                       C 425 305, 420 320, 410 330
-                       L 400 335
-                       C 390 340, 380 335, 375 320
-                       L 355 265
-                       C 350 250, 355 235, 365 225
-                       C 365 210, 365 200, 365 190 Z"
+              <path d="M 300 190 
+                       C 320 200, 335 220, 345 245
+                       L 360 295
+                       C 365 310, 360 325, 350 335
+                       L 340 340
+                       C 330 345, 320 340, 315 325
+                       L 300 275
+                       C 295 260, 300 245, 310 235
+                       C 310 220, 310 210, 300 190 Z"
                 fill={getIntensityColor(getSystemIntensity(['right-arm', 'right-shoulder']))}
                 stroke={getIntensityStroke(getSystemIntensity(['right-arm', 'right-shoulder']))}
-                strokeWidth="3"
-                filter={hoveredPart === 'right-arm' ? "url(#hoverHighlight)" : "url(#organDepth)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'right-arm' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
-              {/* Shoulder joint */}
-              <circle cx="360" cy="200" r="18" 
+              <circle cx="295" cy="200" r="12" 
                 fill="url(#skinToneGradient)"
-                stroke="#d4b896"
-                strokeWidth="2"
-                filter="url(#organDepth)"
+                stroke="#f97316"
+                strokeWidth="1"
+                filter="url(#softShadow)"
               />
               
-              {/* Elbow joint */}
-              <ellipse cx="410" cy="330" rx="12" ry="8" 
-                fill="rgba(139, 115, 85, 0.6)" 
-                stroke="rgba(120, 100, 75, 0.8)" 
-                strokeWidth="2" 
-              />
-              
-              {/* Forearm extended */}
-              <path d="M 415 330 
-                       C 425 340, 435 355, 445 375
-                       L 465 430
-                       C 470 445, 465 460, 455 470
-                       L 445 475
-                       C 435 480, 425 475, 420 460
-                       L 400 405
-                       C 395 390, 400 375, 410 365
-                       C 410 350, 410 340, 415 330 Z"
+              <path d="M 355 335 
+                       C 370 345, 380 360, 390 380
+                       L 405 430
+                       C 410 445, 405 460, 395 470
+                       L 385 475
+                       C 375 480, 365 475, 360 460
+                       L 345 410
+                       C 340 395, 345 380, 355 370
+                       C 355 355, 355 345, 355 335 Z"
                 fill="url(#skinToneGradient)"
-                stroke="#d4b896"
-                strokeWidth="2"
-                filter="url(#organDepth)"
+                stroke="#f97316"
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
               />
               
-              {/* Hand */}
-              <ellipse cx="458" cy="490" rx="18" ry="25" 
+              <ellipse cx="398" cy="490" rx="12" ry="18" 
                 fill={getIntensityColor(getSymptomIntensity('right-hand'))}
                 stroke={getIntensityStroke(getSymptomIntensity('right-hand'))}
-                strokeWidth="2"
-                filter="url(#organDepth)"
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
               />
-              
-              {/* Fingers */}
-              <g opacity="0.9">
-                <rect x="462" y="510" width="3" height="12" rx="1.5" fill="#d4b896" />
-                <rect x="458" y="515" width="3" height="15" rx="1.5" fill="#d4b896" />
-                <rect x="454" y="513" width="3" height="13" rx="1.5" fill="#d4b896" />
-                <rect x="450" y="510" width="3" height="10" rx="1.5" fill="#d4b896" />
-                <rect x="467" y="505" width="3" height="8" rx="1.5" fill="#d4b896" />
-                
-                {/* Finger joints */}
-                <circle cx="463.5" cy="516" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="459.5" cy="521" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="455.5" cy="519" r="1" fill="rgba(139, 115, 85, 0.5)" />
-                <circle cx="451.5" cy="516" r="1" fill="rgba(139, 115, 85, 0.5)" />
-              </g>
             </g>
 
-            {/* 7. LEFT LEG - Realistic anatomy */}
+            {/* 7. LEFT LEG - Natural leg proportions */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
@@ -702,77 +478,56 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('left-leg')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Thigh */}
-              <path d="M 270 490 
-                       C 265 495, 260 505, 260 520
-                       L 260 580
-                       C 260 595, 265 605, 275 610
-                       L 285 610
-                       C 295 605, 300 595, 300 580
-                       L 300 520
-                       C 300 505, 295 495, 285 490
-                       C 280 485, 275 485, 270 490 Z"
+              {/* Thigh with natural curve */}
+              <path d="M 235 470 
+                       C 230 475, 225 485, 225 500
+                       L 225 560
+                       C 225 575, 230 585, 240 590
+                       L 250 590
+                       C 260 585, 265 575, 265 560
+                       L 265 500
+                       C 265 485, 260 475, 250 470
+                       C 245 465, 240 465, 235 470 Z"
                 fill={getIntensityColor(getSystemIntensity(['left-leg', 'left-knee']))}
                 stroke={getIntensityStroke(getSystemIntensity(['left-leg', 'left-knee']))}
-                strokeWidth="3"
-                filter={hoveredPart === 'left-leg' ? "url(#hoverHighlight)" : "url(#organDepth)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'left-leg' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
-              {/* Knee joint with patella */}
-              <ellipse cx="280" cy="610" rx="15" ry="10" 
-                fill="rgba(139, 115, 85, 0.6)" 
-                stroke="rgba(120, 100, 75, 0.8)" 
-                strokeWidth="2" 
-              />
-              <ellipse cx="280" cy="608" rx="8" ry="6" 
-                fill="rgba(160, 135, 105, 0.8)" 
-                stroke="rgba(139, 115, 85, 0.9)" 
+              {/* Knee */}
+              <ellipse cx="245" cy="590" rx="10" ry="8" 
+                fill="rgba(249, 115, 22, 0.6)" 
+                stroke="rgba(234, 88, 12, 0.8)" 
                 strokeWidth="1" 
               />
               
-              {/* Shin/calf */}
-              <path d="M 275 620 
-                       C 270 625, 265 635, 265 650
-                       L 265 680
-                       C 265 695, 270 705, 280 710
-                       L 290 710
-                       C 300 705, 305 695, 305 680
-                       L 305 650
-                       C 305 635, 300 625, 290 620
-                       C 285 615, 280 615, 275 620 Z"
+              {/* Calf with natural taper */}
+              <path d="M 240 600 
+                       C 235 605, 230 615, 230 630
+                       L 230 660
+                       C 230 675, 235 685, 245 690
+                       L 255 690
+                       C 265 685, 270 675, 270 660
+                       L 270 630
+                       C 270 615, 265 605, 255 600
+                       C 250 595, 245 595, 240 600 Z"
                 fill="url(#skinToneGradient)"
-                stroke="#d4b896"
-                strokeWidth="2"
-                filter="url(#organDepth)"
+                stroke="#f97316"
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
               />
               
-              {/* Ankle */}
-              <ellipse cx="282" cy="710" rx="10" ry="6" 
-                fill="rgba(139, 115, 85, 0.5)" 
-                stroke="rgba(120, 100, 75, 0.7)" 
-                strokeWidth="2" 
-              />
-              
-              {/* Realistic foot */}
-              <ellipse cx="282" cy="730" rx="15" ry="28" 
+              {/* Foot */}
+              <ellipse cx="247" cy="710" rx="10" ry="20" 
                 fill={getIntensityColor(getSymptomIntensity('left-foot'))}
                 stroke={getIntensityStroke(getSymptomIntensity('left-foot'))}
-                strokeWidth="2"
-                filter="url(#organDepth)"
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
               />
-              
-              {/* Toes */}
-              <g opacity="0.8">
-                <ellipse cx="282" cy="755" rx="3" ry="6" fill="#d4b896" />
-                <ellipse cx="278" cy="752" rx="2.5" ry="5" fill="#d4b896" />
-                <ellipse cx="286" cy="752" rx="2.5" ry="5" fill="#d4b896" />
-                <ellipse cx="274" cy="748" rx="2" ry="4" fill="#d4b896" />
-                <ellipse cx="290" cy="748" rx="2" ry="4" fill="#d4b896" />
-              </g>
             </g>
 
-            {/* 8. RIGHT LEG - Mirror of left leg */}
+            {/* 8. RIGHT LEG - Mirror with natural proportions */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
@@ -781,121 +536,103 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('right-leg')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              {/* Thigh */}
-              <path d="M 330 490 
-                       C 335 495, 340 505, 340 520
-                       L 340 580
-                       C 340 595, 335 605, 325 610
-                       L 315 610
-                       C 305 605, 300 595, 300 580
-                       L 300 520
-                       C 300 505, 305 495, 315 490
-                       C 320 485, 325 485, 330 490 Z"
+              <path d="M 265 470 
+                       C 270 475, 275 485, 275 500
+                       L 275 560
+                       C 275 575, 270 585, 260 590
+                       L 250 590
+                       C 240 585, 235 575, 235 560
+                       L 235 500
+                       C 235 485, 240 475, 250 470
+                       C 255 465, 260 465, 265 470 Z"
                 fill={getIntensityColor(getSystemIntensity(['right-leg', 'right-knee']))}
                 stroke={getIntensityStroke(getSystemIntensity(['right-leg', 'right-knee']))}
-                strokeWidth="3"
-                filter={hoveredPart === 'right-leg' ? "url(#hoverHighlight)" : "url(#organDepth)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'right-leg' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
-              {/* Knee joint */}
-              <ellipse cx="320" cy="610" rx="15" ry="10" 
-                fill="rgba(139, 115, 85, 0.6)" 
-                stroke="rgba(120, 100, 75, 0.8)" 
-                strokeWidth="2" 
-              />
-              <ellipse cx="320" cy="608" rx="8" ry="6" 
-                fill="rgba(160, 135, 105, 0.8)" 
-                stroke="rgba(139, 115, 85, 0.9)" 
+              <ellipse cx="255" cy="590" rx="10" ry="8" 
+                fill="rgba(249, 115, 22, 0.6)" 
+                stroke="rgba(234, 88, 12, 0.8)" 
                 strokeWidth="1" 
               />
               
-              {/* Shin/calf */}
-              <path d="M 325 620 
-                       C 330 625, 335 635, 335 650
-                       L 335 680
-                       C 335 695, 330 705, 320 710
-                       L 310 710
-                       C 300 705, 295 695, 295 680
-                       L 295 650
-                       C 295 635, 300 625, 310 620
-                       C 315 615, 320 615, 325 620 Z"
+              <path d="M 260 600 
+                       C 265 605, 270 615, 270 630
+                       L 270 660
+                       C 270 675, 265 685, 255 690
+                       L 245 690
+                       C 235 685, 230 675, 230 660
+                       L 230 630
+                       C 230 615, 235 605, 245 600
+                       C 250 595, 255 595, 260 600 Z"
                 fill="url(#skinToneGradient)"
-                stroke="#d4b896"
-                strokeWidth="2"
-                filter="url(#organDepth)"
+                stroke="#f97316"
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
               />
               
-              {/* Ankle */}
-              <ellipse cx="318" cy="710" rx="10" ry="6" 
-                fill="rgba(139, 115, 85, 0.5)" 
-                stroke="rgba(120, 100, 75, 0.7)" 
-                strokeWidth="2" 
-              />
-              
-              {/* Foot */}
-              <ellipse cx="318" cy="730" rx="15" ry="28" 
+              <ellipse cx="253" cy="710" rx="10" ry="20" 
                 fill={getIntensityColor(getSymptomIntensity('right-foot'))}
                 stroke={getIntensityStroke(getSymptomIntensity('right-foot'))}
-                strokeWidth="2"
-                filter="url(#organDepth)"
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
               />
-              
-              {/* Toes */}
-              <g opacity="0.8">
-                <ellipse cx="318" cy="755" rx="3" ry="6" fill="#d4b896" />
-                <ellipse cx="322" cy="752" rx="2.5" ry="5" fill="#d4b896" />
-                <ellipse cx="314" cy="752" rx="2.5" ry="5" fill="#d4b896" />
-                <ellipse cx="326" cy="748" rx="2" ry="4" fill="#d4b896" />
-                <ellipse cx="310" cy="748" rx="2" ry="4" fill="#d4b896" />
-              </g>
             </g>
 
           </>
         ) : (
-          // BACK VIEW - Enhanced with anatomical position
+          // BACK VIEW - Enhanced with natural curves
           <>
-            {/* Anatomical Position Back Body Outline */}
-            <path d="M 300 50 
-                     C 330 50, 350 70, 360 95
-                     C 365 110, 365 125, 360 140
-                     C 355 155, 345 165, 335 175
-                     L 330 190
-                     C 325 200, 320 210, 315 220
-                     L 310 240
-                     C 305 260, 300 280, 295 300
-                     L 290 350
-                     C 285 380, 280 410, 275 440
-                     L 270 480
-                     C 265 520, 260 560, 255 600
-                     L 250 640
-                     C 245 660, 240 680, 235 700
-                     L 365 700
-                     C 360 680, 355 660, 350 640
-                     L 345 600
-                     C 340 560, 335 520, 330 480
-                     L 325 440
-                     C 320 410, 315 380, 310 350
-                     L 305 300
-                     C 300 280, 295 260, 290 240
-                     L 285 220
-                     C 280 210, 275 200, 270 190
-                     L 265 175
-                     C 255 165, 245 155, 240 140
-                     C 235 125, 235 110, 240 95
-                     C 250 70, 270 50, 300 50 Z"
+            {/* Natural back body outline */}
+            <path d="M 250 40 
+                     C 275 40, 295 50, 310 70
+                     C 320 85, 320 100, 315 115
+                     C 310 130, 300 140, 290 150
+                     L 285 165
+                     C 280 175, 275 185, 270 195
+                     L 265 215
+                     C 260 235, 255 255, 250 275
+                     L 245 325
+                     C 240 355, 235 385, 230 415
+                     L 225 455
+                     C 220 495, 215 535, 210 575
+                     L 205 615
+                     C 200 635, 195 655, 190 675
+                     L 310 675
+                     C 305 655, 300 635, 295 615
+                     L 290 575
+                     C 285 535, 280 495, 275 455
+                     L 270 415
+                     C 265 385, 260 355, 255 325
+                     L 250 275
+                     C 245 255, 240 235, 235 215
+                     L 230 195
+                     C 225 185, 220 175, 215 165
+                     L 210 150
+                     C 200 140, 190 130, 185 115
+                     C 180 100, 180 85, 190 70
+                     C 205 50, 225 40, 250 40 Z"
               fill="url(#skinToneGradient)" 
-              stroke="#8b7355" 
-              strokeWidth="2"
-              filter="url(#anatomicalShadow)"
+              stroke="#d97706" 
+              strokeWidth="1.5"
+              filter="url(#softShadow)"
             />
 
             {/* BACK OF HEAD */}
-            <ellipse cx="300" cy="85" rx="60" ry="75" 
+            <path d="M 250 45
+                     C 280 45, 305 60, 315 85
+                     C 320 100, 320 115, 315 130
+                     C 310 145, 300 155, 285 160
+                     C 270 165, 250 165, 230 160
+                     C 215 155, 205 145, 200 130
+                     C 195 115, 195 100, 200 85
+                     C 210 60, 235 45, 250 45 Z"
               fill={getIntensityColor(getSymptomIntensity('head'))}
               stroke={getIntensityStroke(getSymptomIntensity('head'))}
-              strokeWidth="3"
-              filter={hoveredPart === 'head' ? "url(#hoverHighlight)" : "url(#organDepth)"}
+              strokeWidth="2"
+              filter={hoveredPart === 'head' ? "url(#hoverGlow)" : "url(#softShadow)"}
               className={cn("transition-all duration-300", !readOnly && "cursor-pointer")}
               onClick={(e) => !readOnly && handleBodyPartClick('head', 'Back of Head', e)}
               onMouseEnter={() => setHoveredPart('head')}
@@ -903,11 +640,11 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
             />
 
             {/* Hair back view */}
-            <path d="M 245 60 Q 250 35, 280 25 Q 300 20, 320 25 Q 350 35, 355 60 
-                     Q 350 45, 335 35 Q 320 30, 300 30 Q 280 30, 265 35 Q 250 45, 245 60" 
-              fill="#8b5a3c" stroke="#6b4423" strokeWidth="1" />
+            <path d="M 200 70 Q 210 45, 240 40 Q 250 35, 260 40 Q 290 45, 300 70 
+                     Q 295 55, 280 50 Q 260 45, 250 45 Q 240 45, 220 50 Q 205 55, 200 70" 
+              fill="#8b4513" stroke="#654321" strokeWidth="0.5" />
 
-            {/* BACK & SPINE - Enhanced anatomical detail */}
+            {/* BACK & SPINE - Natural back contours */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
@@ -916,151 +653,111 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                onMouseEnter={() => setHoveredPart('back')}
                onMouseLeave={() => setHoveredPart(null)}>
               
-              <path d="M 250 180 
-                       C 240 185, 235 195, 235 210
-                       L 235 480
-                       C 235 495, 245 505, 260 510
-                       L 340 510
-                       C 355 505, 365 495, 365 480
-                       L 365 210
-                       C 365 195, 360 185, 350 180
-                       C 335 175, 320 175, 300 175
-                       C 280 175, 265 175, 250 180 Z"
+              <path d="M 215 180 
+                       C 205 185, 200 195, 200 210
+                       L 200 460
+                       C 200 475, 210 485, 225 490
+                       L 275 490
+                       C 290 485, 300 475, 300 460
+                       L 300 210
+                       C 300 195, 295 185, 285 180
+                       C 270 175, 255 175, 250 175
+                       C 245 175, 230 175, 215 180 Z"
                 fill={getIntensityColor(getSymptomIntensity('back'))}
                 stroke={getIntensityStroke(getSymptomIntensity('back'))}
-                strokeWidth="3"
-                filter={hoveredPart === 'back' ? "url(#hoverHighlight)" : "url(#organDepth)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'back' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
-              {/* Detailed spine with realistic curvature */}
-              <path d="M 300 190 
-                       Q 298 220, 300 250
-                       Q 302 280, 300 310
-                       Q 298 340, 300 370
-                       Q 302 400, 300 430
-                       Q 298 460, 300 490"
-                stroke="rgba(139, 115, 85, 0.9)" 
-                strokeWidth="6"
+              {/* Natural spine curve */}
+              <path d="M 250 190 
+                       Q 248 220, 250 250
+                       Q 252 280, 250 310
+                       Q 248 340, 250 370
+                       Q 252 400, 250 430
+                       Q 248 460, 250 480"
+                stroke="rgba(234, 88, 12, 0.8)" 
+                strokeWidth="3"
                 strokeLinecap="round"
                 fill="none"
               />
               
-              {/* Individual vertebrae with realistic spacing */}
-              {[200, 215, 230, 245, 260, 275, 290, 305, 320, 335, 350, 365, 380, 395, 410, 425, 440, 455, 470, 485].map((y, i) => (
-                <ellipse key={i} cx="300" cy={y} rx="5" ry="3" 
-                  fill="rgba(139, 115, 85, 0.8)" 
-                  stroke="rgba(120, 100, 75, 0.9)" 
-                  strokeWidth="1"
-                />
-              ))}
-              
-              {/* Realistic shoulder blade anatomy */}
-              <path d="M 260 220 
-                       C 250 225, 245 235, 245 250
-                       L 245 290
-                       C 245 305, 250 315, 260 320
-                       L 280 320
-                       C 290 315, 295 305, 295 290
-                       L 295 250
-                       C 295 235, 290 225, 280 220
-                       C 270 215, 270 215, 260 220 Z"
-                fill="rgba(139, 115, 85, 0.4)" 
-                stroke="rgba(120, 100, 75, 0.6)" 
-                strokeWidth="2"
-                transform="rotate(-10 272.5 270)"
-              />
-              
-              <path d="M 320 220 
-                       C 330 225, 335 235, 335 250
-                       L 335 290
-                       C 335 305, 330 315, 320 320
-                       L 300 320
-                       C 290 315, 285 305, 285 290
-                       L 285 250
-                       C 285 235, 290 225, 300 220
-                       C 310 215, 310 215, 320 220 Z"
-                fill="rgba(139, 115, 85, 0.4)" 
-                stroke="rgba(120, 100, 75, 0.6)" 
-                strokeWidth="2"
-                transform="rotate(10 310 270)"
-              />
-              
-              {/* Muscle definition lines */}
-              <path d="M 270 240 Q 300 235, 330 240" stroke="rgba(139, 115, 85, 0.3)" strokeWidth="1" fill="none" />
-              <path d="M 275 280 Q 300 275, 325 280" stroke="rgba(139, 115, 85, 0.3)" strokeWidth="1" fill="none" />
-              <path d="M 280 320 Q 300 315, 320 320" stroke="rgba(139, 115, 85, 0.3)" strokeWidth="1" fill="none" />
+              {/* Shoulder blade definition */}
+              <path d="M 220 220 Q 235 215, 245 225 Q 240 240, 225 245 Q 215 235, 220 220" 
+                fill="rgba(249, 115, 22, 0.3)" stroke="rgba(234, 88, 12, 0.4)" strokeWidth="1" />
+              <path d="M 280 220 Q 265 215, 255 225 Q 260 240, 275 245 Q 285 235, 280 220" 
+                fill="rgba(249, 115, 22, 0.3)" stroke="rgba(234, 88, 12, 0.4)" strokeWidth="1" />
             </g>
 
-            {/* BACK ARMS - Anatomical Position */}
-            <path d="M 235 190 
-                     C 220 200, 210 215, 200 235
-                     L 180 290
-                     C 175 305, 180 320, 190 330
-                     L 200 335
-                     C 210 340, 220 335, 225 320
-                     L 245 265
-                     C 250 250, 245 235, 235 225
-                     C 235 210, 235 200, 235 190 Z"
+            {/* BACK ARMS - Natural positioning */}
+            <path d="M 200 190 
+                     C 180 200, 165 220, 155 245
+                     L 140 295
+                     C 135 310, 140 325, 150 335
+                     L 160 340
+                     C 170 345, 180 340, 185 325
+                     L 200 275
+                     C 205 260, 200 245, 190 235
+                     C 190 220, 190 210, 200 190 Z"
               fill={getIntensityColor(getSymptomIntensity('left-arm'))}
               stroke={getIntensityStroke(getSymptomIntensity('left-arm'))}
-              strokeWidth="3"
+              strokeWidth="2"
               className={cn("transition-all duration-300", !readOnly && "cursor-pointer")}
               onClick={(e) => !readOnly && handleBodyPartClick('left-arm', 'Left Arm (Back)', e)}
-              filter="url(#organDepth)"
+              filter="url(#softShadow)"
             />
             
-            <path d="M 365 190 
-                     C 380 200, 390 215, 400 235
-                     L 420 290
-                     C 425 305, 420 320, 410 330
-                     L 400 335
-                     C 390 340, 380 335, 375 320
-                     L 355 265
-                     C 350 250, 355 235, 365 225
-                     C 365 210, 365 200, 365 190 Z"
+            <path d="M 300 190 
+                     C 320 200, 335 220, 345 245
+                     L 360 295
+                     C 365 310, 360 325, 350 335
+                     L 340 340
+                     C 330 345, 320 340, 315 325
+                     L 300 275
+                     C 295 260, 300 245, 310 235
+                     C 310 220, 310 210, 300 190 Z"
               fill={getIntensityColor(getSymptomIntensity('right-arm'))}
               stroke={getIntensityStroke(getSymptomIntensity('right-arm'))}
-              strokeWidth="3"
+              strokeWidth="2"
               className={cn("transition-all duration-300", !readOnly && "cursor-pointer")}
               onClick={(e) => !readOnly && handleBodyPartClick('right-arm', 'Right Arm (Back)', e)}
-              filter="url(#organDepth)"
+              filter="url(#softShadow)"
             />
 
-            {/* BACK LEGS - Enhanced */}
-            <path d="M 270 510 
-                     C 265 515, 260 525, 260 540
-                     L 260 680
-                     C 260 695, 265 705, 275 710
-                     L 285 710
-                     C 295 705, 300 695, 300 680
-                     L 300 540
-                     C 300 525, 295 515, 285 510
-                     C 280 505, 275 505, 270 510 Z"
+            {/* BACK LEGS - Natural proportions */}
+            <path d="M 235 490 
+                     C 230 495, 225 505, 225 520
+                     L 225 660
+                     C 225 675, 230 685, 240 690
+                     L 250 690
+                     C 260 685, 265 675, 265 660
+                     L 265 520
+                     C 265 505, 260 495, 250 490
+                     C 245 485, 240 485, 235 490 Z"
               fill={getIntensityColor(getSymptomIntensity('left-leg'))}
               stroke={getIntensityStroke(getSymptomIntensity('left-leg'))}
-              strokeWidth="3"
+              strokeWidth="2"
               className={cn("transition-all duration-300", !readOnly && "cursor-pointer")}
               onClick={(e) => !readOnly && handleBodyPartClick('left-leg', 'Left Leg (Back)', e)}
-              filter="url(#organDepth)"
+              filter="url(#softShadow)"
             />
             
-            <path d="M 330 510 
-                     C 335 515, 340 525, 340 540
-                     L 340 680
-                     C 340 695, 335 705, 325 710
-                     L 315 710
-                     C 305 705, 300 695, 300 680
-                     
-                     L 300 540
-                     C 300 525, 305 515, 315 510
-                     C 320 505, 325 505, 330 510 Z"
+            <path d="M 265 490 
+                     C 270 495, 275 505, 275 520
+                     L 275 660
+                     C 275 675, 270 685, 260 690
+                     L 250 690
+                     C 240 685, 235 675, 235 660
+                     L 235 520
+                     C 235 505, 240 495, 250 490
+                     C 255 485, 260 485, 265 490 Z"
               fill={getIntensityColor(getSymptomIntensity('right-leg'))}
               stroke={getIntensityStroke(getSymptomIntensity('right-leg'))}
-              strokeWidth="3"
+              strokeWidth="2"
               className={cn("transition-all duration-300", !readOnly && "cursor-pointer")}
               onClick={(e) => !readOnly && handleBodyPartClick('right-leg', 'Right Leg (Back)', e)}
-              filter="url(#organDepth)"
+              filter="url(#softShadow)"
             />
           </>
         )}
