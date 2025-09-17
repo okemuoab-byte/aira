@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Pill, Clock, AlertCircle, Camera, Star } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Plus, Pill, Clock, AlertCircle, Camera, Star, Shield, Phone, AlertTriangle, Info, Zap } from 'lucide-react';
 import { Medication } from '@/types/health';
 import { cn } from '@/lib/utils';
 import { showSuccess } from '@/utils/toast';
@@ -17,6 +18,45 @@ interface MedicationTrackerProps {
   className?: string;
 }
 
+// Common drug interactions and safety information database
+const DRUG_SAFETY_INFO: Record<string, {
+  commonInteractions: string[];
+  foodInteractions: string[];
+  sideEffects: string[];
+  emergencySignsImmediate: string[];
+  emergencySignsUrgent: string[];
+  contraindications: string[];
+  specialWarnings: string[];
+}> = {
+  'metformin': {
+    commonInteractions: ['Alcohol (increases lactic acidosis risk)', 'Contrast dyes (kidney damage)', 'Diuretics', 'Corticosteroids'],
+    foodInteractions: ['Limit alcohol consumption', 'Take with food to reduce stomach upset'],
+    sideEffects: ['Nausea', 'Diarrhea', 'Stomach upset', 'Metallic taste', 'Vitamin B12 deficiency (long-term)'],
+    emergencySignsImmediate: ['Severe stomach pain', 'Muscle pain/weakness', 'Trouble breathing', 'Unusual drowsiness', 'Cold/blue skin'],
+    emergencySignsUrgent: ['Persistent vomiting', 'Severe diarrhea', 'Signs of dehydration', 'Unusual fatigue'],
+    contraindications: ['Kidney disease', 'Liver disease', 'Heart failure', 'Recent heart attack'],
+    specialWarnings: ['Stop before surgery or medical procedures', 'Monitor kidney function regularly']
+  },
+  'lisinopril': {
+    commonInteractions: ['NSAIDs (ibuprofen, naproxen)', 'Potassium supplements', 'Diuretics', 'Lithium'],
+    foodInteractions: ['Avoid salt substitutes with potassium', 'Limit alcohol'],
+    sideEffects: ['Dry cough', 'Dizziness', 'Headache', 'Fatigue', 'Nausea'],
+    emergencySignsImmediate: ['Swelling of face/lips/tongue/throat', 'Difficulty breathing', 'Severe dizziness/fainting', 'Chest pain'],
+    emergencySignsUrgent: ['Persistent dry cough', 'Signs of high potassium (muscle weakness)', 'Kidney problems (decreased urination)'],
+    contraindications: ['Pregnancy', 'History of angioedema', 'Bilateral renal artery stenosis'],
+    specialWarnings: ['Can cause birth defects - notify doctor if pregnant', 'Monitor blood pressure regularly']
+  },
+  'warfarin': {
+    commonInteractions: ['Aspirin', 'NSAIDs', 'Antibiotics', 'Antifungals', 'Many herbal supplements'],
+    foodInteractions: ['Consistent vitamin K intake (leafy greens)', 'Limit alcohol', 'Avoid cranberry juice'],
+    sideEffects: ['Easy bruising', 'Bleeding gums', 'Nosebleeds', 'Heavy menstrual periods'],
+    emergencySignsImmediate: ['Severe bleeding', 'Blood in urine/stool', 'Coughing up blood', 'Severe headache', 'Vision changes'],
+    emergencySignsUrgent: ['Unusual bruising', 'Prolonged bleeding from cuts', 'Black/tarry stools', 'Pink/red urine'],
+    contraindications: ['Active bleeding', 'Severe liver disease', 'Recent surgery', 'Pregnancy'],
+    specialWarnings: ['Regular INR monitoring required', 'Carry medical alert card', 'Inform all healthcare providers']
+  }
+};
+
 const MedicationTracker: React.FC<MedicationTrackerProps> = ({
   medications,
   onMedicationAdd,
@@ -25,6 +65,7 @@ const MedicationTracker: React.FC<MedicationTrackerProps> = ({
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingMed, setEditingMed] = useState<string | null>(null);
+  const [selectedMedForSafety, setSelectedMedForSafety] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     dosage: '',
@@ -176,6 +217,188 @@ const MedicationTracker: React.FC<MedicationTrackerProps> = ({
     const tomorrowStr = tomorrow.toDateString();
     const firstDose = new Date(`${tomorrowStr} ${medication.times[0]}`);
     return `Tomorrow ${firstDose.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  };
+
+  const getSafetyInfo = (medicationName: string) => {
+    const drugName = medicationName.toLowerCase();
+    for (const [key, info] of Object.entries(DRUG_SAFETY_INFO)) {
+      if (drugName.includes(key)) {
+        return info;
+      }
+    }
+    return null;
+  };
+
+  const renderSafetyInformation = (medication: Medication) => {
+    const safetyInfo = getSafetyInfo(medication.name);
+    
+    return (
+      <div className="space-y-6">
+        {/* Emergency Warning - Always show */}
+        <Alert className="border-red-500 bg-red-50">
+          <AlertTriangle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            <div className="font-semibold mb-2">🚨 EMERGENCY - Call 911 or go to ER immediately if you experience:</div>
+            <ul className="list-disc list-inside space-y-1 text-sm">
+              <li>Severe allergic reaction (difficulty breathing, swelling of face/throat)</li>
+              <li>Chest pain or heart problems</li>
+              <li>Severe bleeding that won't stop</li>
+              <li>Loss of consciousness or severe confusion</li>
+              <li>Signs of overdose or poisoning</li>
+            </ul>
+          </AlertDescription>
+        </Alert>
+
+        {/* Contact Healthcare Provider */}
+        <Alert className="border-orange-500 bg-orange-50">
+          <Phone className="h-4 w-4 text-orange-600" />
+          <AlertDescription className="text-orange-800">
+            <div className="font-semibold mb-2">📞 Contact your healthcare provider if you experience:</div>
+            <ul className="list-disc list-inside space-y-1 text-sm">
+              <li>New or worsening side effects</li>
+              <li>Signs of infection (fever, chills)</li>
+              <li>Unusual symptoms or changes in health</li>
+              <li>Questions about your medication</li>
+            </ul>
+          </AlertDescription>
+        </Alert>
+
+        {safetyInfo ? (
+          <>
+            {/* Drug Interactions */}
+            <Card className="border-yellow-300 bg-yellow-50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center text-yellow-800">
+                  <Zap className="h-5 w-5 mr-2" />
+                  Drug Interactions to Avoid
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-yellow-800 mb-2">⚠️ Do NOT take with:</h4>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-yellow-700">
+                    {safetyInfo.commonInteractions.map((interaction, index) => (
+                      <li key={index}>{interaction}</li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-yellow-800 mb-2">🍽️ Food & Drink Interactions:</h4>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-yellow-700">
+                    {safetyInfo.foodInteractions.map((interaction, index) => (
+                      <li key={index}>{interaction}</li>
+                    ))}
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Emergency Signs - Medication Specific */}
+            <Card className="border-red-400 bg-red-50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center text-red-800">
+                  <AlertTriangle className="h-5 w-5 mr-2" />
+                  Emergency Warning Signs for {medication.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-red-800 mb-2">🚨 IMMEDIATE EMERGENCY (Call 911):</h4>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-red-700">
+                    {safetyInfo.emergencySignsImmediate.map((sign, index) => (
+                      <li key={index}>{sign}</li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-red-800 mb-2">⚠️ URGENT (Contact doctor immediately):</h4>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-red-700">
+                    {safetyInfo.emergencySignsUrgent.map((sign, index) => (
+                      <li key={index}>{sign}</li>
+                    ))}
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Side Effects */}
+            <Card className="border-blue-300 bg-blue-50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center text-blue-800">
+                  <Info className="h-5 w-5 mr-2" />
+                  Common Side Effects
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-blue-700 mb-3">These are usually mild and may improve over time:</p>
+                <ul className="list-disc list-inside space-y-1 text-sm text-blue-700">
+                  {safetyInfo.sideEffects.map((effect, index) => (
+                    <li key={index}>{effect}</li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Contraindications */}
+            <Card className="border-purple-300 bg-purple-50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center text-purple-800">
+                  <Shield className="h-5 w-5 mr-2" />
+                  Important Warnings & Contraindications
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-purple-800 mb-2">🚫 Do NOT use if you have:</h4>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-purple-700">
+                    {safetyInfo.contraindications.map((condition, index) => (
+                      <li key={index}>{condition}</li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-purple-800 mb-2">⚠️ Special Warnings:</h4>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-purple-700">
+                    {safetyInfo.specialWarnings.map((warning, index) => (
+                      <li key={index}>{warning}</li>
+                    ))}
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        ) : (
+          <Card className="border-gray-300 bg-gray-50">
+            <CardContent className="p-6 text-center">
+              <Info className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-600 mb-4">
+                Specific safety information for "{medication.name}" is not available in our database.
+              </p>
+              <Alert className="border-blue-500 bg-blue-50">
+                <AlertCircle className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-800">
+                  <strong>Important:</strong> Always consult your pharmacist or healthcare provider for complete 
+                  safety information, drug interactions, and proper usage instructions for this medication.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* General Disclaimer */}
+        <Alert className="border-gray-400 bg-gray-50">
+          <Info className="h-4 w-4 text-gray-600" />
+          <AlertDescription className="text-gray-700">
+            <strong>Medical Disclaimer:</strong> This information is for educational purposes only and does not 
+            replace professional medical advice. Always consult your healthcare provider or pharmacist for 
+            complete medication information, proper dosing, and personalized medical advice.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   };
 
   const activeMedications = medications.filter(med => 
@@ -333,6 +556,31 @@ const MedicationTracker: React.FC<MedicationTrackerProps> = ({
         </Card>
       )}
 
+      {/* Safety Information Modal */}
+      {selectedMedForSafety && (
+        <Card className="border-red-300 bg-red-50">
+          <CardHeader className="bg-red-100 border-b border-red-200">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl flex items-center text-red-800">
+                <Shield className="h-6 w-6 mr-2" />
+                Safety Information: {medications.find(m => m.id === selectedMedForSafety)?.name}
+              </CardTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setSelectedMedForSafety(null)}
+                className="text-red-600 hover:text-red-800"
+              >
+                ✕
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            {renderSafetyInformation(medications.find(m => m.id === selectedMedForSafety)!)}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Medications List */}
       <Tabs defaultValue="active" className="space-y-4">
         <TabsList>
@@ -425,17 +673,11 @@ const MedicationTracker: React.FC<MedicationTrackerProps> = ({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                          const effectiveness = prompt('Rate effectiveness (1-10):');
-                          if (effectiveness) {
-                            onMedicationUpdate(medication.id, { 
-                              effectiveness: parseInt(effectiveness) 
-                            });
-                          }
-                        }}
-                        className="flex-1"
+                        onClick={() => setSelectedMedForSafety(medication.id)}
+                        className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 border-red-200"
                       >
-                        Rate
+                        <Shield className="h-4 w-4 mr-1" />
+                        Safety Info
                       </Button>
                     </div>
                   </CardContent>
@@ -467,12 +709,22 @@ const MedicationTracker: React.FC<MedicationTrackerProps> = ({
                           Ended: {medication.endDate?.toLocaleDateString()}
                         </p>
                       </div>
-                      {medication.effectiveness && (
-                        <div className="flex items-center space-x-1">
-                          <Star className="h-4 w-4 text-yellow-500" />
-                          <span className="text-sm">{medication.effectiveness}/10</span>
-                        </div>
-                      )}
+                      <div className="flex items-center space-x-2">
+                        {medication.effectiveness && (
+                          <div className="flex items-center space-x-1">
+                            <Star className="h-4 w-4 text-yellow-500" />
+                            <span className="text-sm">{medication.effectiveness}/10</span>
+                          </div>
+                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedMedForSafety(medication.id)}
+                          className="bg-red-50 hover:bg-red-100 text-red-700 border-red-200"
+                        >
+                          <Shield className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
