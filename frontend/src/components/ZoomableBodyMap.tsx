@@ -20,6 +20,13 @@ type ZoomLevel =
 
 type ViewSide = 'front' | 'back';
 
+interface HoverTooltip {
+  visible: boolean;
+  text: string;
+  x: number;
+  y: number;
+}
+
 const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
   onBodyPartClick,
   symptoms,
@@ -32,6 +39,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
   const [zoomHistory, setZoomHistory] = useState<ZoomLevel[]>(['overview']);
   const [hoveredPart, setHoveredPart] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [tooltip, setTooltip] = useState<HoverTooltip>({ visible: false, text: '', x: 0, y: 0 });
 
   const getSymptomIntensity = (bodyPartId: string): number => {
     const recentSymptoms = symptoms
@@ -121,9 +129,30 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     onBodyPartClick(bodyPartId, bodyPartName, coordinates);
   };
 
-  // Enhanced human-like body diagram with seamless joints
+  const handleMouseEnter = (partName: string, event: React.MouseEvent<SVGElement>) => {
+    if (!readOnly) {
+      setHoveredPart(partName);
+      const rect = event.currentTarget.getBoundingClientRect();
+      const svgRect = event.currentTarget.closest('svg')?.getBoundingClientRect();
+      if (svgRect) {
+        setTooltip({
+          visible: true,
+          text: partName,
+          x: event.clientX - svgRect.left,
+          y: event.clientY - svgRect.top - 10
+        });
+      }
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredPart(null);
+    setTooltip({ visible: false, text: '', x: 0, y: 0 });
+  };
+
+  // Enhanced human-like body diagram with better anatomical accuracy
   const renderOverview = () => (
-    <div className="flex justify-center">
+    <div className="flex justify-center relative">
       <svg width="520" height="680" viewBox="0 0 520 680" className="w-full h-auto max-w-md drop-shadow-lg">
         <defs>
           {/* Enhanced natural skin tone gradients */}
@@ -194,609 +223,636 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
         
         {currentSide === 'front' ? (
           <>
-            {/* 1. HEAD - Enhanced realistic head shape with seamless neck connection */}
+            {/* 1. HEAD - Enhanced realistic head shape */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
               )} 
                onClick={() => !readOnly && handleZoomIn('head-system')}
-               onMouseEnter={() => setHoveredPart('head-system')}
-               onMouseLeave={() => setHoveredPart(null)}>
+               onMouseEnter={(e) => handleMouseEnter('Head & Brain', e)}
+               onMouseLeave={handleMouseLeave}>
               
-              {/* Natural head shape with seamless neck connection */}
+              {/* More anatomically accurate head shape */}
               <path d="M 260 45
-                       C 290 45, 315 60, 325 85
-                       C 330 100, 330 115, 325 130
-                       C 320 145, 310 155, 295 160
-                       C 285 163, 275 164, 265 165
-                       Q 260 166, 255 166
-                       Q 250 166, 245 165
-                       C 235 164, 225 163, 215 160
-                       C 200 155, 190 145, 185 130
-                       C 180 115, 180 100, 185 85
-                       C 195 60, 220 45, 260 45 Z"
+                       C 295 45, 320 65, 330 90
+                       C 335 105, 335 120, 330 135
+                       C 325 150, 315 160, 300 165
+                       C 290 168, 280 169, 270 170
+                       Q 260 171, 250 170
+                       C 240 169, 230 168, 220 165
+                       C 205 160, 195 150, 190 135
+                       C 185 120, 185 105, 190 90
+                       C 200 65, 225 45, 260 45 Z"
                 fill={getIntensityColor(getSystemIntensity(['head', 'brain', 'left-eye', 'right-eye', 'left-ear', 'right-ear']))}
                 stroke={getIntensityStroke(getSystemIntensity(['head', 'brain', 'left-eye', 'right-eye', 'left-ear', 'right-ear']))}
-                strokeWidth="1.5"
-                filter={hoveredPart === 'head-system' ? "url(#hoverGlow)" : "url(#softShadow)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'Head & Brain' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
               {/* Enhanced realistic facial features */}
-              {/* Eyes with more detail */}
-              <ellipse cx="235" cy="95" rx="10" ry="7" fill="#ffffff" stroke="#d97706" strokeWidth="0.3" />
-              <ellipse cx="275" cy="95" rx="10" ry="7" fill="#ffffff" stroke="#d97706" strokeWidth="0.3" />
-              <circle cx="235" cy="95" r="5" fill="#4a5568" />
-              <circle cx="275" cy="95" r="5" fill="#4a5568" />
-              <circle cx="237" cy="93" r="2" fill="#ffffff" opacity="0.9" />
-              <circle cx="277" cy="93" r="2" fill="#ffffff" opacity="0.9" />
+              {/* More detailed eyes */}
+              <ellipse cx="235" cy="100" rx="12" ry="8" fill="#ffffff" stroke="#d97706" strokeWidth="0.5" />
+              <ellipse cx="285" cy="100" rx="12" ry="8" fill="#ffffff" stroke="#d97706" strokeWidth="0.5" />
+              <circle cx="235" cy="100" r="6" fill="#4a5568" />
+              <circle cx="285" cy="100" r="6" fill="#4a5568" />
+              <circle cx="237" cy="98" r="2" fill="#ffffff" opacity="0.9" />
+              <circle cx="287" cy="98" r="2" fill="#ffffff" opacity="0.9" />
               
-              {/* Eyebrows */}
-              <path d="M 225 88 Q 235 85, 245 88" stroke="#8b4513" strokeWidth="2" fill="none" strokeLinecap="round" />
-              <path d="M 265 88 Q 275 85, 285 88" stroke="#8b4513" strokeWidth="2" fill="none" strokeLinecap="round" />
+              {/* Better eyebrows */}
+              <path d="M 223 92 Q 235 88, 247 92" stroke="#8b4513" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+              <path d="M 273 92 Q 285 88, 297 92" stroke="#8b4513" strokeWidth="2.5" fill="none" strokeLinecap="round" />
               
               {/* More realistic nose */}
-              <path d="M 255 100 
-                       C 253 105, 252 110, 255 115 
-                       C 258 110, 257 105, 255 100" 
-                fill="#fdba74" stroke="#f97316" strokeWidth="0.3" />
-              <ellipse cx="252" cy="112" rx="2" ry="1.5" fill="#f97316" opacity="0.3" />
-              <ellipse cx="258" cy="112" rx="2" ry="1.5" fill="#f97316" opacity="0.3" />
+              <path d="M 260 105 
+                       C 257 112, 256 118, 260 125 
+                       C 264 118, 263 112, 260 105" 
+                fill="#fdba74" stroke="#f97316" strokeWidth="0.5" />
+              <ellipse cx="256" cy="122" rx="2.5" ry="2" fill="#f97316" opacity="0.4" />
+              <ellipse cx="264" cy="122" rx="2.5" ry="2" fill="#f97316" opacity="0.4" />
               
-              {/* More realistic mouth */}
-              <path d="M 245 125 Q 255 130, 265 125" stroke="#dc2626" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-              <path d="M 250 127 Q 255 129, 260 127" stroke="#ef4444" strokeWidth="1" fill="none" strokeLinecap="round" />
+              {/* Better mouth */}
+              <path d="M 245 135 Q 260 142, 275 135" stroke="#dc2626" strokeWidth="3" fill="none" strokeLinecap="round" />
+              <path d="M 252 138 Q 260 141, 268 138" stroke="#ef4444" strokeWidth="1.5" fill="none" strokeLinecap="round" />
               
-              {/* Enhanced ears with more detail */}
-              <ellipse cx="185" cy="100" rx="8" ry="15" fill="url(#faceGradient)" stroke="#f97316" strokeWidth="0.8" />
-              <ellipse cx="325" cy="100" rx="8" ry="15" fill="url(#faceGradient)" stroke="#f97316" strokeWidth="0.8" />
-              <ellipse cx="187" cy="100" rx="4" ry="8" fill="#fdba74" opacity="0.6" />
-              <ellipse cx="323" cy="100" rx="4" ry="8" fill="#fdba74" opacity="0.6" />
+              {/* Enhanced ears */}
+              <ellipse cx="185" cy="105" rx="10" ry="18" fill="url(#faceGradient)" stroke="#f97316" strokeWidth="1" />
+              <ellipse cx="335" cy="105" rx="10" ry="18" fill="url(#faceGradient)" stroke="#f97316" strokeWidth="1" />
+              <ellipse cx="188" cy="105" rx="5" ry="10" fill="#fdba74" opacity="0.7" />
+              <ellipse cx="332" cy="105" rx="5" ry="10" fill="#fdba74" opacity="0.7" />
               
-              {/* Enhanced hair with more texture */}
-              <path d="M 185 75 
-                       Q 195 45, 225 40 
-                       Q 240 35, 255 35
-                       Q 270 35, 285 40
-                       Q 315 45, 325 75
-                       Q 320 55, 300 50 
-                       Q 280 45, 255 45 
-                       Q 230 45, 210 50 
-                       Q 190 55, 185 75" 
-                fill="#8b4513" stroke="#654321" strokeWidth="0.3" />
-              
-              {/* Hair texture details */}
-              <path d="M 200 60 Q 220 55, 240 60" stroke="#654321" strokeWidth="0.5" fill="none" opacity="0.6" />
-              <path d="M 270 60 Q 290 55, 310 60" stroke="#654321" strokeWidth="0.5" fill="none" opacity="0.6" />
+              {/* Better hair */}
+              <path d="M 190 85 
+                       Q 200 50, 230 45 
+                       Q 245 40, 260 40
+                       Q 275 40, 290 45
+                       Q 320 50, 330 85
+                       Q 325 60, 305 55 
+                       Q 285 50, 260 50 
+                       Q 235 50, 215 55 
+                       Q 195 60, 190 85" 
+                fill="#8b4513" stroke="#654321" strokeWidth="0.5" />
             </g>
 
-            {/* Seamless neck connection - puzzle piece style */}
-            <path d="M 245 165 
-                     Q 255 168, 265 165
-                     Q 270 170, 275 175
-                     Q 270 180, 265 185
-                     Q 255 188, 245 185
-                     Q 240 180, 235 175
-                     Q 240 170, 245 165 Z" 
+            {/* Seamless neck connection */}
+            <path d="M 250 170 
+                     Q 260 173, 270 170
+                     Q 275 175, 280 180
+                     Q 275 185, 270 190
+                     Q 260 193, 250 190
+                     Q 245 185, 240 180
+                     Q 245 175, 250 170 Z" 
               fill="url(#skinToneGradient)" 
               stroke="#f97316" 
-              strokeWidth="0.8"
+              strokeWidth="1"
               filter="url(#jointShadow)"
             />
 
-            {/* 2. CHEST/RESPIRATORY SYSTEM - Enhanced with seamless shoulder connections */}
+            {/* 2. CHEST/RESPIRATORY SYSTEM - Better chest anatomy */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
               )} 
                onClick={() => !readOnly && handleZoomIn('respiratory-system')}
-               onMouseEnter={() => setHoveredPart('respiratory-system')}
-               onMouseLeave={() => setHoveredPart(null)}>
+               onMouseEnter={(e) => handleMouseEnter('Chest & Lungs', e)}
+               onMouseLeave={handleMouseLeave}>
               
-              {/* Enhanced chest/torso with natural curves */}
-              <path d="M 235 185 
-                       C 220 190, 210 200, 205 220
-                       L 205 310
-                       C 205 325, 215 335, 230 340
-                       L 280 340
-                       C 295 335, 305 325, 305 310
-                       L 305 220
-                       C 300 200, 290 190, 275 185
-                       Q 270 183, 265 185
-                       Q 255 188, 245 185
-                       Q 240 183, 235 185 Z"
+              {/* More anatomically accurate chest */}
+              <path d="M 240 190 
+                       C 220 195, 205 210, 200 230
+                       L 200 320
+                       C 200 340, 215 355, 235 360
+                       L 285 360
+                       C 305 355, 320 340, 320 320
+                       L 320 230
+                       C 315 210, 300 195, 280 190
+                       Q 275 188, 270 190
+                       Q 260 193, 250 190
+                       Q 245 188, 240 190 Z"
                 fill={getIntensityColor(getSystemIntensity(['lungs', 'chest', 'throat']))}
                 stroke={getIntensityStroke(getSystemIntensity(['lungs', 'chest', 'throat']))}
-                strokeWidth="1.5"
-                filter={hoveredPart === 'respiratory-system' ? "url(#hoverGlow)" : "url(#softShadow)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'Chest & Lungs' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
-              {/* Enhanced chest definition with natural muscle lines */}
-              <path d="M 225 210 Q 240 205, 255 210 Q 270 205, 285 210" 
-                stroke="rgba(249, 115, 22, 0.25)" strokeWidth="1" fill="none" />
-              <path d="M 230 230 Q 255 225, 280 230" 
-                stroke="rgba(249, 115, 22, 0.2)" strokeWidth="1" fill="none" />
-              <path d="M 235 250 Q 255 248, 275 250" 
-                stroke="rgba(249, 115, 22, 0.15)" strokeWidth="1" fill="none" />
+              {/* Rib cage indication */}
+              <path d="M 230 220 Q 245 215, 260 220 Q 275 215, 290 220" 
+                stroke="rgba(249, 115, 22, 0.3)" strokeWidth="1.5" fill="none" />
+              <path d="M 235 240 Q 260 235, 285 240" 
+                stroke="rgba(249, 115, 22, 0.25)" strokeWidth="1.5" fill="none" />
+              <path d="M 240 260 Q 260 258, 280 260" 
+                stroke="rgba(249, 115, 22, 0.2)" strokeWidth="1.5" fill="none" />
+              
+              {/* Lung outlines */}
+              <ellipse cx="235" cy="270" rx="25" ry="40" fill="none" stroke="rgba(59, 130, 246, 0.3)" strokeWidth="1" strokeDasharray="3,2" />
+              <ellipse cx="285" cy="270" rx="25" ry="40" fill="none" stroke="rgba(59, 130, 246, 0.3)" strokeWidth="1" strokeDasharray="3,2" />
             </g>
 
-            {/* 3. HEART - Anatomically positioned with better integration */}
+            {/* 3. HEART - Better anatomical positioning */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-110"
               )} 
                onClick={() => !readOnly && handleZoomIn('cardiovascular-system')}
-               onMouseEnter={() => setHoveredPart('cardiovascular-system')}
-               onMouseLeave={() => setHoveredPart(null)}>
+               onMouseEnter={(e) => handleMouseEnter('Heart', e)}
+               onMouseLeave={handleMouseLeave}>
               
-              <path d="M 255 235 
-                       C 245 225, 230 225, 230 245 
-                       C 230 265, 255 295, 255 295 
-                       C 255 295, 280 265, 280 245 
-                       C 280 225, 265 225, 255 235 Z"
+              {/* More anatomically accurate heart */}
+              <path d="M 260 250 
+                       C 248 238, 230 238, 230 260 
+                       C 230 285, 260 320, 260 320 
+                       C 260 320, 290 285, 290 260 
+                       C 290 238, 272 238, 260 250 Z"
                 fill={getIntensityColor(getSystemIntensity(['heart']))}
                 stroke={getIntensityStroke(getSystemIntensity(['heart']))}
-                strokeWidth="1.5"
-                filter={hoveredPart === 'cardiovascular-system' ? "url(#hoverGlow)" : "url(#softShadow)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'Heart' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
+              
+              {/* Heart detail lines */}
+              <path d="M 245 265 Q 260 270, 275 265" stroke="rgba(220, 38, 38, 0.4)" strokeWidth="1" fill="none" />
             </g>
 
-            {/* 4. ABDOMEN/DIGESTIVE SYSTEM - Seamless waist connection */}
+            {/* 4. STOMACH - Completely redesigned for anatomical accuracy */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
               )} 
                onClick={() => !readOnly && handleZoomIn('digestive-system')}
-               onMouseEnter={() => setHoveredPart('digestive-system')}
-               onMouseLeave={() => setHoveredPart(null)}>
+               onMouseEnter={(e) => handleMouseEnter('Stomach & Abdomen', e)}
+               onMouseLeave={handleMouseLeave}>
               
-              {/* Seamless waist connection - puzzle piece style */}
-              <path d="M 230 340 
-                       Q 240 345, 250 342
-                       Q 260 345, 270 342
-                       Q 280 345, 290 350
-                       C 295 355, 300 365, 300 380
-                       L 300 460
-                       C 300 475, 290 485, 275 490
-                       L 235 490
-                       C 220 485, 210 475, 210 460
-                       L 210 380
-                       C 210 365, 215 355, 220 350
-                       Q 225 345, 230 340 Z"
-                fill={getIntensityColor(getSystemIntensity(['stomach', 'abdomen', 'intestines']))}
-                stroke={getIntensityStroke(getSystemIntensity(['stomach', 'abdomen', 'intestines']))}
-                strokeWidth="1.5"
-                filter={hoveredPart === 'digestive-system' ? "url(#hoverGlow)" : "url(#softShadow)"}
+              {/* Anatomically accurate stomach shape */}
+              <path d="M 220 340
+                       C 215 345, 210 355, 210 370
+                       Q 208 385, 215 400
+                       C 220 415, 230 425, 245 430
+                       Q 260 435, 275 430
+                       C 290 425, 300 415, 305 400
+                       Q 312 385, 310 370
+                       C 310 355, 305 345, 300 340
+                       Q 285 338, 275 340
+                       Q 260 342, 245 340
+                       Q 230 338, 220 340 Z"
+                fill={getIntensityColor(getSystemIntensity(['stomach']))}
+                stroke={getIntensityStroke(getSystemIntensity(['stomach']))}
+                strokeWidth="2"
+                filter={hoveredPart === 'Stomach & Abdomen' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
-              {/* Natural waist definition */}
-              <path d="M 225 370 Q 255 365, 285 370" 
-                stroke="rgba(249, 115, 22, 0.25)" strokeWidth="1" fill="none" />
+              {/* Stomach internal curve to show it's a stomach */}
+              <path d="M 230 360 Q 245 355, 260 360 Q 275 355, 290 360" 
+                stroke="rgba(34, 197, 94, 0.4)" strokeWidth="1.5" fill="none" />
+              <path d="M 235 380 Q 260 375, 285 380" 
+                stroke="rgba(34, 197, 94, 0.3)" strokeWidth="1" fill="none" />
             </g>
 
-            {/* 5. LEFT ARM - Enhanced with seamless shoulder connection */}
+            {/* 5. LOWER ABDOMEN/INTESTINES - Separate from stomach */}
+            <g className={cn(
+                "transition-all duration-300 transform-gpu", 
+                !readOnly && "cursor-pointer hover:scale-105"
+              )} 
+               onClick={() => !readOnly && handleZoomIn('digestive-system')}
+               onMouseEnter={(e) => handleMouseEnter('Lower Abdomen', e)}
+               onMouseLeave={handleMouseLeave}>
+              
+              {/* Lower abdominal area */}
+              <path d="M 235 430
+                       C 220 435, 210 450, 210 470
+                       L 210 520
+                       C 210 540, 220 555, 240 560
+                       L 280 560
+                       C 300 555, 310 540, 310 520
+                       L 310 470
+                       C 310 450, 300 435, 285 430
+                       Q 275 428, 265 430
+                       Q 260 432, 255 430
+                       Q 245 428, 235 430 Z"
+                fill={getIntensityColor(getSystemIntensity(['intestines', 'lower-abdomen']))}
+                stroke={getIntensityStroke(getSystemIntensity(['intestines', 'lower-abdomen']))}
+                strokeWidth="2"
+                filter={hoveredPart === 'Lower Abdomen' ? "url(#hoverGlow)" : "url(#softShadow)"}
+                className="transition-all duration-300"
+              />
+              
+              {/* Intestinal indication */}
+              <path d="M 240 450 Q 260 445, 280 450 Q 270 465, 250 470 Q 270 485, 280 500" 
+                stroke="rgba(34, 197, 94, 0.3)" strokeWidth="1.5" fill="none" />
+            </g>
+
+            {/* 6. LEFT ARM - Better proportions */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
               )} 
                onClick={() => !readOnly && handleZoomIn('musculoskeletal-system')}
-               onMouseEnter={() => setHoveredPart('left-arm')}
-               onMouseLeave={() => setHoveredPart(null)}>
+               onMouseEnter={(e) => handleMouseEnter('Left Arm', e)}
+               onMouseLeave={handleMouseLeave}>
               
-              {/* Seamless shoulder connection - puzzle piece style */}
-              <circle cx="205" cy="210" r="15" 
+              {/* Shoulder joint */}
+              <circle cx="200" cy="220" r="18" 
                 fill="url(#skinToneGradient)"
                 stroke="#f97316"
-                strokeWidth="0.8"
-                filter="url(#jointShadow)"
-              />
-              
-              {/* Upper arm with natural muscle definition */}
-              <path d="M 190 210 
-                       Q 175 220, 165 240
-                       Q 160 260, 155 280
-                       L 145 320
-                       Q 140 335, 145 350
-                       Q 150 365, 160 370
-                       L 170 375
-                       Q 180 380, 185 365
-                       Q 190 350, 195 335
-                       L 205 295
-                       Q 210 280, 205 265
-                       Q 200 250, 195 235
-                       Q 192 222, 190 210 Z"
-                fill={getIntensityColor(getSystemIntensity(['left-arm', 'left-shoulder']))}
-                stroke={getIntensityStroke(getSystemIntensity(['left-arm', 'left-shoulder']))}
-                strokeWidth="1.5"
-                filter={hoveredPart === 'left-arm' ? "url(#hoverGlow)" : "url(#softShadow)"}
-                className="transition-all duration-300"
-              />
-              
-              {/* Seamless elbow connection - puzzle piece style */}
-              <ellipse cx="155" cy="375" rx="12" ry="8" 
-                fill="url(#skinToneGradient)"
-                stroke="#f97316"
-                strokeWidth="0.8"
-                filter="url(#jointShadow)"
-              />
-              
-              {/* Forearm with natural taper */}
-              <path d="M 145 380 
-                       Q 130 390, 120 410
-                       Q 115 430, 110 450
-                       L 100 490
-                       Q 95 505, 100 520
-                       Q 105 535, 115 540
-                       L 125 545
-                       Q 135 550, 140 535
-                       Q 145 520, 150 505
-                       L 160 465
-                       Q 165 450, 160 435
-                       Q 155 420, 150 405
-                       Q 147 392, 145 380 Z"
-                fill="url(#skinToneGradient)"
-                stroke="#f97316"
-                strokeWidth="1.2"
-                filter="url(#softShadow)"
-              />
-              
-              {/* Seamless wrist connection */}
-              <ellipse cx="110" cy="545" rx="8" ry="6" 
-                fill="url(#skinToneGradient)"
-                stroke="#f97316"
-                strokeWidth="0.6"
-                filter="url(#jointShadow)"
-              />
-              
-              {/* Hand with finger definition */}
-              <ellipse cx="107" cy="565" rx="14" ry="20" 
-                fill={getIntensityColor(getSymptomIntensity('left-hand'))}
-                stroke={getIntensityStroke(getSymptomIntensity('left-hand'))}
-                strokeWidth="1.2"
-                filter="url(#softShadow)"
-              />
-            </g>
-
-            {/* 6. RIGHT ARM - Mirror with seamless connections */}
-            <g className={cn(
-                "transition-all duration-300 transform-gpu", 
-                !readOnly && "cursor-pointer hover:scale-105"
-              )} 
-               onClick={() => !readOnly && handleZoomIn('musculoskeletal-system')}
-               onMouseEnter={() => setHoveredPart('right-arm')}
-               onMouseLeave={() => setHoveredPart(null)}>
-              
-              <circle cx="305" cy="210" r="15" 
-                fill="url(#skinToneGradient)"
-                stroke="#f97316"
-                strokeWidth="0.8"
-                filter="url(#jointShadow)"
-              />
-              
-              <path d="M 320 210 
-                       Q 335 220, 345 240
-                       Q 350 260, 355 280
-                       L 365 320
-                       Q 370 335, 365 350
-                       Q 360 365, 350 370
-                       L 340 375
-                       Q 330 380, 325 365
-                       Q 320 350, 315 335
-                       L 305 295
-                       Q 300 280, 305 265
-                       Q 310 250, 315 235
-                       Q 318 222, 320 210 Z"
-                fill={getIntensityColor(getSystemIntensity(['right-arm', 'right-shoulder']))}
-                stroke={getIntensityStroke(getSystemIntensity(['right-arm', 'right-shoulder']))}
-                strokeWidth="1.5"
-                filter={hoveredPart === 'right-arm' ? "url(#hoverGlow)" : "url(#softShadow)"}
-                className="transition-all duration-300"
-              />
-              
-              <ellipse cx="355" cy="375" rx="12" ry="8" 
-                fill="url(#skinToneGradient)"
-                stroke="#f97316"
-                strokeWidth="0.8"
-                filter="url(#jointShadow)"
-              />
-              
-              <path d="M 365 380 
-                       Q 380 390, 390 410
-                       Q 395 430, 400 450
-                       L 410 490
-                       Q 415 505, 410 520
-                       Q 405 535, 395 540
-                       L 385 545
-                       Q 375 550, 370 535
-                       Q 365 520, 360 505
-                       L 350 465
-                       Q 345 450, 350 435
-                       Q 355 420, 360 405
-                       Q 363 392, 365 380 Z"
-                fill="url(#skinToneGradient)"
-                stroke="#f97316"
-                strokeWidth="1.2"
-                filter="url(#softShadow)"
-              />
-              
-              <ellipse cx="400" cy="545" rx="8" ry="6" 
-                fill="url(#skinToneGradient)"
-                stroke="#f97316"
-                strokeWidth="0.6"
-                filter="url(#jointShadow)"
-              />
-              
-              <ellipse cx="403" cy="565" rx="14" ry="20" 
-                fill={getIntensityColor(getSymptomIntensity('right-hand'))}
-                stroke={getIntensityStroke(getSymptomIntensity('right-hand'))}
-                strokeWidth="1.2"
-                filter="url(#softShadow)"
-              />
-            </g>
-
-            {/* 7. LEFT LEG - Separated and with seamless hip connection */}
-            <g className={cn(
-                "transition-all duration-300 transform-gpu", 
-                !readOnly && "cursor-pointer hover:scale-105"
-              )} 
-               onClick={() => !readOnly && handleZoomIn('musculoskeletal-system')}
-               onMouseEnter={() => setHoveredPart('left-leg')}
-               onMouseLeave={() => setHoveredPart(null)}>
-              
-              {/* Seamless hip connection - puzzle piece style */}
-              <ellipse cx="235" cy="495" rx="12" ry="8" 
-                fill="url(#skinToneGradient)"
-                stroke="#f97316"
-                strokeWidth="0.8"
-                filter="url(#jointShadow)"
-              />
-              
-              {/* Thigh with natural muscle definition - separated from right leg */}
-              <path d="M 225 500 
-                       Q 220 510, 218 525
-                       Q 216 540, 215 555
-                       L 215 590
-                       Q 215 605, 220 620
-                       Q 225 635, 235 640
-                       L 245 642
-                       Q 255 644, 260 635
-                       Q 265 620, 265 605
-                       L 265 555
-                       Q 264 540, 262 525
-                       Q 260 510, 255 500
-                       Q 250 495, 245 495
-                       Q 235 495, 225 500 Z"
-                fill={getIntensityColor(getSystemIntensity(['left-leg', 'left-knee']))}
-                stroke={getIntensityStroke(getSystemIntensity(['left-leg', 'left-knee']))}
-                strokeWidth="1.5"
-                filter={hoveredPart === 'left-leg' ? "url(#hoverGlow)" : "url(#softShadow)"}
-                className="transition-all duration-300"
-              />
-              
-              {/* Seamless knee connection - puzzle piece style */}
-              <ellipse cx="240" cy="645" rx="15" ry="10" 
-                fill="rgba(249, 115, 22, 0.4)" 
-                stroke="rgba(234, 88, 12, 0.6)" 
                 strokeWidth="1"
                 filter="url(#jointShadow)"
               />
               
-              {/* Calf with natural taper */}
-              <path d="M 230 650 
-                       Q 225 660, 222 675
-                       Q 220 690, 218 705
-                       L 216 740
-                       Q 215 755, 220 770
-                       Q 225 785, 235 790
-                       L 245 792
-                       Q 255 794, 260 785
-                       Q 265 770, 265 755
-                       L 263 705
-                       Q 261 690, 259 675
-                       Q 257 660, 252 650
-                       Q 247 645, 242 645
-                       Q 237 645, 230 650 Z"
+              {/* Upper arm - better proportions */}
+              <path d="M 182 220 
+                       Q 165 235, 155 260
+                       Q 150 285, 145 310
+                       L 135 350
+                       Q 130 370, 135 390
+                       Q 140 410, 155 420
+                       L 170 425
+                       Q 185 430, 190 410
+                       Q 195 390, 200 370
+                       L 210 330
+                       Q 215 310, 210 290
+                       Q 205 270, 200 250
+                       Q 195 235, 182 220 Z"
+                fill={getIntensityColor(getSystemIntensity(['left-arm', 'left-shoulder']))}
+                stroke={getIntensityStroke(getSystemIntensity(['left-arm', 'left-shoulder']))}
+                strokeWidth="2"
+                filter={hoveredPart === 'Left Arm' ? "url(#hoverGlow)" : "url(#softShadow)"}
+                className="transition-all duration-300"
+              />
+              
+              {/* Elbow joint */}
+              <ellipse cx="145" cy="425" rx="15" ry="10" 
                 fill="url(#skinToneGradient)"
                 stroke="#f97316"
-                strokeWidth="1.2"
+                strokeWidth="1"
+                filter="url(#jointShadow)"
+              />
+              
+              {/* Forearm */}
+              <path d="M 130 435 
+                       Q 115 450, 105 480
+                       Q 100 510, 95 540
+                       L 85 580
+                       Q 80 600, 85 620
+                       Q 90 640, 105 650
+                       L 120 655
+                       Q 135 660, 140 640
+                       Q 145 620, 150 600
+                       L 160 560
+                       Q 165 540, 160 520
+                       Q 155 500, 150 480
+                       Q 147 450, 130 435 Z"
+                fill="url(#skinToneGradient)"
+                stroke="#f97316"
+                strokeWidth="1.5"
                 filter="url(#softShadow)"
               />
               
-              {/* Seamless ankle connection */}
-              <ellipse cx="240" cy="795" rx="10" ry="6" 
+              {/* Hand */}
+              <ellipse cx="92" cy="675" rx="16" ry="25" 
+                fill={getIntensityColor(getSymptomIntensity('left-hand'))}
+                stroke={getIntensityStroke(getSymptomIntensity('left-hand'))}
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
+              />
+            </g>
+
+            {/* 7. RIGHT ARM - Mirror of left arm */}
+            <g className={cn(
+                "transition-all duration-300 transform-gpu", 
+                !readOnly && "cursor-pointer hover:scale-105"
+              )} 
+               onClick={() => !readOnly && handleZoomIn('musculoskeletal-system')}
+               onMouseEnter={(e) => handleMouseEnter('Right Arm', e)}
+               onMouseLeave={handleMouseLeave}>
+              
+              <circle cx="320" cy="220" r="18" 
                 fill="url(#skinToneGradient)"
                 stroke="#f97316"
-                strokeWidth="0.6"
+                strokeWidth="1"
                 filter="url(#jointShadow)"
+              />
+              
+              <path d="M 338 220 
+                       Q 355 235, 365 260
+                       Q 370 285, 375 310
+                       L 385 350
+                       Q 390 370, 385 390
+                       Q 380 410, 365 420
+                       L 350 425
+                       Q 335 430, 330 410
+                       Q 325 390, 320 370
+                       L 310 330
+                       Q 305 310, 310 290
+                       Q 315 270, 320 250
+                       Q 325 235, 338 220 Z"
+                fill={getIntensityColor(getSystemIntensity(['right-arm', 'right-shoulder']))}
+                stroke={getIntensityStroke(getSystemIntensity(['right-arm', 'right-shoulder']))}
+                strokeWidth="2"
+                filter={hoveredPart === 'Right Arm' ? "url(#hoverGlow)" : "url(#softShadow)"}
+                className="transition-all duration-300"
+              />
+              
+              <ellipse cx="375" cy="425" rx="15" ry="10" 
+                fill="url(#skinToneGradient)"
+                stroke="#f97316"
+                strokeWidth="1"
+                filter="url(#jointShadow)"
+              />
+              
+              <path d="M 390 435 
+                       Q 405 450, 415 480
+                       Q 420 510, 425 540
+                       L 435 580
+                       Q 440 600, 435 620
+                       Q 430 640, 415 650
+                       L 400 655
+                       Q 385 660, 380 640
+                       Q 375 620, 370 600
+                       L 360 560
+                       Q 355 540, 360 520
+                       Q 365 500, 370 480
+                       Q 373 450, 390 435 Z"
+                fill="url(#skinToneGradient)"
+                stroke="#f97316"
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
+              />
+              
+              <ellipse cx="428" cy="675" rx="16" ry="25" 
+                fill={getIntensityColor(getSymptomIntensity('right-hand'))}
+                stroke={getIntensityStroke(getSymptomIntensity('right-hand'))}
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
+              />
+            </g>
+
+            {/* 8. LEFT LEG - Better proportions */}
+            <g className={cn(
+                "transition-all duration-300 transform-gpu", 
+                !readOnly && "cursor-pointer hover:scale-105"
+              )} 
+               onClick={() => !readOnly && handleZoomIn('musculoskeletal-system')}
+               onMouseEnter={(e) => handleMouseEnter('Left Leg', e)}
+               onMouseLeave={handleMouseLeave}>
+              
+              {/* Hip joint */}
+              <ellipse cx="240" cy="565" rx="15" ry="10" 
+                fill="url(#skinToneGradient)"
+                stroke="#f97316"
+                strokeWidth="1"
+                filter="url(#jointShadow)"
+              />
+              
+              {/* Thigh */}
+              <path d="M 225 570 
+                       Q 220 585, 218 605
+                       Q 216 625, 215 645
+                       L 215 685
+                       Q 215 705, 220 725
+                       Q 225 745, 240 750
+                       L 255 752
+                       Q 270 754, 275 745
+                       Q 280 725, 280 705
+                       L 280 645
+                       Q 279 625, 277 605
+                       Q 275 585, 270 570
+                       Q 265 565, 255 565
+                       Q 245 565, 225 570 Z"
+                fill={getIntensityColor(getSystemIntensity(['left-leg', 'left-knee']))}
+                stroke={getIntensityStroke(getSystemIntensity(['left-leg', 'left-knee']))}
+                strokeWidth="2"
+                filter={hoveredPart === 'Left Leg' ? "url(#hoverGlow)" : "url(#softShadow)"}
+                className="transition-all duration-300"
+              />
+              
+              {/* Knee */}
+              <ellipse cx="247" cy="755" rx="18" ry="12" 
+                fill="rgba(249, 115, 22, 0.4)" 
+                stroke="rgba(234, 88, 12, 0.6)" 
+                strokeWidth="1.5"
+                filter="url(#jointShadow)"
+              />
+              
+              {/* Calf */}
+              <path d="M 230 765 
+                       Q 225 780, 222 800
+                       Q 220 820, 218 840
+                       L 216 880
+                       Q 215 900, 220 920
+                       Q 225 940, 240 945
+                       L 255 947
+                       Q 270 949, 275 940
+                       Q 280 920, 280 900
+                       L 278 840
+                       Q 276 820, 274 800
+                       Q 272 780, 267 765
+                       Q 262 760, 252 760
+                       Q 242 760, 230 765 Z"
+                fill="url(#skinToneGradient)"
+                stroke="#f97316"
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
               />
               
               {/* Foot */}
-              <ellipse cx="237" cy="815" rx="12" ry="22" 
+              <ellipse cx="247" cy="970" rx="15" ry="28" 
                 fill={getIntensityColor(getSymptomIntensity('left-foot'))}
                 stroke={getIntensityStroke(getSymptomIntensity('left-foot'))}
-                strokeWidth="1.2"
+                strokeWidth="1.5"
                 filter="url(#softShadow)"
               />
             </g>
 
-            {/* 8. RIGHT LEG - Separated and mirrored with seamless connections */}
+            {/* 9. RIGHT LEG - Mirror of left leg */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
               )} 
                onClick={() => !readOnly && handleZoomIn('musculoskeletal-system')}
-               onMouseEnter={() => setHoveredPart('right-leg')}
-               onMouseLeave={() => setHoveredPart(null)}>
+               onMouseEnter={(e) => handleMouseEnter('Right Leg', e)}
+               onMouseLeave={handleMouseLeave}>
               
-              <ellipse cx="275" cy="495" rx="12" ry="8" 
+              <ellipse cx="280" cy="565" rx="15" ry="10" 
                 fill="url(#skinToneGradient)"
                 stroke="#f97316"
-                strokeWidth="0.8"
-                filter="url(#jointShadow)"
-              />
-              
-              {/* Right thigh - properly separated from left leg */}
-              <path d="M 285 500 
-                       Q 290 510, 292 525
-                       Q 294 540, 295 555
-                       L 295 590
-                       Q 295 605, 290 620
-                       Q 285 635, 275 640
-                       L 265 642
-                       Q 255 644, 250 635
-                       Q 245 620, 245 605
-                       L 245 555
-                       Q 246 540, 248 525
-                       Q 250 510, 255 500
-                       Q 260 495, 265 495
-                       Q 275 495, 285 500 Z"
-                fill={getIntensityColor(getSystemIntensity(['right-leg', 'right-knee']))}
-                stroke={getIntensityStroke(getSystemIntensity(['right-leg', 'right-knee']))}
-                strokeWidth="1.5"
-                filter={hoveredPart === 'right-leg' ? "url(#hoverGlow)" : "url(#softShadow)"}
-                className="transition-all duration-300"
-              />
-              
-              <ellipse cx="270" cy="645" rx="15" ry="10" 
-                fill="rgba(249, 115, 22, 0.4)" 
-                stroke="rgba(234, 88, 12, 0.6)" 
                 strokeWidth="1"
                 filter="url(#jointShadow)"
               />
               
-              <path d="M 280 650 
-                       Q 285 660, 288 675
-                       Q 290 690, 292 705
-                       L 294 740
-                       Q 295 755, 290 770
-                       Q 285 785, 275 790
-                       L 265 792
-                       Q 255 794, 250 785
-                       Q 245 770, 245 755
-                       L 247 705
-                       Q 249 690, 251 675
-                       Q 253 660, 258 650
-                       Q 263 645, 268 645
-                       Q 273 645, 280 650 Z"
-                fill="url(#skinToneGradient)"
-                stroke="#f97316"
-                strokeWidth="1.2"
-                filter="url(#softShadow)"
+              <path d="M 295 570 
+                       Q 300 585, 302 605
+                       Q 304 625, 305 645
+                       L 305 685
+                       Q 305 705, 300 725
+                       Q 295 745, 280 750
+                       L 265 752
+                       Q 250 754, 245 745
+                       Q 240 725, 240 705
+                       L 240 645
+                       Q 241 625, 243 605
+                       Q 245 585, 250 570
+                       Q 255 565, 265 565
+                       Q 275 565, 295 570 Z"
+                fill={getIntensityColor(getSystemIntensity(['right-leg', 'right-knee']))}
+                stroke={getIntensityStroke(getSystemIntensity(['right-leg', 'right-knee']))}
+                strokeWidth="2"
+                filter={hoveredPart === 'Right Leg' ? "url(#hoverGlow)" : "url(#softShadow)"}
+                className="transition-all duration-300"
               />
               
-              <ellipse cx="270" cy="795" rx="10" ry="6" 
-                fill="url(#skinToneGradient)"
-                stroke="#f97316"
-                strokeWidth="0.6"
+              <ellipse cx="273" cy="755" rx="18" ry="12" 
+                fill="rgba(249, 115, 22, 0.4)" 
+                stroke="rgba(234, 88, 12, 0.6)" 
+                strokeWidth="1.5"
                 filter="url(#jointShadow)"
               />
               
-              <ellipse cx="273" cy="815" rx="12" ry="22" 
+              <path d="M 290 765 
+                       Q 295 780, 298 800
+                       Q 300 820, 302 840
+                       L 304 880
+                       Q 305 900, 300 920
+                       Q 295 940, 280 945
+                       L 265 947
+                       Q 250 949, 245 940
+                       Q 240 920, 240 900
+                       L 242 840
+                       Q 244 820, 246 800
+                       Q 248 780, 253 765
+                       Q 258 760, 268 760
+                       Q 278 760, 290 765 Z"
+                fill="url(#skinToneGradient)"
+                stroke="#f97316"
+                strokeWidth="1.5"
+                filter="url(#softShadow)"
+              />
+              
+              <ellipse cx="273" cy="970" rx="15" ry="28" 
                 fill={getIntensityColor(getSymptomIntensity('right-foot'))}
                 stroke={getIntensityStroke(getSymptomIntensity('right-foot'))}
-                strokeWidth="1.2"
+                strokeWidth="1.5"
                 filter="url(#softShadow)"
               />
             </g>
 
           </>
         ) : (
-          // BACK VIEW - Enhanced with same improvements
+          // BACK VIEW - Enhanced with better anatomy
           <>
-            {/* Enhanced back view with same seamless joint principles */}
+            {/* Back of head */}
             <path d="M 260 45
-                     C 290 45, 315 60, 325 85
-                     C 330 100, 330 115, 325 130
-                     C 320 145, 310 155, 295 160
-                     C 285 163, 275 164, 265 165
-                     Q 260 166, 255 166
-                     Q 250 166, 245 165
-                     C 235 164, 225 163, 215 160
-                     C 200 155, 190 145, 185 130
-                     C 180 115, 180 100, 185 85
-                     C 195 60, 220 45, 260 45 Z"
+                     C 295 45, 320 65, 330 90
+                     C 335 105, 335 120, 330 135
+                     C 325 150, 315 160, 300 165
+                     C 290 168, 280 169, 270 170
+                     Q 260 171, 250 170
+                     C 240 169, 230 168, 220 165
+                     C 205 160, 195 150, 190 135
+                     C 185 120, 185 105, 190 90
+                     C 200 65, 225 45, 260 45 Z"
               fill={getIntensityColor(getSymptomIntensity('head'))}
               stroke={getIntensityStroke(getSymptomIntensity('head'))}
-              strokeWidth="1.5"
-              filter={hoveredPart === 'head' ? "url(#hoverGlow)" : "url(#softShadow)"}
+              strokeWidth="2"
+              filter={hoveredPart === 'Back of Head' ? "url(#hoverGlow)" : "url(#softShadow)"}
               className={cn("transition-all duration-300", !readOnly && "cursor-pointer")}
               onClick={(e) => !readOnly && handleBodyPartClick('head', 'Back of Head', e)}
-              onMouseEnter={() => setHoveredPart('head')}
-              onMouseLeave={() => setHoveredPart(null)}
+              onMouseEnter={(e) => handleMouseEnter('Back of Head', e)}
+              onMouseLeave={handleMouseLeave}
             />
 
-            {/* Enhanced hair back view */}
-            <path d="M 185 75 Q 195 45, 225 40 Q 240 35, 255 35 Q 270 35, 285 40 Q 315 45, 325 75 
-                     Q 320 55, 300 50 Q 280 45, 255 45 Q 230 45, 210 50 Q 190 55, 185 75" 
-              fill="#8b4513" stroke="#654321" strokeWidth="0.3" />
+            {/* Hair back view */}
+            <path d="M 190 85 Q 200 50, 230 45 Q 245 40, 260 40 Q 275 40, 290 45 Q 320 50, 330 85 
+                     Q 325 60, 305 55 Q 285 50, 260 50 Q 235 50, 215 55 Q 195 60, 190 85" 
+              fill="#8b4513" stroke="#654321" strokeWidth="0.5" />
 
-            {/* BACK & SPINE - Enhanced with natural back contours and seamless connections */}
+            {/* BACK & SPINE - Enhanced anatomy */}
             <g className={cn(
                 "transition-all duration-300 transform-gpu", 
                 !readOnly && "cursor-pointer hover:scale-105"
               )} 
                onClick={(e) => !readOnly && handleBodyPartClick('back', 'Back & Spine', e)}
-               onMouseEnter={() => setHoveredPart('back')}
-               onMouseLeave={() => setHoveredPart(null)}>
+               onMouseEnter={(e) => handleMouseEnter('Back & Spine', e)}
+               onMouseLeave={handleMouseLeave}>
               
-              {/* Seamless neck to back connection */}
-              <path d="M 245 165 
-                       Q 255 168, 265 165
-                       Q 270 170, 275 175
-                       Q 270 180, 265 185
-                       Q 255 188, 245 185
-                       Q 240 180, 235 175
-                       Q 240 170, 245 165 Z" 
+              {/* Neck connection */}
+              <path d="M 250 170 
+                       Q 260 173, 270 170
+                       Q 275 175, 280 180
+                       Q 275 185, 270 190
+                       Q 260 193, 250 190
+                       Q 245 185, 240 180
+                       Q 245 175, 250 170 Z" 
                 fill="url(#skinToneGradient)" 
                 stroke="#f97316" 
-                strokeWidth="0.8"
+                strokeWidth="1"
                 filter="url(#jointShadow)"
               />
               
-              <path d="M 235 185 
-                       C 220 190, 210 200, 205 220
-                       L 205 500
-                       C 205 515, 215 525, 230 530
-                       L 280 530
-                       C 295 525, 305 515, 305 500
-                       L 305 220
-                       C 300 200, 290 190, 275 185
-                       Q 270 183, 265 185
-                       Q 255 188, 245 185
-                       Q 240 183, 235 185 Z"
+              {/* Back torso */}
+              <path d="M 240 190 
+                       C 220 195, 205 210, 200 230
+                       L 200 560
+                       C 200 580, 215 595, 235 600
+                       L 285 600
+                       C 305 595, 320 580, 320 560
+                       L 320 230
+                       C 315 210, 300 195, 280 190
+                       Q 275 188, 270 190
+                       Q 260 193, 250 190
+                       Q 245 188, 240 190 Z"
                 fill={getIntensityColor(getSymptomIntensity('back'))}
                 stroke={getIntensityStroke(getSymptomIntensity('back'))}
-                strokeWidth="1.5"
-                filter={hoveredPart === 'back' ? "url(#hoverGlow)" : "url(#softShadow)"}
+                strokeWidth="2"
+                filter={hoveredPart === 'Back & Spine' ? "url(#hoverGlow)" : "url(#softShadow)"}
                 className="transition-all duration-300"
               />
               
-              {/* Enhanced natural spine curve */}
-              <path d="M 255 200 
-                       Q 253 230, 255 260
-                       Q 257 290, 255 320
-                       Q 253 350, 255 380
-                       Q 257 410, 255 440
-                       Q 253 470, 255 500"
-                stroke="rgba(234, 88, 12, 0.7)" 
-                strokeWidth="2.5"
+              {/* Spine */}
+              <path d="M 260 210 
+                       Q 258 250, 260 290
+                       Q 262 330, 260 370
+                       Q 258 410, 260 450
+                       Q 262 490, 260 530
+                       Q 258 570, 260 580"
+                stroke="rgba(234, 88, 12, 0.8)" 
+                strokeWidth="3"
                 strokeLinecap="round"
                 fill="none"
               />
               
-              {/* Enhanced shoulder blade definition */}
-              <path d="M 220 230 Q 235 225, 245 235 Q 240 250, 225 255 Q 215 245, 220 230" 
-                fill="rgba(249, 115, 22, 0.25)" stroke="rgba(234, 88, 12, 0.3)" strokeWidth="0.8" />
-              <path d="M 290 230 Q 275 225, 265 235 Q 270 250, 285 255 Q 295 245, 290 230" 
-                fill="rgba(249, 115, 22, 0.25)" stroke="rgba(234, 88, 12, 0.3)" strokeWidth="0.8" />
+              {/* Shoulder blades */}
+              <ellipse cx="230" cy="260" rx="20" ry="35" fill="none" stroke="rgba(249, 115, 22, 0.4)" strokeWidth="1.5" />
+              <ellipse cx="290" cy="260" rx="20" ry="35" fill="none" stroke="rgba(249, 115, 22, 0.4)" strokeWidth="1.5" />
             </g>
-
-            {/* Back arms and legs with same seamless joint improvements as front view */}
-            {/* (Similar enhancements applied to back view arms and legs) */}
           </>
+        )}
+
+        {/* Hover Tooltip */}
+        {tooltip.visible && (
+          <g>
+            <rect
+              x={tooltip.x - 40}
+              y={tooltip.y - 25}
+              width="80"
+              height="20"
+              rx="10"
+              fill="rgba(0, 0, 0, 0.8)"
+              stroke="rgba(255, 255, 255, 0.3)"
+              strokeWidth="1"
+            />
+            <text
+              x={tooltip.x}
+              y={tooltip.y - 10}
+              textAnchor="middle"
+              fill="white"
+              fontSize="12"
+              fontWeight="500"
+            >
+              {tooltip.text}
+            </text>
+          </g>
         )}
       </svg>
     </div>
@@ -1084,7 +1140,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     
     switch (currentZoom) {
       case 'overview':
-        return '👆 Tap any body area to explore specific parts, or use "General Health Changes" for whole-body symptoms';
+        return '👆 Hover to see body part names, then tap any area to explore specific parts';
       case 'head-system':
       case 'respiratory-system':
       case 'cardiovascular-system':
