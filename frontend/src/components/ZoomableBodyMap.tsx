@@ -1110,7 +1110,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               {['overview'].includes(currentZoom) && (
                 <Button variant="secondary" size="sm" onClick={toggleSide} className="bg-white/20 hover:bg-white/30 text-white border-white/30">
                   <RotateCcw className="h-4 w-4 mr-1" />
-                  {currentSide === 'front' ? 'Back' : 'Front'}
+                  {currentSide === 'front' ? 'Back View' : 'Front View'}
                 </Button>
               )}
               
@@ -1144,6 +1144,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                   {level === 'overview' ? 'Body View' : getViewTitle()}
                 </span>
               </React.Fragment>
+            
             ))}
           </div>
         </CardHeader>
