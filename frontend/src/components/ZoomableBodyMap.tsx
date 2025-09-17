@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Home, Sparkles, RotateCcw, Activity } from 'lucide-react';
+import { ArrowLeft, Home, Sparkles, RotateCcw, Activity, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Symptom } from '@/types/health';
 
@@ -103,6 +103,12 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
       setCurrentSide(prev => prev === 'front' ? 'back' : 'front');
       setIsTransitioning(false);
     }, 150);
+  };
+
+  const handleGeneralHealthClick = () => {
+    if (readOnly) return;
+    // Trigger the callback with a special identifier for general health changes
+    onBodyPartClick('general-health', 'General Health Changes', { x: 0, y: 0 });
   };
 
   const handleBodyPartClick = (bodyPartId: string, bodyPartName: string, event: React.MouseEvent<SVGElement>) => {
@@ -1078,7 +1084,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
     
     switch (currentZoom) {
       case 'overview':
-        return '👆 Tap any body area to explore specific parts for symptom logging';
+        return '👆 Tap any body area to explore specific parts, or use "General Health Changes" for whole-body symptoms';
       case 'head-system':
       case 'respiratory-system':
       case 'cardiovascular-system':
@@ -1100,18 +1106,36 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
               {getViewTitle()}
             </CardTitle>
             <div className="flex space-x-2">
+              {/* General Health Changes Button - Only show on overview */}
+              {currentZoom === 'overview' && (
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  onClick={handleGeneralHealthClick}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0 shadow-md"
+                >
+                  <Heart className="h-4 w-4 mr-1" />
+                  General Health
+                </Button>
+              )}
+              
+              {/* Front/Back Toggle - Only show on overview */}
               {['overview'].includes(currentZoom) && (
                 <Button variant="secondary" size="sm" onClick={toggleSide} className="bg-white/20 hover:bg-white/30 text-white border-white/30">
                   <RotateCcw className="h-4 w-4 mr-1" />
                   {currentSide === 'front' ? 'Back' : 'Front'}
                 </Button>
               )}
+              
+              {/* Back Button */}
               {currentZoom !== 'overview' && (
                 <Button variant="secondary" size="sm" onClick={handleZoomOut} className="bg-white/20 hover:bg-white/30 text-white border-white/30">
                   <ArrowLeft className="h-4 w-4 mr-1" />
                   Back
                 </Button>
               )}
+              
+              {/* Home Button */}
               {currentZoom !== 'overview' && (
                 <Button variant="secondary" size="sm" onClick={handleGoHome} className="bg-white/20 hover:bg-white/30 text-white border-white/30">
                   <Home className="h-4 w-4" />
