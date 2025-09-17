@@ -141,7 +141,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
             Where are you experiencing symptoms?
           </h2>
           <p className="text-gray-600 mb-6">
-            Choose a specific body part or select system-wide changes
+            Choose a specific body part or track general health changes
           </p>
         </div>
 
@@ -152,7 +152,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
           selectedBodyPart={selectedBodyPart}
         />
 
-        {/* System Changes Option */}
+        {/* General Health Changes Option */}
         <div className="flex justify-center">
           <Card 
             className="cursor-pointer transition-all duration-300 hover:scale-105 border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-lg max-w-md"
@@ -165,10 +165,10 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
                 </div>
               </div>
               <h3 className="text-xl font-bold text-purple-800 mb-2">
-                System Changes
+                General Health Changes
               </h3>
               <p className="text-purple-700 text-sm mb-4">
-                Track changes that affect your whole body like mood, sleep, appetite, or skin changes
+                Track changes that affect your overall wellbeing like energy, mood, sleep, appetite, or skin changes
               </p>
               <div className="flex items-center justify-center space-x-2 text-sm text-purple-600">
                 <Activity className="h-4 w-4" />
@@ -180,7 +180,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
 
         <div className="text-center">
           <p className="text-sm text-gray-500">
-            💡 <strong>Tip:</strong> Use "System Changes" for symptoms like fatigue, mood changes, sleep issues, or skin changes that affect your whole body
+            💡 <strong>Tip:</strong> Use "General Health Changes" for symptoms that affect your whole body rather than one specific area
           </p>
         </div>
       </div>
