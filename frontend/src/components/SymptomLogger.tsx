@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { X, Check, User, Activity, Sparkles } from 'lucide-react';
+import { X, Check, User, Activity, Sparkles, ArrowRight, Heart } from 'lucide-react';
 import ZoomableBodyMap from './ZoomableBodyMap';
 import SystemicSymptomLogger from './SystemicSymptomLogger';
 import IntensitySelector from './IntensitySelector';
@@ -152,35 +152,74 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
           selectedBodyPart={selectedBodyPart}
         />
 
-        {/* General Health Changes Option */}
-        <div className="flex justify-center">
-          <Card 
-            className="cursor-pointer transition-all duration-300 hover:scale-105 border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-lg max-w-md"
-            onClick={handleSystemChangesSelect}
-          >
-            <CardContent className="p-6 text-center">
-              <div className="flex items-center justify-center mb-4">
-                <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
-                  <Sparkles className="h-8 w-8 text-white" />
+        {/* Enhanced General Health Changes Integration */}
+        <div className="relative">
+          {/* Connection Line */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 -top-4 w-px h-8 bg-gradient-to-b from-blue-300 to-purple-300"></div>
+          
+          {/* Connection Dots */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 -top-6 w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+          <div className="absolute left-1/2 transform -translate-x-1/2 top-0 w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+          
+          <div className="flex justify-center">
+            <Card 
+              className="cursor-pointer transition-all duration-500 hover:scale-105 border-2 border-purple-300 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 hover:shadow-2xl max-w-lg relative overflow-hidden group"
+              onClick={handleSystemChangesSelect}
+            >
+              {/* Animated background gradient */}
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/10 via-pink-400/10 to-blue-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              
+              {/* Floating particles effect */}
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute top-4 left-4 w-1 h-1 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+                <div className="absolute top-8 right-6 w-1 h-1 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
+                <div className="absolute bottom-6 left-8 w-1 h-1 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.6s' }}></div>
+              </div>
+              
+              <CardContent className="p-8 text-center relative z-10">
+                <div className="flex items-center justify-center mb-6">
+                  <div className="relative">
+                    <div className="p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                      <Heart className="h-10 w-10 text-white animate-pulse" />
+                    </div>
+                    {/* Ripple effect */}
+                    <div className="absolute inset-0 rounded-full border-2 border-purple-300 animate-ping opacity-20"></div>
+                    <div className="absolute inset-0 rounded-full border-2 border-pink-300 animate-ping opacity-20" style={{ animationDelay: '0.5s' }}></div>
+                  </div>
                 </div>
-              </div>
-              <h3 className="text-xl font-bold text-purple-800 mb-2">
-                General Health Changes
-              </h3>
-              <p className="text-purple-700 text-sm mb-4">
-                Track changes that affect your overall wellbeing like energy, mood, sleep, appetite, or skin changes
-              </p>
-              <div className="flex items-center justify-center space-x-2 text-sm text-purple-600">
-                <Activity className="h-4 w-4" />
-                <span>6 categories available</span>
-              </div>
-            </CardContent>
-          </Card>
+                
+                <h3 className="text-2xl font-bold text-purple-800 mb-3 group-hover:text-purple-900 transition-colors">
+                  General Health Changes
+                </h3>
+                
+                <p className="text-purple-700 text-base mb-6 leading-relaxed">
+                  Track changes that affect your overall wellbeing like energy, mood, sleep, appetite, or skin changes
+                </p>
+                
+                <div className="flex items-center justify-center space-x-6 text-sm text-purple-600 mb-4">
+                  <div className="flex items-center space-x-2">
+                    <Activity className="h-4 w-4" />
+                    <span>6 categories</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Sparkles className="h-4 w-4" />
+                    <span>Whole-body tracking</span>
+                  </div>
+                </div>
+                
+                {/* Call to action */}
+                <div className="flex items-center justify-center space-x-2 text-purple-700 font-medium group-hover:text-purple-800 transition-colors">
+                  <span>Tap to explore</span>
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        <div className="text-center">
-          <p className="text-sm text-gray-500">
-            💡 <strong>Tip:</strong> Use "General Health Changes" for symptoms that affect your whole body rather than one specific area
+        <div className="text-center bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-200">
+          <p className="text-sm text-slate-700 font-medium">
+            💡 <strong>Choose your approach:</strong> Use the body map above for location-specific symptoms, or "General Health Changes" for symptoms that affect your whole body like fatigue, mood changes, or sleep issues.
           </p>
         </div>
       </div>
