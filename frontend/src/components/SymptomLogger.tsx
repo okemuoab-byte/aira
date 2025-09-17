@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { X, Check, User, Activity } from 'lucide-react';
+import { X, Check, User, Activity, Sparkles } from 'lucide-react';
 import ZoomableBodyMap from './ZoomableBodyMap';
 import SystemicSymptomLogger from './SystemicSymptomLogger';
 import IntensitySelector from './IntensitySelector';
@@ -17,15 +16,16 @@ interface SymptomLoggerProps {
   userConditions?: string[];
 }
 
-type LoggingStep = 'selection' | 'intensity' | 'notes';
+type LoggingStep = 'selection' | 'intensity' | 'notes' | 'system-changes';
+type LoggingMode = 'body-parts' | 'system-changes';
 
 const SymptomLogger: React.FC<SymptomLoggerProps> = ({
   symptoms,
   onSymptomAdd,
   userConditions = []
 }) => {
-  const [activeTab, setActiveTab] = useState<'body' | 'systems'>('body');
   const [currentStep, setCurrentStep] = useState<LoggingStep>('selection');
+  const [loggingMode, setLoggingMode] = useState<LoggingMode>('body-parts');
   const [selectedBodyPart, setSelectedBodyPart] = useState<string>('');
   const [selectedBodyPartName, setSelectedBodyPartName] = useState<string>('');
   const [selectedCoordinates, setSelectedCoordinates] = useState<{ x: number; y: number } | null>(null);
@@ -38,6 +38,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
     setSelectedBodyPart(bodyPartId);
     setSelectedBodyPartName(bodyPartName);
     setSelectedCoordinates(coordinates);
+    setLoggingMode('body-parts');
     
     // Auto-select if there's only one common symptom
     const suggestions = getFilteredSuggestions(bodyPartId);
@@ -47,6 +48,11 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
     } else {
       setCurrentStep('intensity'); // Skip suggestion step for now, go straight to intensity
     }
+  };
+
+  const handleSystemChangesSelect = () => {
+    setLoggingMode('system-changes');
+    setCurrentStep('system-changes');
   };
 
   const handleSuggestionSelect = (suggestion: SymptomSuggestion) => {
@@ -84,6 +90,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
 
   const resetForm = () => {
     setCurrentStep('selection');
+    setLoggingMode('body-parts');
     setSelectedBodyPart('');
     setSelectedBodyPartName('');
     setSelectedCoordinates(null);
@@ -105,6 +112,10 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
         setCurrentStep('intensity');
         setIntensity(0);
         break;
+      case 'system-changes':
+        setCurrentStep('selection');
+        setLoggingMode('body-parts');
+        break;
     }
   };
 
@@ -118,104 +129,169 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
     });
   };
 
-  const renderBodySymptomLogger = () => {
-    if (currentStep === 'selection') {
-      return (
-        <div className="space-y-6">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Where are you experiencing symptoms?
-            </h2>
-            <p className="text-gray-600">
-              Click on body parts to zoom in and select specific areas
-            </p>
+  const renderSelection = () => {
+    if (loggingMode === 'system-changes') {
+      return null; // SystemicSymptomLogger will handle its own rendering
+    }
+
+    return (
+      <div className="space-y-8">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Where are you experiencing symptoms?
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Choose a specific body part or select system-wide changes
+          </p>
+        </div>
+
+        {/* Body Map */}
+        <ZoomableBodyMap
+          onBodyPartClick={handleBodyPartClick}
+          symptoms={symptoms}
+          selectedBodyPart={selectedBodyPart}
+        />
+
+        {/* System Changes Option */}
+        <div className="flex justify-center">
+          <Card 
+            className="cursor-pointer transition-all duration-300 hover:scale-105 border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-lg max-w-md"
+            onClick={handleSystemChangesSelect}
+          >
+            <CardContent className="p-6 text-center">
+              <div className="flex items-center justify-center mb-4">
+                <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
+                  <Sparkles className="h-8 w-8 text-white" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-purple-800 mb-2">
+                System Changes
+              </h3>
+              <p className="text-purple-700 text-sm mb-4">
+                Track changes that affect your whole body like mood, sleep, appetite, or skin changes
+              </p>
+              <div className="flex items-center justify-center space-x-2 text-sm text-purple-600">
+                <Activity className="h-4 w-4" />
+                <span>6 categories available</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="text-center">
+          <p className="text-sm text-gray-500">
+            💡 <strong>Tip:</strong> Use "System Changes" for symptoms like fatigue, mood changes, sleep issues, or skin changes that affect your whole body
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  const renderIntensity = () => {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            How intense is the discomfort in your {selectedBodyPartName.toLowerCase()}?
+          </h3>
+          <p className="text-sm text-gray-600">
+            You can add more details on the next step
+          </p>
+        </div>
+        <IntensitySelector
+          intensity={intensity}
+          onIntensityChange={handleIntensitySelect}
+        />
+      </div>
+    );
+  };
+
+  const renderNotes = () => {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            Tell us more about your {selectedBodyPartName.toLowerCase()} symptoms
+          </h3>
+          <p className="text-gray-600">
+            Add any additional details (optional)
+          </p>
+        </div>
+        
+        <div className="bg-gray-50 rounded-lg p-4">
+          <div className="text-sm text-gray-600 mb-2">Summary:</div>
+          <div className="font-medium">
+            {selectedBodyPartName} discomfort - Intensity: {intensity}/10
           </div>
-          <ZoomableBodyMap
-            onBodyPartClick={handleBodyPartClick}
-            symptoms={symptoms}
-            selectedBodyPart={selectedBodyPart}
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">
+            What type of symptom is this?
+          </label>
+          <Textarea
+            value={customSymptom}
+            onChange={(e) => setCustomSymptom(e.target.value)}
+            placeholder="e.g., sharp pain, dull ache, stiffness, burning sensation, swelling..."
+            className="min-h-[60px]"
           />
         </div>
-      );
-    }
 
-    if (currentStep === 'intensity') {
-      return (
-        <div className="space-y-6">
-          <div className="text-center">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              How intense is the discomfort in your {selectedBodyPartName.toLowerCase()}?
-            </h3>
-            <p className="text-sm text-gray-600">
-              You can add more details on the next step
-            </p>
-          </div>
-          <IntensitySelector
-            intensity={intensity}
-            onIntensityChange={handleIntensitySelect}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">
+            Additional notes:
+          </label>
+          <Textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="When did it start? What makes it better or worse? Any other details..."
+            className="min-h-[100px]"
           />
         </div>
-      );
-    }
+      </div>
+    );
+  };
 
-    if (currentStep === 'notes') {
+  const renderCurrentStep = () => {
+    if (currentStep === 'system-changes') {
       return (
-        <div className="space-y-6">
-          <div className="text-center">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Tell us more about your {selectedBodyPartName.toLowerCase()} symptoms
-            </h3>
-            <p className="text-gray-600">
-              Add any additional details (optional)
-            </p>
-          </div>
-          
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="text-sm text-gray-600 mb-2">Summary:</div>
-            <div className="font-medium">
-              {selectedBodyPartName} discomfort - Intensity: {intensity}/10
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              What type of symptom is this?
-            </label>
-            <Textarea
-              value={customSymptom}
-              onChange={(e) => setCustomSymptom(e.target.value)}
-              placeholder="e.g., sharp pain, dull ache, stiffness, burning sensation, swelling..."
-              className="min-h-[60px]"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Additional notes:
-            </label>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="When did it start? What makes it better or worse? Any other details..."
-              className="min-h-[100px]"
-            />
-          </div>
-        </div>
+        <SystemicSymptomLogger
+          onSymptomAdd={onSymptomAdd}
+          userConditions={userConditions}
+        />
       );
     }
 
-    return null;
+    switch (currentStep) {
+      case 'selection':
+        return renderSelection();
+      case 'intensity':
+        return renderIntensity();
+      case 'notes':
+        return renderNotes();
+      default:
+        return renderSelection();
+    }
   };
 
   const canProceed = () => {
     switch (currentStep) {
       case 'selection':
-        return selectedBodyPart !== '';
+        return selectedBodyPart !== '' || loggingMode === 'system-changes';
       case 'intensity':
         return intensity > 0;
       case 'notes':
         return true;
+      case 'system-changes':
+        return true;
     }
+  };
+
+  const getProgressSteps = () => {
+    if (currentStep === 'system-changes') {
+      return []; // SystemicSymptomLogger handles its own progress
+    }
+    return ['selection', 'intensity', 'notes'];
   };
 
   return (
@@ -223,8 +299,11 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
       <Card>
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Log Your Symptoms</CardTitle>
-            {currentStep !== 'selection' && activeTab === 'body' && (
+            <CardTitle className="text-lg flex items-center">
+              <User className="h-5 w-5 mr-2" />
+              Log Your Symptoms
+            </CardTitle>
+            {currentStep !== 'selection' && currentStep !== 'system-changes' && (
               <Button variant="ghost" size="sm" onClick={goBack}>
                 <X className="h-4 w-4" />
               </Button>
@@ -233,83 +312,69 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
         </CardHeader>
 
         <CardContent>
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'body' | 'systems')}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="body" className="flex items-center space-x-2">
-                <User className="h-4 w-4" />
-                <span>Body Parts</span>
-              </TabsTrigger>
-              <TabsTrigger value="systems" className="flex items-center space-x-2">
-                <Activity className="h-4 w-4" />
-                <span>System Changes</span>
-              </TabsTrigger>
-            </TabsList>
+          {/* Progress indicator for body symptoms only */}
+          {currentStep !== 'selection' && currentStep !== 'system-changes' && (
+            <div className="flex space-x-2 mb-6">
+              {getProgressSteps().map((step, index) => (
+                <div
+                  key={step}
+                  className={`h-2 flex-1 rounded-full transition-colors ${
+                    currentStep === step
+                      ? 'bg-blue-500'
+                      : index < getProgressSteps().indexOf(currentStep)
+                      ? 'bg-green-500'
+                      : 'bg-gray-200'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
 
-            <TabsContent value="body" className="mt-6">
-              {activeTab === 'body' && (
-                <>
-                  {/* Progress indicator for body symptoms */}
-                  {currentStep !== 'selection' && (
-                    <div className="flex space-x-2 mb-6">
-                      {['selection', 'intensity', 'notes'].map((step, index) => (
-                        <div
-                          key={step}
-                          className={`h-2 flex-1 rounded-full transition-colors ${
-                            currentStep === step
-                              ? 'bg-blue-500'
-                              : index < ['selection', 'intensity', 'notes'].indexOf(currentStep)
-                              ? 'bg-green-500'
-                              : 'bg-gray-200'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  )}
+          {renderCurrentStep()}
 
-                  {renderBodySymptomLogger()}
+          {/* Action buttons for body symptoms only */}
+          {currentStep !== 'selection' && currentStep !== 'system-changes' && (
+            <div className="flex justify-between pt-6">
+              <Button
+                variant="outline"
+                onClick={goBack}
+              >
+                Back
+              </Button>
 
-                  {/* Action buttons for body symptoms */}
-                  {currentStep !== 'selection' && (
-                    <div className="flex justify-between pt-6">
-                      <Button
-                        variant="outline"
-                        onClick={goBack}
-                      >
-                        Back
-                      </Button>
-
-                      {currentStep === 'notes' ? (
-                        <Button
-                          onClick={handleSaveSymptom}
-                          disabled={!canProceed()}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <Check className="h-4 w-4 mr-2" />
-                          Save Symptom
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => {
-                            if (currentStep === 'intensity') setCurrentStep('notes');
-                          }}
-                          disabled={!canProceed()}
-                        >
-                          Next
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </>
+              {currentStep === 'notes' ? (
+                <Button
+                  onClick={handleSaveSymptom}
+                  disabled={!canProceed()}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Save Symptom
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => {
+                    if (currentStep === 'intensity') setCurrentStep('notes');
+                  }}
+                  disabled={!canProceed()}
+                >
+                  Next
+                </Button>
               )}
-            </TabsContent>
+            </div>
+          )}
 
-            <TabsContent value="systems" className="mt-6">
-              <SystemicSymptomLogger
-                onSymptomAdd={onSymptomAdd}
-                userConditions={userConditions}
-              />
-            </TabsContent>
-          </Tabs>
+          {/* Back button for system changes */}
+          {currentStep === 'system-changes' && (
+            <div className="flex justify-start pt-6">
+              <Button
+                variant="outline"
+                onClick={goBack}
+              >
+                ← Back to Body Selection
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
