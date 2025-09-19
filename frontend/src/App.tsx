@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { AuthPage } from "./pages/AuthPage";
+import DesignPreviewPage from "./pages/DesignPreviewPage";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const AppRoutes = () => (
   <BrowserRouter>
     <Routes>
       <Route path="/auth" element={<AuthPage />} />
+      <Route path="/design-preview" element={<DesignPreviewPage />} />
       <Route
         path="/"
         element={

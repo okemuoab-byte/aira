@@ -137,6 +137,89 @@ class SymptomInDB(SymptomBase):
         json_encoders = {ObjectId: str}
 
 
+# Medication Models
+class MedicationBase(BaseModel):
+    name: str
+    dosage: str
+    frequency: str
+    times: List[str] = []
+    start_date: datetime
+    end_date: Optional[datetime] = None
+    notes: Optional[str] = None
+    reminder_enabled: bool = True
+    side_effects: List[str] = []
+    effectiveness: Optional[int] = Field(None, ge=1, le=10)
+    adherence_rate: Optional[float] = Field(None, ge=0.0, le=100.0)
+    missed_doses: List[Dict[str, Any]] = []
+
+
+class MedicationCreate(MedicationBase):
+    pass
+
+
+class MedicationUpdate(BaseModel):
+    name: Optional[str] = None
+    dosage: Optional[str] = None
+    frequency: Optional[str] = None
+    times: Optional[List[str]] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    notes: Optional[str] = None
+    reminder_enabled: Optional[bool] = None
+    side_effects: Optional[List[str]] = None
+    effectiveness: Optional[int] = Field(None, ge=1, le=10)
+    adherence_rate: Optional[float] = Field(None, ge=0.0, le=100.0)
+    missed_doses: Optional[List[Dict[str, Any]]] = None
+
+
+class MedicationInDB(MedicationBase):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
+class Medication(MedicationBase):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
+# Dose tracking models
+class DoseLogBase(BaseModel):
+    medication_id: PyObjectId
+    scheduled_time: datetime
+    actual_time: Optional[datetime] = None
+    status: str  # "taken", "missed", "skipped"
+    notes: Optional[str] = None
+
+
+class DoseLogCreate(DoseLogBase):
+    pass
+
+
+class DoseLog(DoseLogBase):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
+    created_at: datetime
+
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
 class Symptom(SymptomBase):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     user_id: PyObjectId

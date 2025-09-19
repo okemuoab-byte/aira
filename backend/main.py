@@ -85,10 +85,18 @@ async def api_v1_health_check():
     """
     return await health_check()
 
+# Database dependency
+async def get_database():
+    return database
+
 # Import and include route modules
 from routes.auth import router as auth_router
+from routes.symptoms import router as symptoms_router
+from routes.medications import router as medications_router
 
-api_v1_router.include_router(auth_router)
+api_v1_router.include_router(auth_router, prefix="/auth", tags=["authentication"])
+api_v1_router.include_router(symptoms_router, prefix="/symptoms", tags=["symptoms"])
+api_v1_router.include_router(medications_router, prefix="/medications", tags=["medications"])
 
 # Root endpoint
 @app.get("/")
