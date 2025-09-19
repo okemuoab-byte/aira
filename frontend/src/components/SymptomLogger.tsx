@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { X, Check, User, Activity, Sparkles, ArrowRight, Heart, Mic, FileText } from 'lucide-react';
+import { X, Check, User, Activity, Sparkles, ArrowRight, Heart, Mic, FileText, Brain } from 'lucide-react';
 import ZoomableBodyMap from './ZoomableBodyMap';
 import SystemicSymptomLogger from './SystemicSymptomLogger';
 import IntensitySelector from './IntensitySelector';
 import VoiceRecorder from './VoiceRecorder';
+import TriageAssessment from './TriageAssessment';
 import { Symptom, SymptomSuggestion, VoiceRecording } from '@/types/health';
 import { symptomSuggestions } from '@/data/bodyParts';
 import { showSuccess } from '@/utils/toast';
@@ -16,15 +17,17 @@ interface SymptomLoggerProps {
   symptoms: Symptom[];
   onSymptomAdd: (symptom: Omit<Symptom, 'id'>) => void;
   userConditions?: string[];
+  patientAge?: number;
 }
 
-type LoggingStep = 'selection' | 'intensity' | 'notes' | 'system-changes';
+type LoggingStep = 'selection' | 'intensity' | 'notes' | 'triage' | 'system-changes';
 type LoggingMode = 'body-parts' | 'system-changes';
 
 const SymptomLogger: React.FC<SymptomLoggerProps> = ({
   symptoms,
   onSymptomAdd,
-  userConditions = []
+  userConditions = [],
+  patientAge = 45
 }) => {
   const [currentStep, setCurrentStep] = useState<LoggingStep>('selection');
   const [loggingMode, setLoggingMode] = useState<LoggingMode>('body-parts');
@@ -36,6 +39,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
   const [notes, setNotes] = useState<string>('');
   const [customSymptom, setCustomSymptom] = useState<string>('');
   const [voiceRecording, setVoiceRecording] = useState<VoiceRecording | null>(null);
+  const [currentSymptom, setCurrentSymptom] = useState<Symptom | null>(null);
 
   const handleBodyPartClick = (bodyPartId: string, bodyPartName: string, coordinates: { x: number; y: number }) => {
     setSelectedBodyPart(bodyPartId);
@@ -87,7 +91,8 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
     // Use a default symptom type if none selected
     const symptomType = selectedSuggestion?.text || customSymptom || `${selectedBodyPartName} discomfort`;
     
-    const newSymptom: Omit<Symptom, 'id'> = {
+    const newSymptom: Symptom = {
+      id: Date.now().toString(),
       bodyPartId: selectedBodyPart,
       bodyPartName: selectedBodyPartName,
       type: symptomType,
@@ -98,11 +103,20 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
       voiceRecording: voiceRecording || undefined
     };
 
-    onSymptomAdd(newSymptom);
-    showSuccess(`${symptomType} logged for ${selectedBodyPartName}`);
-    
-    // Reset form
-    resetForm();
+    // Set current symptom for triage and proceed to triage step
+    setCurrentSymptom(newSymptom);
+    setCurrentStep('triage');
+  };
+
+  const handleTriageComplete = (triageRecommendation: any) => {
+    if (currentSymptom) {
+      // Add the symptom to the list
+      onSymptomAdd(currentSymptom);
+      showSuccess(`${currentSymptom.type} logged with clinical assessment for ${currentSymptom.bodyPartName}`);
+      
+      // Reset form
+      resetForm();
+    }
   };
 
   const resetForm = () => {
@@ -116,6 +130,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
     setNotes('');
     setCustomSymptom('');
     setVoiceRecording(null);
+    setCurrentSymptom(null);
   };
 
   const goBack = () => {
@@ -129,6 +144,10 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
       case 'notes':
         setCurrentStep('intensity');
         setIntensity(0);
+        break;
+      case 'triage':
+        setCurrentStep('notes');
+        setCurrentSymptom(null);
         break;
       case 'system-changes':
         setCurrentStep('selection');
@@ -342,6 +361,31 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
     );
   };
 
+  const renderTriage = () => {
+    if (!currentSymptom) return null;
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center justify-center">
+            <Brain className="h-6 w-6 mr-2 text-blue-600" />
+            AI Clinical Assessment
+          </h3>
+          <p className="text-gray-600">
+            Our AI system is analyzing your symptoms using NICE clinical guidelines to provide personalized recommendations
+          </p>
+        </div>
+        
+        <TriageAssessment
+          symptom={currentSymptom}
+          patientAge={patientAge}
+          patientConditions={userConditions}
+          onRecommendationAccept={handleTriageComplete}
+        />
+      </div>
+    );
+  };
+
   const renderCurrentStep = () => {
     if (currentStep === 'system-changes') {
       return (
@@ -359,6 +403,8 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
         return renderIntensity();
       case 'notes':
         return renderNotes();
+      case 'triage':
+        return renderTriage();
       default:
         return renderSelection();
     }
@@ -372,6 +418,8 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
         return intensity > 0;
       case 'notes':
         return true;
+      case 'triage':
+        return true;
       case 'system-changes':
         return true;
     }
@@ -381,7 +429,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
     if (currentStep === 'system-changes') {
       return []; // SystemicSymptomLogger handles its own progress
     }
-    return ['selection', 'intensity', 'notes'];
+    return ['selection', 'intensity', 'notes', 'triage'];
   };
 
   return (
@@ -423,7 +471,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
           {renderCurrentStep()}
 
           {/* Action buttons for body symptoms only */}
-          {currentStep !== 'selection' && currentStep !== 'system-changes' && (
+          {currentStep !== 'selection' && currentStep !== 'system-changes' && currentStep !== 'triage' && (
             <div className="flex justify-between pt-6">
               <Button
                 variant="outline"
@@ -436,10 +484,10 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
                 <Button
                   onClick={handleSaveSymptom}
                   disabled={!canProceed()}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-blue-600 hover:bg-blue-700"
                 >
-                  <Check className="h-4 w-4 mr-2" />
-                  Save Symptom
+                  <Brain className="h-4 w-4 mr-2" />
+                  Get Clinical Assessment
                 </Button>
               ) : (
                 <Button
@@ -462,6 +510,18 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
                 onClick={goBack}
               >
                 ← Back to Body Selection
+              </Button>
+            </div>
+          )}
+
+          {/* Back button for triage */}
+          {currentStep === 'triage' && (
+            <div className="flex justify-start pt-6">
+              <Button
+                variant="outline"
+                onClick={goBack}
+              >
+                ← Back to Edit Details
               </Button>
             </div>
           )}

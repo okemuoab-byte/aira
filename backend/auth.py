@@ -61,9 +61,15 @@ async def authenticate_user(database: AsyncIOMotorDatabase, email: str, password
     return user
 
 
+def get_database_dependency():
+    """Get database dependency."""
+    from main import database
+    return database
+
+
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    database: AsyncIOMotorDatabase = None
+    database: AsyncIOMotorDatabase = Depends(get_database_dependency)
 ) -> dict:
     """Get current user from JWT token."""
     credentials_exception = HTTPException(
