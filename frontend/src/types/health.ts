@@ -23,6 +23,7 @@ export interface Symptom {
   triggers?: string[];
   treatments?: string[];
   foodHistory?: string[]; // Foods consumed in last 24-48 hours
+  voiceRecording?: VoiceRecording; // New voice recording field
 }
 
 export interface SymptomPhoto {
@@ -39,6 +40,15 @@ export interface SymptomMeasurement {
   value: number;
   unit: string;
   timestamp: Date;
+}
+
+export interface VoiceRecording {
+  id: string;
+  audioBlob: Blob;
+  duration: number; // in seconds
+  timestamp: Date;
+  transcript?: string; // Optional transcription
+  fileSize: number; // in bytes
 }
 
 export interface SymptomProgression {

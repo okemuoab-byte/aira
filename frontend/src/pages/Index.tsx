@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Activity, User, BookOpen, Pill, Users, Bell, Brain, Stethoscope, Calendar, FileText, Heart } from 'lucide-react';
+import { Plus, Activity, User, BookOpen, Pill, Users, Bell, Brain, Stethoscope, Calendar, FileText, Heart, LogOut } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import CombinedDashboard from '@/components/CombinedDashboard';
 import SymptomLogger from '@/components/SymptomLogger';
 import MedicationTracker from '@/components/MedicationTracker';
@@ -11,6 +12,7 @@ import FamilyHistorySection from '@/components/FamilyHistorySection';
 import { Symptom, UserProfile, Medication, FamilyMember, MedicationReminder as MedicationReminderType, FamilyHistoryCondition } from '@/types/health';
 
 const Index = () => {
+  const { user, logout } = useAuth();
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [medications, setMedications] = useState<Medication[]>([]);
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
@@ -297,7 +299,7 @@ const Index = () => {
             
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600 font-medium">
-                {getGreeting()}, {userProfile.name}
+                {getGreeting()}, {user?.name || userProfile.name}
               </span>
               {hasActiveReminders && (
                 <Button
@@ -317,6 +319,14 @@ const Index = () => {
               >
                 <User className="h-4 w-4 mr-2" />
                 Profile
+              </Button>
+              <Button
+                variant="outline"
+                onClick={logout}
+                className="bg-white/50 backdrop-blur-sm hover:bg-white/80 border-gray-200 text-red-600 hover:text-red-700"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
               </Button>
               <Button
                 onClick={() => setActiveTab('log-symptoms')}

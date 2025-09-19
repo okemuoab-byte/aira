@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { X, Check, User, Activity, Sparkles, ArrowRight, Heart } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { X, Check, User, Activity, Sparkles, ArrowRight, Heart, Mic, FileText } from 'lucide-react';
 import ZoomableBodyMap from './ZoomableBodyMap';
 import SystemicSymptomLogger from './SystemicSymptomLogger';
 import IntensitySelector from './IntensitySelector';
-import { Symptom, SymptomSuggestion } from '@/types/health';
+import VoiceRecorder from './VoiceRecorder';
+import { Symptom, SymptomSuggestion, VoiceRecording } from '@/types/health';
 import { symptomSuggestions } from '@/data/bodyParts';
 import { showSuccess } from '@/utils/toast';
 
@@ -33,6 +35,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
   const [intensity, setIntensity] = useState<number>(0);
   const [notes, setNotes] = useState<string>('');
   const [customSymptom, setCustomSymptom] = useState<string>('');
+  const [voiceRecording, setVoiceRecording] = useState<VoiceRecording | null>(null);
 
   const handleBodyPartClick = (bodyPartId: string, bodyPartName: string, coordinates: { x: number; y: number }) => {
     setSelectedBodyPart(bodyPartId);
@@ -65,6 +68,19 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
     setCurrentStep('notes');
   };
 
+  const handleVoiceRecordingSave = (audioBlob: Blob, duration: number, transcript?: string) => {
+    const recording: VoiceRecording = {
+      id: Date.now().toString(),
+      audioBlob,
+      duration,
+      timestamp: new Date(),
+      transcript,
+      fileSize: audioBlob.size
+    };
+    setVoiceRecording(recording);
+    showSuccess('Voice recording saved');
+  };
+
   const handleSaveSymptom = () => {
     if (!selectedBodyPart || intensity === 0) return;
 
@@ -78,7 +94,8 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
       intensity,
       notes: notes.trim() || undefined,
       timestamp: new Date(),
-      coordinates: selectedCoordinates || undefined
+      coordinates: selectedCoordinates || undefined,
+      voiceRecording: voiceRecording || undefined
     };
 
     onSymptomAdd(newSymptom);
@@ -98,6 +115,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
     setIntensity(0);
     setNotes('');
     setCustomSymptom('');
+    setVoiceRecording(null);
   };
 
   const goBack = () => {
@@ -253,7 +271,7 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
             Tell us more about your {selectedBodyPartName.toLowerCase()} symptoms
           </h3>
           <p className="text-gray-600">
-            Add any additional details (optional)
+            Add details by typing or speaking - whatever feels easier for you
           </p>
         </div>
         
@@ -262,31 +280,64 @@ const SymptomLogger: React.FC<SymptomLoggerProps> = ({
           <div className="font-medium">
             {selectedBodyPartName} discomfort - Intensity: {intensity}/10
           </div>
+          {voiceRecording && (
+            <div className="text-sm text-green-600 mt-1 flex items-center">
+              <Mic className="h-3 w-3 mr-1" />
+              Voice recording attached ({Math.round(voiceRecording.duration)}s)
+            </div>
+          )}
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
-            What type of symptom is this?
-          </label>
-          <Textarea
-            value={customSymptom}
-            onChange={(e) => setCustomSymptom(e.target.value)}
-            placeholder="e.g., sharp pain, dull ache, stiffness, burning sensation, swelling..."
-            className="min-h-[60px]"
-          />
-        </div>
+        <Tabs defaultValue="text" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="text" className="flex items-center space-x-2">
+              <FileText className="h-4 w-4" />
+              <span>Type Details</span>
+            </TabsTrigger>
+            <TabsTrigger value="voice" className="flex items-center space-x-2">
+              <Mic className="h-4 w-4" />
+              <span>Voice Description</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="text" className="space-y-4 mt-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">
+                What type of symptom is this?
+              </label>
+              <Textarea
+                value={customSymptom}
+                onChange={(e) => setCustomSymptom(e.target.value)}
+                placeholder="e.g., sharp pain, dull ache, stiffness, burning sensation, swelling..."
+                className="min-h-[60px]"
+              />
+            </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
-            Additional notes:
-          </label>
-          <Textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="When did it start? What makes it better or worse? Any other details..."
-            className="min-h-[100px]"
-          />
-        </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">
+                Additional notes:
+              </label>
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="When did it start? What makes it better or worse? Any other details..."
+                className="min-h-[100px]"
+              />
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="voice" className="mt-6">
+            <VoiceRecorder
+              onAudioSave={handleVoiceRecordingSave}
+              existingAudio={voiceRecording ? {
+                blob: voiceRecording.audioBlob,
+                duration: voiceRecording.duration,
+                transcript: voiceRecording.transcript
+              } : undefined}
+              maxDuration={300} // 5 minutes
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     );
   };

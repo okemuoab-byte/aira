@@ -899,7 +899,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                 "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
                 intensity > 0 ? "border-orange-300 shadow-orange-200/50" : "border-slate-300"
               )}
-              onClick={(e) => handleBodyPartClick(part.id, part.name, e)}
+              onClick={(e) => handleBodyPartClick(part.id, part.name, e as any)}
             >
               <CardContent className={cn(
                 "p-4 text-center bg-gradient-to-br",
@@ -944,7 +944,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                 "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
                 intensity > 0 ? "border-blue-300 shadow-blue-200/50" : "border-slate-300"
               )}
-              onClick={(e) => handleBodyPartClick(part.id, part.name, e)}
+              onClick={(e) => handleBodyPartClick(part.id, part.name, e as any)}
             >
               <CardContent className={cn(
                 "p-4 text-center bg-gradient-to-br",
@@ -987,7 +987,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                 "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
                 intensity > 0 ? "border-red-300 shadow-red-200/50" : "border-slate-300"
               )}
-              onClick={(e) => handleBodyPartClick(part.id, part.name, e)}
+              onClick={(e) => handleBodyPartClick(part.id, part.name, e as any)}
             >
               <CardContent className={cn(
                 "p-4 text-center bg-gradient-to-br",
@@ -1034,7 +1034,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                 "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
                 intensity > 0 ? "border-green-300 shadow-green-200/50" : "border-slate-300"
               )}
-              onClick={(e) => handleBodyPartClick(part.id, part.name, e)}
+              onClick={(e) => handleBodyPartClick(part.id, part.name, e as any)}
             >
               <CardContent className={cn(
                 "p-4 text-center bg-gradient-to-br",
@@ -1083,7 +1083,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                 "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
                 intensity > 0 ? "border-orange-300 shadow-orange-200/50" : "border-slate-300"
               )}
-              onClick={(e) => handleBodyPartClick(part.id, part.name, e)}
+              onClick={(e) => handleBodyPartClick(part.id, part.name, e as any)}
             >
               <CardContent className={cn(
                 "p-4 text-center bg-gradient-to-br",
@@ -1134,7 +1134,7 @@ const ZoomableBodyMap: React.FC<ZoomableBodyMapProps> = ({
                 "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
                 intensity > 0 ? "border-green-300 shadow-green-200/50" : "border-slate-300"
               )}
-              onClick={(e) => handleBodyPartClick(part.i, part.name, e)}
+              onClick={(e) => handleBodyPartClick(part.id, part.name, e as any)}
             >
               <CardContent className={cn(
                 "p-4 text-center bg-gradient-to-br",

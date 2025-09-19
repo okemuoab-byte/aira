@@ -85,6 +85,11 @@ async def api_v1_health_check():
     """
     return await health_check()
 
+# Import and include route modules
+from routes.auth import router as auth_router
+
+api_v1_router.include_router(auth_router)
+
 # Root endpoint
 @app.get("/")
 async def root():
