@@ -6,7 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from auth import get_current_user
 from models import MedicationCreate, MedicationUpdate, DoseLogCreate
-from main import get_database
+from database import get_database
 
 router = APIRouter()
 

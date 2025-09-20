@@ -4,12 +4,9 @@ from typing import Dict, Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+from database import get_database
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -31,12 +28,8 @@ app.add_middleware(
 )
 
 # MongoDB connection
-mongodb_uri = os.getenv("MONGODB_URI")
-if not mongodb_uri:
-    raise ValueError("MONGODB_URI environment variable is required")
-
-client = AsyncIOMotorClient(mongodb_uri)
-database = client.health_journey
+database = get_database()
+client = database.client
 
 # Response models
 class HealthCheckResponse(BaseModel):
@@ -86,8 +79,6 @@ async def api_v1_health_check():
     return await health_check()
 
 # Database dependency
-async def get_database():
-    return database
 
 # Import and include route modules
 from routes.auth import router as auth_router
