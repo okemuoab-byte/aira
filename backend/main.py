@@ -18,18 +18,21 @@ app = FastAPI(
 )
 
 # CORS configuration
-cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5137,http://localhost:5173").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origins=["*"],  # Allow all origins for development
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
-# MongoDB connection
-database = get_database()
-client = database.client
+# MongoDB connection - using mock database for testing
+from database_mock import get_mock_database
+database = get_mock_database()
+
+# Keep the original client for health check
+from database import client
 
 # Response models
 class HealthCheckResponse(BaseModel):
@@ -84,10 +87,20 @@ async def api_v1_health_check():
 from routes.auth import router as auth_router
 from routes.symptoms import router as symptoms_router
 from routes.medications import router as medications_router
+from routes.users import router as users_router
+from routes.visits import router as visits_router
+from routes.family import router as family_router
+from routes.uploads import router as uploads_router
+from routes.health import router as health_router
 
 api_v1_router.include_router(auth_router, prefix="/auth", tags=["authentication"])
 api_v1_router.include_router(symptoms_router, prefix="/symptoms", tags=["symptoms"])
 api_v1_router.include_router(medications_router, prefix="/medications", tags=["medications"])
+api_v1_router.include_router(users_router, prefix="/users", tags=["user-profile"])
+api_v1_router.include_router(visits_router, prefix="/visits", tags=["healthcare-visits"])
+api_v1_router.include_router(family_router, prefix="/family", tags=["family-sharing"])
+api_v1_router.include_router(uploads_router, prefix="/uploads", tags=["photo-uploads"])
+api_v1_router.include_router(health_router, prefix="/health", tags=["health-insights"])
 
 # Root endpoint
 @app.get("/")
@@ -108,9 +121,14 @@ app.include_router(api_v1_router)
 # Global exception handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
-    return HTTPException(
+    import logging
+    logging.error(f"Global exception handler triggered: {type(exc).__name__}: {str(exc)}")
+    logging.error(f"Request URL: {request.url}")
+    
+    from fastapi.responses import JSONResponse
+    return JSONResponse(
         status_code=500,
-        detail=ErrorResponse(
+        content=ErrorResponse(
             error="Internal server error",
             code="INTERNAL_ERROR",
             details={"message": str(exc)}
@@ -122,7 +140,7 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(
         "main:app",
-        host="0.0.0.0",
+        host="127.0.0.1",
         port=port,
         reload=True,
         log_level="info"

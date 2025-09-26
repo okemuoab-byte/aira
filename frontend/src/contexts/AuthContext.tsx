@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { apiService, User, LoginRequest, SignupRequest } from '../services/api';
 
 interface AuthContextType {
@@ -27,6 +28,8 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -51,6 +54,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       const response = await apiService.login(credentials);
       setUser(response.user);
+      
+      // Redirect to main page after successful login
+      const from = location.state?.from?.pathname || '/';
+      navigate(from, { replace: true });
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -64,6 +71,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       const response = await apiService.signup(userData);
       setUser(response.user);
+      
+      // Redirect to main page after successful signup
+      const from = location.state?.from?.pathname || '/';
+      navigate(from, { replace: true });
     } catch (error) {
       console.error('Signup failed:', error);
       throw error;

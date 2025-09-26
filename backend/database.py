@@ -1,4 +1,4 @@
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 import os
 
@@ -9,7 +9,8 @@ MONGODB_URI = os.getenv("MONGODB_URI")
 if not MONGODB_URI:
     raise ValueError("MONGODB_URI environment variable is required")
 
-client = MongoClient(MONGODB_URI)
+# Simple client configuration for MongoDB Atlas
+client = AsyncIOMotorClient(MONGODB_URI)
 db = client.health_journey
 
 def get_database():
