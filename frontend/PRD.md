@@ -10,7 +10,7 @@ source: Deep Mode PRD Generation
 
 ## EXECUTIVE SUMMARY
 
-**Product Vision:** A comprehensive Health Journey Platform that serves as the "Google Maps for your illness" - guiding patients from diagnosis through chronic disease management to end-of-life care with AI-powered transparency, education, and family support.
+**Product Vision:** Aira is a comprehensive health platform that serves as the "Google Maps for your illness" - guiding patients from diagnosis through chronic disease management to end-of-life care with AI-powered transparency, education, and family support.
 
 **Core Purpose:** Eliminates healthcare fragmentation by providing patients with clear understanding of their conditions, procedures, and care journey while supporting families and training medical students in compassionate communication.
 
@@ -232,11 +232,11 @@ source: Deep Mode PRD Generation
 **Simulation 1: Patient Seeking Procedure Explanation - Happy Path**
 - **Context:** Patient recently had biliary stent placement and wants to understand the procedure
 - **User:** "I had a biliary stent placed yesterday. Can you explain what this means for my condition?"
-- **Health Journey AI:** "I'd be happy to explain your biliary stent procedure in simple terms. A biliary stent is like a tiny tube that was placed in your bile duct to keep it open. Think of it as a small tunnel that helps bile flow from your liver to your intestines when the natural pathway is blocked. For your cholangiocarcinoma, this helps relieve symptoms like jaundice and abdominal pain. Would you like me to explain how this fits into your overall care plan?"
+- **Tellus:** "I'd be happy to explain your biliary stent procedure in simple terms. A biliary stent is like a tiny tube that was placed in your bile duct to keep it open. Think of it as a small tunnel that helps bile flow from your liver to your intestines when the natural pathway is blocked. For your cholangiocarcinoma, this helps relieve symptoms like jaundice and abdominal pain. Would you like me to explain how this fits into your overall care plan?"
 - **User:** "Yes, and how long will it stay in?"
-- **Health Journey AI:** "Great question! Biliary stents typically stay in place for several months, but the exact timing depends on your specific situation. Your care team will monitor how well it's working through regular check-ups. Some patients need stent replacement every 3-6 months, while others may have theirs for longer. I can add this to your care timeline so you and your family can see what to expect. Would you like me to show you how this procedure fits into your treatment journey?"
+- **Tellus:** "Great question! Biliary stents typically stay in place for several months, but the exact timing depends on your specific situation. Your care team will monitor how well it's working through regular check-ups. Some patients need stent replacement every 3-6 months, while others may have theirs for longer. I can add this to your care timeline so you and your family can see what to expect. Would you like me to show you how this procedure fits into your treatment journey?"
 - **User:** "That would be helpful. My daughter is worried and doesn't understand what's happening."
-- **Health Journey AI:** "I understand her concern - it's natural for family to worry when they don't fully understand medical procedures. I can create a family-friendly summary that explains your stent placement in even simpler terms, focusing on how it helps you feel better. This summary will be available in your family dashboard, and your daughter can access it anytime. Would you like me to prepare that summary now?"
+- **Tellus:** "I understand her concern - it's natural for family to worry when they don't fully understand medical procedures. I can create a family-friendly summary that explains your stent placement in even simpler terms, focusing on how it helps you feel better. This summary will be available in your family dashboard, and your daughter can access it anytime. Would you like me to prepare that summary now?"
 
 **Simulation 2: Student Training Scenario - Communication Practice**
 - **Context:** Medical student practicing how to explain a complex cardiac procedure to a patient

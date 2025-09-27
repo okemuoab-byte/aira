@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { AuthPage } from "./pages/AuthPage";
 import DesignPreviewPage from "./pages/DesignPreviewPage";
+import Chatbot from "./components/Chatbot";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -31,22 +32,31 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const AppRoutes = () => (
-  <Routes>
-    <Route path="/auth" element={<AuthPage />} />
-    <Route path="/design-preview" element={<DesignPreviewPage />} />
-    <Route
-      path="/"
-      element={
-        <ProtectedRoute>
-          <Index />
-        </ProtectedRoute>
-      }
-    />
-    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-    <Route path="*" element={<NotFound />} />
-  </Routes>
-);
+const AppRoutes = () => {
+  const { isAuthenticated } = useAuth();
+  
+  return (
+    <>
+      <Routes>
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/design-preview" element={<DesignPreviewPage />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Index />
+            </ProtectedRoute>
+          }
+        />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      
+      {/* Show chatbot on all authenticated pages */}
+      {isAuthenticated && <Chatbot />}
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

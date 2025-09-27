@@ -296,10 +296,10 @@ const Index = () => {
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    Health Journey
+                  <h1 className="text-2xl font-black tracking-wide bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent uppercase">
+                    Aira
                   </h1>
-                  <div className="text-xs text-slate-500">AI-Powered Health Tracking</div>
+                  <div className="text-xs text-slate-500 font-medium tracking-widest uppercase">Your Health Journey</div>
                 </div>
               </div>
             </div>

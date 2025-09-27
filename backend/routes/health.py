@@ -17,6 +17,7 @@ from models import (
     RecommendationItem
 )
 from database import get_database
+from services.simple_openai_service import get_simple_openai_service
 
 router = APIRouter()
 
@@ -277,6 +278,131 @@ async def get_health_recommendations(
         medical_consultation_needed=medical_consultation_needed,
         generated_at=now
     )
+
+
+@router.post("/ai-insights")
+async def get_ai_health_insights(
+    current_user: User = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Get AI-generated health insights based on user's symptoms and medical history"""
+    try:
+        user_id = ObjectId(current_user["_id"])
+        now = datetime.utcnow()
+        
+        # Get recent symptoms (last 30 days)
+        recent_symptoms = await db.symptoms.find({
+            "user_id": user_id,
+            "timestamp": {"$gte": now - timedelta(days=30)},
+            "deleted_at": {"$exists": False}
+        }).to_list(length=None)
+        
+        if not recent_symptoms:
+            return {
+                "insights": "No recent symptoms found. Please log some symptoms to get AI insights.",
+                "model_used": None,
+                "disclaimer": "This information is for educational purposes only. Please consult with a healthcare professional for proper medical advice."
+            }
+        
+        # Extract symptom types and medical history
+        symptom_types = [s["type"] for s in recent_symptoms]
+        medical_history = current_user.get("medical_history", "")
+        
+        # Get AI insights
+        openai_service = get_simple_openai_service()
+        insights = await openai_service.generate_health_insights(symptom_types, medical_history)
+        
+        return insights
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate AI insights: {str(e)}")
+
+
+@router.post("/ai-symptom-analysis")
+async def get_ai_symptom_analysis(
+    current_user: User = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Get AI analysis of symptom progression over time"""
+    try:
+        user_id = ObjectId(current_user["_id"])
+        now = datetime.utcnow()
+        
+        # Get symptom history (last 90 days)
+        symptom_history = await db.symptoms.find({
+            "user_id": user_id,
+            "timestamp": {"$gte": now - timedelta(days=90)},
+            "deleted_at": {"$exists": False}
+        }).sort("timestamp", 1).to_list(length=None)
+        
+        if len(symptom_history) < 2:
+            return {
+                "analysis": "Insufficient symptom data for progression analysis. Please log more symptoms over time.",
+                "model_used": None,
+                "disclaimer": "This analysis is for informational purposes only. Consult healthcare professionals for medical advice."
+            }
+        
+        # Format symptom history for AI analysis
+        formatted_history = []
+        for symptom in symptom_history:
+            formatted_history.append({
+                "date": symptom.get("timestamp", symptom.get("created_at")).strftime("%Y-%m-%d"),
+                "symptoms": [symptom["type"]],
+                "severity": symptom["intensity"]
+            })
+        
+        # Get AI analysis
+        openai_service = get_simple_openai_service()
+        analysis = await openai_service.analyze_symptom_progression(formatted_history)
+        
+        return analysis
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to analyze symptom progression: {str(e)}")
+
+
+@router.post("/ai-medication-reminders")
+async def get_ai_medication_reminders(
+    current_user: User = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Get AI-generated personalized medication reminders and tips"""
+    try:
+        user_id = ObjectId(current_user["_id"])
+        
+        # Get active medications
+        medications = await db.medications.find({
+            "user_id": user_id,
+            "$or": [
+                {"end_date": {"$exists": False}},
+                {"end_date": {"$gte": datetime.utcnow()}}
+            ]
+        }).to_list(length=None)
+        
+        if not medications:
+            return {
+                "reminders": "No active medications found. Add your medications to get personalized reminders.",
+                "model_used": None,
+                "disclaimer": "Always follow your healthcare provider's instructions for medication use."
+            }
+        
+        # Format medications for AI analysis
+        formatted_medications = []
+        for med in medications:
+            formatted_medications.append({
+                "name": med.get("name", "Unknown medication"),
+                "dosage": med.get("dosage", "Unknown dosage"),
+                "frequency": med.get("frequency", "Unknown frequency")
+            })
+        
+        # Get AI reminders
+        openai_service = get_simple_openai_service()
+        reminders = await openai_service.generate_medication_reminders(formatted_medications)
+        
+        return reminders
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate medication reminders: {str(e)}")
 
 
 # Helper functions for analytics and AI insights

@@ -116,6 +116,51 @@ class ApiService {
     return this.handleResponse<any>(response);
   }
 
+  // Chatbot methods
+  async sendChatMessage(message: string, context?: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/chatbot/chat`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({
+        message,
+        context
+      }),
+    });
+
+    return this.handleResponse<any>(response);
+  }
+
+  async continueChatConversation(conversationId: string, message: string, context?: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/chatbot/chat/continue/${conversationId}`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({
+        message,
+        context
+      }),
+    });
+
+    return this.handleResponse<any>(response);
+  }
+
+  async getChatHistory(limit: number = 10): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/chatbot/chat/history?limit=${limit}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+
+    return this.handleResponse<any>(response);
+  }
+
+  async getChatConversation(conversationId: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/chatbot/chat/${conversationId}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+
+    return this.handleResponse<any>(response);
+  }
+
   // Token management
   setToken(token: string): void {
     this.token = token;

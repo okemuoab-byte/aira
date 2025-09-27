@@ -285,7 +285,7 @@ JWT_SECRET=your-super-secret-jwt-key-here
 JWT_EXPIRES_IN=86400
 
 # CORS
-CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+CORS_ORIGINS=http://localhost:5137,http://localhost:3000
 ```
 
 ## 7) Testing Strategy (Manual via Frontend)

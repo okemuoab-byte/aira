@@ -92,6 +92,7 @@ from routes.visits import router as visits_router
 from routes.family import router as family_router
 from routes.uploads import router as uploads_router
 from routes.health import router as health_router
+from routes.chatbot import router as chatbot_router
 
 api_v1_router.include_router(auth_router, prefix="/auth", tags=["authentication"])
 api_v1_router.include_router(symptoms_router, prefix="/symptoms", tags=["symptoms"])
@@ -101,6 +102,7 @@ api_v1_router.include_router(visits_router, prefix="/visits", tags=["healthcare-
 api_v1_router.include_router(family_router, prefix="/family", tags=["family-sharing"])
 api_v1_router.include_router(uploads_router, prefix="/uploads", tags=["photo-uploads"])
 api_v1_router.include_router(health_router, prefix="/health", tags=["health-insights"])
+api_v1_router.include_router(chatbot_router, prefix="/chatbot", tags=["ai-chatbot"])
 
 # Root endpoint
 @app.get("/")
