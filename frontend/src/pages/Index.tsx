@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Activity, User, BookOpen, Pill, Users, Bell, Brain, Stethoscope, Calendar, FileText, Heart, LogOut } from 'lucide-react';
+import { Plus, Activity, User, BookOpen, Pill, Users, Bell, Brain, Stethoscope, Calendar, FileText, Heart, LogOut, GraduationCap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import CombinedDashboard from '@/components/CombinedDashboard';
 import SymptomLogger from '@/components/SymptomLogger';
@@ -9,6 +9,7 @@ import MedicationTracker from '@/components/MedicationTracker';
 import MedicationReminder from '@/components/MedicationReminder';
 import FamilyDashboard from '@/components/FamilyDashboard';
 import FamilyHistorySection from '@/components/FamilyHistorySection';
+import MedicalExplanations from '@/components/MedicalExplanations';
 import { Symptom, UserProfile, Medication, FamilyMember, MedicationReminder as MedicationReminderType, FamilyHistoryCondition } from '@/types/health';
 
 const Index = () => {
@@ -204,6 +205,12 @@ const Index = () => {
     console.log('Share settings updated:', settings);
   };
 
+  const handleFamilyHistoryUpdate = (updatedHistory: FamilyHistoryCondition[]) => {
+    // Update the user profile with the new family history
+    // In a real app, this would make an API call to save the data
+    console.log('Family history updated:', updatedHistory);
+  };
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
@@ -343,7 +350,7 @@ const Index = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-[500px] bg-white/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-6 lg:w-[600px] bg-white/50 backdrop-blur-sm">
             <TabsTrigger value="log-symptoms" className="flex items-center space-x-2">
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Log</span>
@@ -366,6 +373,10 @@ const Index = () => {
             <TabsTrigger value="family" className="flex items-center space-x-2">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Family</span>
+            </TabsTrigger>
+            <TabsTrigger value="explanations" className="flex items-center space-x-2">
+              <GraduationCap className="h-4 w-4" />
+              <span className="hidden sm:inline">Explain</span>
             </TabsTrigger>
           </TabsList>
 
@@ -413,6 +424,10 @@ const Index = () => {
               onFamilyMemberUpdate={handleFamilyMemberUpdate}
               onShareSettingsUpdate={handleShareSettingsUpdate}
             />
+          </TabsContent>
+
+          <TabsContent value="explanations" className="space-y-6">
+            <MedicalExplanations />
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
@@ -480,9 +495,10 @@ const Index = () => {
                       <Heart className="h-5 w-5 mr-2 text-red-600" />
                       Family Health History
                     </h4>
-                    <FamilyHistorySection 
+                    <FamilyHistorySection
                       familyHistory={userProfile.familyHistory}
                       userConditions={userProfile.conditions}
+                      onFamilyHistoryUpdate={handleFamilyHistoryUpdate}
                     />
                   </div>
 

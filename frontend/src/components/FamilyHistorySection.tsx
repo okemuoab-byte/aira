@@ -3,34 +3,79 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Users, 
-  Heart, 
-  Brain, 
-  Activity, 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Users,
+  Heart,
+  Brain,
+  Activity,
   Eye,
   Info,
   ChevronDown,
   ChevronRight,
   Plus,
-  FileText
+  FileText,
+  Edit,
+  Save,
+  X
 } from 'lucide-react';
 import { FamilyHistoryCondition } from '@/types/health';
 import { cn } from '@/lib/utils';
+import { showSuccess } from '@/utils/toast';
 
 interface FamilyHistorySectionProps {
   familyHistory: FamilyHistoryCondition[];
   userConditions: string[];
+  onFamilyHistoryUpdate?: (history: FamilyHistoryCondition[]) => void;
   className?: string;
 }
 
 const FamilyHistorySection: React.FC<FamilyHistorySectionProps> = ({
   familyHistory,
   userConditions,
+  onFamilyHistoryUpdate,
   className
 }) => {
   const [expandedConditions, setExpandedConditions] = useState<Set<string>>(new Set());
   const [showAllConditions, setShowAllConditions] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingCondition, setEditingCondition] = useState<FamilyHistoryCondition | null>(null);
+  
+  // Form state for adding/editing family history
+  const [formData, setFormData] = useState({
+    condition: '',
+    familyMember: '',
+    relationship: 'parent' as 'parent' | 'grandparent' | 'sibling' | 'aunt_uncle' | 'cousin',
+    ageOfOnset: '',
+    severity: 'mild' as 'mild' | 'moderate' | 'severe',
+    notes: '',
+    isUserAffected: false,
+    riskLevel: 'low' as 'low' | 'moderate' | 'high'
+  });
+
+  const relationshipOptions = [
+    { value: 'parent', label: 'Parent' },
+    { value: 'grandparent', label: 'Grandparent' },
+    { value: 'sibling', label: 'Sibling' },
+    { value: 'aunt_uncle', label: 'Aunt/Uncle' },
+    { value: 'cousin', label: 'Cousin' }
+  ];
+
+  const severityOptions = [
+    { value: 'mild', label: 'Mild' },
+    { value: 'moderate', label: 'Moderate' },
+    { value: 'severe', label: 'Severe' }
+  ];
+
+  const riskLevelOptions = [
+    { value: 'low', label: 'Low Risk' },
+    { value: 'moderate', label: 'Moderate Risk' },
+    { value: 'high', label: 'High Risk' }
+  ];
 
   const toggleCondition = (conditionName: string) => {
     const newExpanded = new Set(expandedConditions);
@@ -40,6 +85,88 @@ const FamilyHistorySection: React.FC<FamilyHistorySectionProps> = ({
       newExpanded.add(conditionName);
     }
     setExpandedConditions(newExpanded);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      condition: '',
+      familyMember: '',
+      relationship: 'parent',
+      ageOfOnset: '',
+      severity: 'mild',
+      notes: '',
+      isUserAffected: false,
+      riskLevel: 'low'
+    });
+    setEditingCondition(null);
+  };
+
+  const handleAddCondition = () => {
+    if (!formData.condition || !formData.familyMember) return;
+
+    const newCondition: FamilyHistoryCondition = {
+      id: Date.now().toString(),
+      condition: formData.condition,
+      familyMember: formData.familyMember,
+      relationship: formData.relationship,
+      ageOfOnset: formData.ageOfOnset ? parseInt(formData.ageOfOnset) : undefined,
+      severity: formData.severity,
+      notes: formData.notes || undefined,
+      isUserAffected: formData.isUserAffected,
+      riskLevel: formData.riskLevel
+    };
+
+    const updatedHistory = [...familyHistory, newCondition];
+    onFamilyHistoryUpdate?.(updatedHistory);
+    showSuccess(`Added ${formData.condition} to family history`);
+    resetForm();
+    setShowAddForm(false);
+  };
+
+  const handleEditCondition = (condition: FamilyHistoryCondition) => {
+    setEditingCondition(condition);
+    setFormData({
+      condition: condition.condition,
+      familyMember: condition.familyMember,
+      relationship: condition.relationship,
+      ageOfOnset: condition.ageOfOnset?.toString() || '',
+      severity: condition.severity || 'mild',
+      notes: condition.notes || '',
+      isUserAffected: condition.isUserAffected,
+      riskLevel: condition.riskLevel
+    });
+    setShowAddForm(true);
+  };
+
+  const handleUpdateCondition = () => {
+    if (!editingCondition || !formData.condition || !formData.familyMember) return;
+
+    const updatedCondition: FamilyHistoryCondition = {
+      ...editingCondition,
+      condition: formData.condition,
+      familyMember: formData.familyMember,
+      relationship: formData.relationship,
+      ageOfOnset: formData.ageOfOnset ? parseInt(formData.ageOfOnset) : undefined,
+      severity: formData.severity,
+      notes: formData.notes || undefined,
+      isUserAffected: formData.isUserAffected,
+      riskLevel: formData.riskLevel
+    };
+
+    const updatedHistory = familyHistory.map(condition =>
+      condition.id === editingCondition.id ? updatedCondition : condition
+    );
+    
+    onFamilyHistoryUpdate?.(updatedHistory);
+    showSuccess(`Updated ${formData.condition} in family history`);
+    resetForm();
+    setShowAddForm(false);
+  };
+
+  const handleDeleteCondition = (conditionId: string) => {
+    const updatedHistory = familyHistory.filter(condition => condition.id !== conditionId);
+    onFamilyHistoryUpdate?.(updatedHistory);
+    showSuccess('Removed condition from family history');
   };
 
   const getConditionIcon = (condition: string) => {
@@ -178,12 +305,43 @@ const FamilyHistorySection: React.FC<FamilyHistorySectionProps> = ({
                 <div className="mt-4 p-3 bg-slate-50 rounded-lg">
                   <div className="text-sm font-medium text-slate-700 mb-2">Additional notes:</div>
                   {conditions.filter(c => c.notes).map((condition) => (
-                    <div key={condition.id} className="text-sm text-slate-600 mb-1">
-                      <strong>{condition.familyMember}:</strong> {condition.notes}
+                    <div key={condition.id} className="text-sm text-slate-600 mb-1 flex items-center justify-between">
+                      <span><strong>{condition.familyMember}:</strong> {condition.notes}</span>
+                      <div className="flex space-x-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditCondition(condition)}
+                          className="h-6 w-6 p-0"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteCondition(condition.id)}
+                          className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
+              
+              {/* Edit buttons for each condition */}
+              <div className="mt-4 flex justify-end space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEditCondition(conditions[0])}
+                  className="text-xs"
+                >
+                  <Edit className="h-3 w-3 mr-1" />
+                  Edit
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
@@ -191,21 +349,175 @@ const FamilyHistorySection: React.FC<FamilyHistorySectionProps> = ({
     );
   };
 
+  const renderFamilyHistoryForm = () => (
+    <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center">
+            {editingCondition ? <Edit className="h-5 w-5 mr-2" /> : <Plus className="h-5 w-5 mr-2" />}
+            {editingCondition ? 'Edit Family History' : 'Add Family History'}
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-6 py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="condition">Health Condition *</Label>
+              <Input
+                id="condition"
+                value={formData.condition}
+                onChange={(e) => setFormData(prev => ({ ...prev, condition: e.target.value }))}
+                placeholder="e.g., Type 2 Diabetes, Heart Disease"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="familyMember">Family Member *</Label>
+              <Input
+                id="familyMember"
+                value={formData.familyMember}
+                onChange={(e) => setFormData(prev => ({ ...prev, familyMember: e.target.value }))}
+                placeholder="e.g., Mother, Father, Grandmother"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="relationship">Relationship</Label>
+              <Select value={formData.relationship} onValueChange={(value: any) => setFormData(prev => ({ ...prev, relationship: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {relationshipOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="ageOfOnset">Age of Onset</Label>
+              <Input
+                id="ageOfOnset"
+                type="number"
+                value={formData.ageOfOnset}
+                onChange={(e) => setFormData(prev => ({ ...prev, ageOfOnset: e.target.value }))}
+                placeholder="Age when diagnosed"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="severity">Severity</Label>
+              <Select value={formData.severity} onValueChange={(value: any) => setFormData(prev => ({ ...prev, severity: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {severityOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="riskLevel">Risk Level</Label>
+              <Select value={formData.riskLevel} onValueChange={(value: any) => setFormData(prev => ({ ...prev, riskLevel: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {riskLevelOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2 flex items-center">
+              <div className="flex items-center space-x-2 mt-6">
+                <input
+                  type="checkbox"
+                  id="isUserAffected"
+                  checked={formData.isUserAffected}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isUserAffected: e.target.checked }))}
+                  className="rounded"
+                />
+                <Label htmlFor="isUserAffected" className="text-sm">
+                  I currently have this condition
+                </Label>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="notes">Additional Notes</Label>
+            <Textarea
+              id="notes"
+              value={formData.notes}
+              onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+              placeholder="Any additional information about this condition..."
+              rows={3}
+            />
+          </div>
+
+          <div className="flex space-x-2 pt-4">
+            <Button
+              onClick={editingCondition ? handleUpdateCondition : handleAddCondition}
+              disabled={!formData.condition || !formData.familyMember}
+              className="flex-1"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {editingCondition ? 'Update' : 'Add'} Condition
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                resetForm();
+                setShowAddForm(false);
+              }}
+            >
+              <X className="h-4 w-4 mr-2" />
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   if (familyHistory.length === 0) {
     return (
-      <Card className={cn("border-dashed border-2 border-slate-300", className)}>
-        <CardContent className="p-8 text-center">
-          <Users className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-slate-700 mb-2">No Family History Recorded</h3>
-          <p className="text-slate-600 mb-4">
-            Adding family health history helps your healthcare provider understand your health background.
-          </p>
-          <Button variant="outline" className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Family History
-          </Button>
-        </CardContent>
-      </Card>
+      <div className={cn("space-y-4", className)}>
+        <Card className="border-dashed border-2 border-slate-300">
+          <CardContent className="p-8 text-center">
+            <Users className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-slate-700 mb-2">No Family History Recorded</h3>
+            <p className="text-slate-600 mb-4">
+              Adding family health history helps your healthcare provider understand your health background.
+            </p>
+            <Button
+              variant="outline"
+              className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+              onClick={() => setShowAddForm(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Family History
+            </Button>
+          </CardContent>
+        </Card>
+        {renderFamilyHistoryForm()}
+      </div>
     );
   }
 
@@ -296,7 +608,11 @@ const FamilyHistorySection: React.FC<FamilyHistorySectionProps> = ({
                 This family history information can help your healthcare provider make informed decisions about 
                 screening schedules, preventive care, and treatment options tailored to your health background.
               </p>
-              <Button variant="outline" className="bg-white/80 hover:bg-white text-green-700 border-green-300">
+              <Button
+                variant="outline"
+                className="bg-white/80 hover:bg-white text-green-700 border-green-300"
+                onClick={() => setShowAddForm(true)}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Update Family History
               </Button>
@@ -304,6 +620,9 @@ const FamilyHistorySection: React.FC<FamilyHistorySectionProps> = ({
           </div>
         </CardContent>
       </Card>
+      
+      {/* Add/Edit Form Modal */}
+      {renderFamilyHistoryForm()}
     </div>
   );
 };
