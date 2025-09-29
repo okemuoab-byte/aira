@@ -4,12 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  AlertTriangle, 
-  Clock, 
-  Activity, 
-  Phone, 
-  Calendar, 
+import {
+  AlertTriangle,
+  Clock,
+  Activity,
+  Phone,
+  Calendar,
   Stethoscope,
   Brain,
   Shield,
@@ -21,11 +21,15 @@ import {
   Ambulance,
   UserCheck,
   FileText,
-  ArrowRight
+  ArrowRight,
+  Sparkles,
+  Target
 } from 'lucide-react';
 import { Symptom } from '@/types/health';
 import { cn } from '@/lib/utils';
 import { showSuccess, showError } from '@/utils/toast';
+import ClinicalQuestions from './ClinicalQuestions';
+import RealTimeClinicalAssessment from './RealTimeClinicalAssessment';
 
 interface TriageAssessmentProps {
   symptom: Symptom;
@@ -71,13 +75,35 @@ const TriageAssessment: React.FC<TriageAssessmentProps> = ({
   className
 }) => {
   const [triageResult, setTriageResult] = useState<TriageRecommendation | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(true);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showDetailedView, setShowDetailedView] = useState(false);
   const [professionalReviewStatus, setProfessionalReviewStatus] = useState<'pending' | 'reviewed' | 'escalated'>('pending');
+  const [assessmentMode, setAssessmentMode] = useState<'questions' | 'realtime' | 'complete'>('questions');
+  const [clinicalQuestions, setClinicalQuestions] = useState<any[]>([]);
+  const [enhancedAssessment, setEnhancedAssessment] = useState<any>(null);
 
   useEffect(() => {
-    performTriageAssessment();
+    // Start with clinical questions for better symptom analysis
+    setAssessmentMode('questions');
   }, [symptom]);
+
+  const handleClinicalQuestionsComplete = (responses: any[]) => {
+    setClinicalQuestions(responses);
+    setAssessmentMode('realtime');
+  };
+
+  const handleEnhancedAssessmentComplete = (assessment: any) => {
+    setEnhancedAssessment(assessment);
+    setAssessmentMode('complete');
+    
+    // Auto-escalate emergencies
+    if (assessment.urgency_level === 'emergency') {
+      setProfessionalReviewStatus('escalated');
+      showError('EMERGENCY DETECTED - Healthcare professional notified immediately');
+    } else {
+      showSuccess('Enhanced AI clinical assessment completed successfully');
+    }
+  };
 
   const performTriageAssessment = async () => {
     setIsAnalyzing(true);
@@ -541,12 +567,176 @@ const TriageAssessment: React.FC<TriageAssessmentProps> = ({
   };
 
   const handleAcceptRecommendation = () => {
-    if (triageResult) {
+    if (enhancedAssessment) {
+      onRecommendationAccept(enhancedAssessment);
+      showSuccess('Enhanced AI assessment accepted and saved to your health record');
+    } else if (triageResult) {
       onRecommendationAccept(triageResult);
       showSuccess('Triage recommendations accepted and saved to your health record');
     }
   };
 
+  // Render based on current assessment mode
+  if (assessmentMode === 'questions') {
+    return (
+      <div className={cn("space-y-6", className)}>
+        <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50">
+          <CardHeader>
+            <CardTitle className="flex items-center text-blue-800">
+              <Brain className="h-6 w-6 mr-2" />
+              Enhanced AI Clinical Assessment
+            </CardTitle>
+            <p className="text-blue-700">
+              Let's gather detailed information about your symptoms for a more accurate assessment
+            </p>
+          </CardHeader>
+        </Card>
+        
+        <ClinicalQuestions
+          symptomData={symptom}
+          patientProfile={{ age: patientAge, conditions: patientConditions }}
+          onQuestionsComplete={handleClinicalQuestionsComplete}
+        />
+      </div>
+    );
+  }
+
+  if (assessmentMode === 'realtime') {
+    return (
+      <div className={cn("space-y-6", className)}>
+        <RealTimeClinicalAssessment
+          symptomData={symptom}
+          patientProfile={{ age: patientAge, conditions: patientConditions }}
+          medicalHistory={patientConditions}
+          onAssessmentComplete={handleEnhancedAssessmentComplete}
+        />
+      </div>
+    );
+  }
+
+  if (assessmentMode === 'complete' && enhancedAssessment) {
+    const UrgencyIcon = getUrgencyIcon(enhancedAssessment.urgency_level);
+    
+    return (
+      <div className={cn("space-y-6", className)}>
+        {/* Emergency Alert */}
+        {enhancedAssessment.urgency_level === 'emergency' && (
+          <Alert className="border-red-500 bg-red-50 animate-pulse">
+            <Ambulance className="h-5 w-5 text-red-600" />
+            <AlertDescription className="text-red-800 font-semibold text-lg">
+              🚨 MEDICAL EMERGENCY DETECTED - CALL 999 IMMEDIATELY
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Enhanced Assessment Results */}
+        <Card className="border-0 shadow-2xl overflow-hidden">
+          <CardHeader className={cn("text-white bg-gradient-to-r", getUrgencyColor(enhancedAssessment.urgency_level))}>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl flex items-center">
+                <UrgencyIcon className="h-6 w-6 mr-3" />
+                Enhanced Clinical Assessment Complete
+              </CardTitle>
+              <div className="flex items-center space-x-2">
+                <Badge className="bg-white/20 text-white border-white/30">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  AI + NICE Guidelines
+                </Badge>
+                <UserCheck className="h-5 w-5" />
+              </div>
+            </div>
+            <p className="text-blue-100 mt-2">
+              Professional healthcare oversight: {professionalReviewStatus === 'escalated' ? 'ESCALATED' : 'Pending review'}
+            </p>
+          </CardHeader>
+
+          <CardContent className="p-6 space-y-6">
+            {/* Key Assessment Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-lg border border-red-200">
+                <div className="text-2xl font-bold text-red-700">{enhancedAssessment.urgency_level?.toUpperCase()}</div>
+                <div className="text-sm text-red-600">Urgency Level</div>
+              </div>
+              
+              <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                <div className="text-2xl font-bold text-orange-700">{enhancedAssessment.classification?.toUpperCase()}</div>
+                <div className="text-sm text-orange-600">Classification</div>
+              </div>
+              
+              <div className="text-center p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg border border-yellow-200">
+                <Badge className={cn("text-lg font-bold", getSeverityBadge(enhancedAssessment.risk_level))}>
+                  {enhancedAssessment.risk_level?.toUpperCase()}
+                </Badge>
+                <div className="text-sm text-yellow-600 mt-1">Risk Level</div>
+              </div>
+              
+              <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                <div className="text-lg font-bold text-blue-700">{enhancedAssessment.severity_score || 'N/A'}/10</div>
+                <div className="text-sm text-blue-600">Severity Score</div>
+              </div>
+            </div>
+
+            {/* Primary Concern */}
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+              <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                <Heart className="h-5 w-5 mr-2" />
+                Primary Clinical Concern
+              </h4>
+              <p className="text-purple-700 text-lg font-medium">{enhancedAssessment.primary_concern}</p>
+              {enhancedAssessment.clinical_summary && (
+                <div className="mt-4 bg-white/50 rounded-lg p-4">
+                  <h5 className="font-medium text-purple-800 mb-2">Clinical Summary</h5>
+                  <p className="text-purple-700 text-sm leading-relaxed">{enhancedAssessment.clinical_summary}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Button
+                onClick={handleAcceptRecommendation}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Accept Enhanced Assessment
+              </Button>
+              
+              {enhancedAssessment.urgency_level === 'emergency' && (
+                <Button
+                  onClick={() => window.open('tel:999')}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white animate-pulse"
+                >
+                  <Phone className="h-4 w-4 mr-2" />
+                  Call 999 Now
+                </Button>
+              )}
+              
+              {enhancedAssessment.urgency_level === 'urgent' && (
+                <Button
+                  onClick={() => window.open('tel:111')}
+                  className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
+                >
+                  <Phone className="h-4 w-4 mr-2" />
+                  Call NHS 111
+                </Button>
+              )}
+            </div>
+
+            {/* Medical Disclaimer */}
+            <Alert className="border-gray-300 bg-gray-50">
+              <Info className="h-4 w-4 text-gray-600" />
+              <AlertDescription className="text-gray-700 text-sm">
+                <strong>Medical Disclaimer:</strong> This enhanced AI assessment uses advanced clinical reasoning and NICE guidelines.
+                It does not replace professional medical judgment. Always seek immediate medical attention for emergencies.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Fallback to original triage assessment
   if (isAnalyzing) {
     return (
       <Card className={cn("border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50", className)}>

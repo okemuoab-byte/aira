@@ -34,12 +34,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        console.log('🔍 DEBUG: Initializing auth...');
+        console.log('🔍 Is authenticated:', apiService.isAuthenticated());
+        console.log('🔍 Token:', apiService.getToken() ? `${apiService.getToken()?.substring(0, 20)}...` : 'null');
+        
         if (apiService.isAuthenticated()) {
           const currentUser = await apiService.getCurrentUser();
           setUser(currentUser);
+          console.log('🔍 Current user loaded:', currentUser.email);
+        } else {
+          console.log('🔍 No authentication token found');
         }
       } catch (error) {
-        console.error('Failed to initialize auth:', error);
+        console.error('🔍 Failed to initialize auth:', error);
         apiService.clearToken();
       } finally {
         setLoading(false);
@@ -101,6 +108,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     isAuthenticated: !!user,
   };
+
+  // Debug logging for auth state changes
+  useEffect(() => {
+    console.log('🔍 Auth state changed:');
+    console.log('🔍 User:', user?.email || 'null');
+    console.log('🔍 Loading:', loading);
+    console.log('🔍 Is authenticated:', !!user);
+  }, [user, loading]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

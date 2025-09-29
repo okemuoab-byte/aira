@@ -161,6 +161,50 @@ class ApiService {
     return this.handleResponse<any>(response);
   }
 
+  // Medication AI methods
+  async getMedicationSuggestions(query: string, purpose?: string): Promise<any> {
+    const url = new URL(`${API_BASE_URL}/medications/suggestions`);
+    url.searchParams.append('query', query);
+    if (purpose) {
+      url.searchParams.append('purpose', purpose);
+    }
+
+    // Debug logging
+    console.log('🔍 DEBUG: Making medication suggestions request');
+    console.log('🔍 Token available:', !!this.token);
+    console.log('🔍 Token value:', this.token ? `${this.token.substring(0, 20)}...` : 'null');
+    console.log('🔍 URL:', url.toString());
+    console.log('🔍 Headers:', this.getHeaders());
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+
+    console.log('🔍 Response status:', response.status);
+    console.log('🔍 Response ok:', response.ok);
+
+    return this.handleResponse<any>(response);
+  }
+
+  async getMedicationSafety(medicationId: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/medications/${medicationId}/safety`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+
+    return this.handleResponse<any>(response);
+  }
+
+  async getMedicationPurpose(medicationName: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/medications/${encodeURIComponent(medicationName)}/purpose`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+
+    return this.handleResponse<any>(response);
+  }
+
   // Token management
   setToken(token: string): void {
     this.token = token;
