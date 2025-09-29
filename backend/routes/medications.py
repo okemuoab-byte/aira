@@ -5,10 +5,18 @@ from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from auth import get_current_user
-from models import MedicationCreate, MedicationUpdate, DoseLogCreate
+from models import (
+    MedicationCreate, MedicationUpdate, DoseLogCreate,
+    MedicationSuggestionRequest, MedicationPurposeResponse,
+    MedicationAIAssistRequest, MedicationAIAssistResponse
+)
 from database import get_database
+from services.medication_ai_service import get_medication_ai_service
 
 router = APIRouter()
+
+# Initialize AI service
+medication_ai_service = get_medication_ai_service()
 
 
 @router.post("/")
@@ -66,6 +74,43 @@ async def get_medications(
         del medication["_id"]
     
     return medications
+
+
+# Move specific routes before parameterized routes to avoid conflicts
+@router.get("/suggestions")
+async def get_medication_suggestions(
+    query: str = Query(..., description="Partial medication name or description"),
+    purpose: Optional[str] = Query(None, description="Optional purpose/condition for the medication"),
+    current_user: dict = Depends(get_current_user)
+):
+    """Get AI-powered medication name suggestions"""
+    try:
+        # Use AI service to get medication suggestions
+        ai_response = await medication_ai_service.suggest_medications(
+            partial_name=query,
+            purpose=purpose
+        )
+        
+        if ai_response["success"]:
+            return {
+                "success": True,
+                "query": query,
+                "purpose": purpose,
+                "suggestions": ai_response["suggestions"],
+                "disclaimer": ai_response["disclaimer"],
+                "ai_generated": True
+            }
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to generate suggestions: {ai_response.get('error', 'Unknown error')}"
+            )
+            
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating medication suggestions: {str(e)}"
+        )
 
 
 @router.get("/{medication_id}")
@@ -172,7 +217,7 @@ async def get_medication_safety_info(
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Get safety information for a medication"""
+    """Get AI-generated safety information for a medication"""
     if not ObjectId.is_valid(medication_id):
         raise HTTPException(status_code=400, detail="Invalid medication ID")
     
@@ -185,17 +230,44 @@ async def get_medication_safety_info(
     if not medication:
         raise HTTPException(status_code=404, detail="Medication not found")
     
-    # This would typically integrate with a drug database API
-    # For now, returning mock safety information based on common medications
-    medication_name = medication["name"].lower()
-    
-    safety_info = get_mock_safety_info(medication_name)
-    
-    return {
-        "medication_id": medication_id,
-        "medication_name": medication["name"],
-        "safety_info": safety_info
-    }
+    try:
+        # Use AI service to generate safety information
+        ai_response = await medication_ai_service.generate_safety_information(
+            medication_name=medication["name"],
+            dosage=medication.get("dosage")
+        )
+        
+        if ai_response["success"]:
+            return {
+                "medication_id": medication_id,
+                "medication_name": medication["name"],
+                "safety_info": ai_response["safety_information"],
+                "disclaimer": ai_response["disclaimer"],
+                "ai_generated": True
+            }
+        else:
+            # Fallback to mock data if AI fails
+            safety_info = get_mock_safety_info(medication["name"].lower())
+            return {
+                "medication_id": medication_id,
+                "medication_name": medication["name"],
+                "safety_info": safety_info,
+                "disclaimer": "This is mock safety information. Please consult your healthcare provider.",
+                "ai_generated": False,
+                "error": ai_response.get("error")
+            }
+            
+    except Exception as e:
+        # Fallback to mock data on any error
+        safety_info = get_mock_safety_info(medication["name"].lower())
+        return {
+            "medication_id": medication_id,
+            "medication_name": medication["name"],
+            "safety_info": safety_info,
+            "disclaimer": "This is mock safety information. Please consult your healthcare provider.",
+            "ai_generated": False,
+            "error": f"AI service error: {str(e)}"
+        }
 
 
 @router.post("/{medication_id}/doses")
@@ -358,3 +430,93 @@ def get_mock_safety_info(medication_name: str) -> dict:
         "warnings": ["Follow your healthcare provider's instructions", "Read medication labels carefully"],
         "contraindications": ["Consult your healthcare provider about any medical conditions"]
     })
+
+
+@router.get("/{medication_name}/purpose")
+async def get_medication_purpose(
+    medication_name: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get AI-powered medication purpose analysis"""
+    try:
+        # Use AI service to analyze medication purpose
+        ai_response = await medication_ai_service.analyze_medication_purpose(medication_name)
+        
+        if ai_response["success"]:
+            purpose_data = ai_response["purpose_analysis"]
+            return MedicationPurposeResponse(
+                medication_name=purpose_data["medication_name"],
+                primary_purpose=purpose_data["primary_purpose"],
+                secondary_purposes=purpose_data["secondary_purposes"],
+                mechanism_of_action=purpose_data["mechanism_of_action"],
+                therapeutic_class=purpose_data["therapeutic_class"],
+                disclaimer=ai_response["disclaimer"]
+            )
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to analyze medication purpose: {ai_response.get('error', 'Unknown error')}"
+            )
+            
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error analyzing medication purpose: {str(e)}"
+        )
+
+
+@router.post("/ai-assist")
+async def medication_ai_assist(
+    request: MedicationAIAssistRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Comprehensive AI-powered medication assistance"""
+    try:
+        # Route to appropriate AI service method based on query type
+        if request.query_type == "safety":
+            ai_response = await medication_ai_service.generate_safety_information(
+                medication_name=request.medication_name
+            )
+        elif request.query_type == "purpose":
+            ai_response = await medication_ai_service.analyze_medication_purpose(
+                medication_name=request.medication_name
+            )
+        elif request.query_type == "suggestions":
+            ai_response = await medication_ai_service.suggest_medications(
+                partial_name=request.medication_name,
+                patient_context=request.patient_context
+            )
+        else:
+            # For general queries, use safety information as default
+            ai_response = await medication_ai_service.generate_safety_information(
+                medication_name=request.medication_name
+            )
+        
+        if ai_response["success"]:
+            return MedicationAIAssistResponse(
+                success=True,
+                medication_name=request.medication_name,
+                query_type=request.query_type,
+                response_data=ai_response,
+                disclaimer=ai_response["disclaimer"],
+                generated_at=datetime.utcnow()
+            )
+        else:
+            return MedicationAIAssistResponse(
+                success=False,
+                medication_name=request.medication_name,
+                query_type=request.query_type,
+                response_data={"error": ai_response.get("error", "Unknown error")},
+                disclaimer="AI service encountered an error. Please consult your healthcare provider.",
+                generated_at=datetime.utcnow()
+            )
+            
+    except Exception as e:
+        return MedicationAIAssistResponse(
+            success=False,
+            medication_name=request.medication_name,
+            query_type=request.query_type,
+            response_data={"error": str(e)},
+            disclaimer="AI service encountered an error. Please consult your healthcare provider.",
+            generated_at=datetime.utcnow()
+        )

@@ -607,3 +607,35 @@ class HealthRecommendationsResponse(BaseModel):
     monitoring_suggestions: List[str]
     medical_consultation_needed: bool
     generated_at: datetime
+
+
+# Medication AI Models
+class MedicationSuggestionRequest(BaseModel):
+    query: str = Field(..., description="Partial medication name or description")
+    purpose: Optional[str] = Field(None, description="Optional purpose/condition for the medication")
+
+
+class MedicationPurposeResponse(BaseModel):
+    medication_name: str
+    primary_purpose: str
+    secondary_purposes: List[str]
+    mechanism_of_action: str
+    therapeutic_class: str
+    disclaimer: str
+
+
+class MedicationAIAssistRequest(BaseModel):
+    medication_name: str = Field(..., description="Name of the medication")
+    patient_context: Optional[str] = Field(None, description="Patient context (age, conditions, etc.)")
+    query_type: str = Field(..., description="Type of assistance needed: 'safety', 'interactions', 'dosage', 'general'")
+    additional_info: Optional[Dict[str, Any]] = Field(None, description="Additional context information")
+
+
+class MedicationAIAssistResponse(BaseModel):
+    success: bool
+    medication_name: str
+    query_type: str
+    response_data: Dict[str, Any]
+    disclaimer: str
+    confidence_score: Optional[float] = None
+    generated_at: datetime

@@ -18,7 +18,7 @@ app = FastAPI(
 )
 
 # CORS configuration
-cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5137,http://localhost:5173").split(",")
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5137").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins for development
@@ -93,6 +93,7 @@ from routes.family import router as family_router
 from routes.uploads import router as uploads_router
 from routes.health import router as health_router
 from routes.chatbot import router as chatbot_router
+from routes.clinical_ai import router as clinical_ai_router
 
 api_v1_router.include_router(auth_router, prefix="/auth", tags=["authentication"])
 api_v1_router.include_router(symptoms_router, prefix="/symptoms", tags=["symptoms"])
@@ -103,6 +104,7 @@ api_v1_router.include_router(family_router, prefix="/family", tags=["family-shar
 api_v1_router.include_router(uploads_router, prefix="/uploads", tags=["photo-uploads"])
 api_v1_router.include_router(health_router, prefix="/health", tags=["health-insights"])
 api_v1_router.include_router(chatbot_router, prefix="/chatbot", tags=["ai-chatbot"])
+api_v1_router.include_router(clinical_ai_router, prefix="/clinical-ai", tags=["enhanced-ai-assessment"])
 
 # Root endpoint
 @app.get("/")
