@@ -55,6 +55,15 @@ class ApiService {
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      
+      // Handle 422 validation errors with detailed field-specific messages
+      if (response.status === 422 && errorData.detail) {
+        const validationError = new Error('Validation failed');
+        (validationError as any).validationErrors = errorData.detail;
+        (validationError as any).status = 422;
+        throw validationError;
+      }
+      
       throw new Error(errorData.detail || errorData.message || `HTTP ${response.status}`);
     }
 

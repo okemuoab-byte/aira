@@ -7,8 +7,13 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from auth import get_current_user
 from models import User
-from database import get_database
 from services.enhanced_clinical_ai_service import get_enhanced_clinical_ai_service
+
+# Use the same database dependency as main.py
+def get_database_dependency():
+    """Get database dependency - uses the same database as main.py"""
+    from main import database
+    return database
 
 router = APIRouter()
 
@@ -32,7 +37,7 @@ class ActionPlanRequest(BaseModel):
 async def create_comprehensive_assessment(
     request: ClinicalAssessmentRequest,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database_dependency)
 ):
     """Generate comprehensive AI clinical assessment with results, summary, and next steps"""
     try:
@@ -85,7 +90,7 @@ async def create_comprehensive_assessment(
 async def get_assessment(
     assessment_id: str,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database_dependency)
 ):
     """Retrieve a specific clinical assessment"""
     try:
@@ -114,7 +119,7 @@ async def get_assessment(
 @router.get("/assessments")
 async def get_user_assessments(
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database),
+    db: AsyncIOMotorDatabase = Depends(get_database_dependency),
     limit: int = Query(20, le=100),
     skip: int = Query(0, ge=0)
 ):
@@ -144,7 +149,7 @@ async def get_user_assessments(
 async def generate_symptom_summary(
     request: SymptomSummaryRequest,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database_dependency)
 ):
     """Generate AI-powered symptom summary and trends analysis"""
     try:
@@ -234,7 +239,7 @@ async def generate_symptom_summary(
 async def generate_action_plan(
     request: ActionPlanRequest,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database_dependency)
 ):
     """Generate personalized action plan based on clinical assessment"""
     try:
@@ -294,7 +299,7 @@ async def generate_action_plan(
 async def get_action_plan(
     action_plan_id: str,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database_dependency)
 ):
     """Retrieve a specific action plan"""
     try:
@@ -328,7 +333,7 @@ async def update_action_plan_progress(
     action_plan_id: str,
     progress_data: Dict[str, Any],
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database_dependency)
 ):
     """Update progress on action plan items"""
     try:
@@ -366,7 +371,7 @@ async def update_action_plan_progress(
 async def start_real_time_assessment(
     symptom_data: Dict[str, Any],
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database_dependency)
 ):
     """Start a real-time clinical assessment session"""
     try:
@@ -399,7 +404,7 @@ async def update_assessment_session(
     session_id: str,
     update_data: Dict[str, Any],
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database_dependency)
 ):
     """Update real-time assessment session with new data"""
     try:
@@ -433,7 +438,7 @@ async def update_assessment_session(
 async def get_assessment_session(
     session_id: str,
     current_user: User = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database_dependency)
 ):
     """Get current state of real-time assessment session"""
     try:

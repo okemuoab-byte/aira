@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Activity, User, BookOpen, Pill, Users, Bell, Brain, Stethoscope, Calendar, FileText, Heart, LogOut, GraduationCap } from 'lucide-react';
+import { Plus, Activity, User, BookOpen, Pill, Users, Bell, Brain, Stethoscope, Calendar, FileText, Heart, LogOut, GraduationCap, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import CombinedDashboard from '@/components/CombinedDashboard';
 import SymptomLogger from '@/components/SymptomLogger';
@@ -10,6 +10,8 @@ import MedicationReminder from '@/components/MedicationReminder';
 import FamilyDashboard from '@/components/FamilyDashboard';
 import FamilyHistorySection from '@/components/FamilyHistorySection';
 import MedicalExplanations from '@/components/MedicalExplanations';
+import ClinicalQuestions from '@/components/ClinicalQuestions';
+import RealTimeClinicalAssessment from '@/components/RealTimeClinicalAssessment';
 import { Symptom, UserProfile, Medication, FamilyMember, MedicationReminder as MedicationReminderType, FamilyHistoryCondition } from '@/types/health';
 
 const Index = () => {
@@ -19,6 +21,12 @@ const Index = () => {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [medicationReminders, setMedicationReminders] = useState<MedicationReminderType[]>([]);
   const [activeTab, setActiveTab] = useState<string>('log-symptoms'); // Changed default to log-symptoms
+  
+  // AI Assessment state
+  const [currentSymptomForAssessment, setCurrentSymptomForAssessment] = useState<any>(null);
+  const [showClinicalQuestions, setShowClinicalQuestions] = useState(false);
+  const [showRealTimeAssessment, setShowRealTimeAssessment] = useState(false);
+  const [clinicalQuestionsResponses, setClinicalQuestionsResponses] = useState<any[]>([]);
   const [userProfile] = useState<UserProfile>({
     id: '1',
     name: 'Sarah',

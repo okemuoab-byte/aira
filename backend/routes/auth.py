@@ -2,12 +2,13 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from pydantic import ValidationError
 
 from models import Token, LoginRequest, SignupRequest, User
 from auth import (
-    authenticate_user, 
-    create_access_token, 
-    create_user, 
+    authenticate_user,
+    create_access_token,
+    create_user,
     create_user_response,
     get_current_user,
     security,
@@ -17,10 +18,10 @@ from auth import (
 router = APIRouter(tags=["authentication"])
 
 
-def get_database():
+async def get_database():
     """Dependency to get database instance."""
-    from main import database
-    return database
+    from database import get_database as get_db
+    return await get_db()
 
 
 @router.post("/signup", response_model=dict)
@@ -36,7 +37,7 @@ async def signup(
         # Create access token
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
-            data={"sub": user_doc["email"]}, 
+            data={"sub": user_doc["email"]},
             expires_delta=access_token_expires
         )
         
@@ -45,12 +46,43 @@ async def signup(
             "access_token": access_token,
             "token_type": "bearer"
         }
+    except ValidationError as e:
+        # Handle Pydantic validation errors with detailed messages
+        error_details = []
+        for error in e.errors():
+            field = error.get('loc', ['unknown'])[-1]  # Get the field name
+            message = error.get('msg', 'Validation error')
+            error_details.append(f"{field}: {message}")
+        
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "message": "Validation failed",
+                "errors": error_details,
+                "type": "validation_error"
+            }
+        )
     except HTTPException:
         raise
     except Exception as e:
+        # Check if it's a user already exists error
+        if "already exists" in str(e).lower() or "duplicate" in str(e).lower():
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail={
+                    "message": "User with this email already exists",
+                    "errors": ["email: A user with this email address already exists"],
+                    "type": "duplicate_user_error"
+                }
+            )
+        
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create user: {str(e)}"
+            detail={
+                "message": "Failed to create user",
+                "errors": [f"server: {str(e)}"],
+                "type": "server_error"
+            }
         )
 
 

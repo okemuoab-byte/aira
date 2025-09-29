@@ -15,11 +15,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, loading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
+
+    // Prevent multiple simultaneous submissions
+    if (isSubmitting || loading) {
+      return;
+    }
 
     if (!email || !password) {
       setError('Please fill in all fields');
@@ -27,9 +35,37 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
     }
 
     try {
+      setIsSubmitting(true);
       await login({ email, password });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+    } catch (err: any) {
+      // Handle detailed validation errors from 422 responses
+      if (err.status === 422 && err.validationErrors) {
+        const errors: Record<string, string> = {};
+        
+        // Parse validation errors - handle both array and object formats
+        if (Array.isArray(err.validationErrors)) {
+          err.validationErrors.forEach((error: any) => {
+            if (error.loc && error.msg) {
+              const field = error.loc[error.loc.length - 1]; // Get the field name
+              errors[field] = error.msg;
+            }
+          });
+        } else if (typeof err.validationErrors === 'object') {
+          Object.keys(err.validationErrors).forEach(field => {
+            errors[field] = err.validationErrors[field];
+          });
+        }
+        
+        if (Object.keys(errors).length > 0) {
+          setFieldErrors(errors);
+        } else {
+          setError('Validation failed. Please check your input.');
+        }
+      } else {
+        setError(err instanceof Error ? err.message : 'Login failed');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -59,11 +95,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-10"
-                disabled={loading}
+                className={`pl-10 ${fieldErrors.email ? 'border-red-500' : ''}`}
+                disabled={loading || isSubmitting}
                 required
               />
             </div>
+            {fieldErrors.email && (
+              <p className="text-sm text-red-500">{fieldErrors.email}</p>
+            )}
           </div>
           
           <div className="space-y-2">
@@ -76,15 +115,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10"
-                disabled={loading}
+                className={`pl-10 ${fieldErrors.password ? 'border-red-500' : ''}`}
+                disabled={loading || isSubmitting}
                 required
               />
             </div>
+            {fieldErrors.password && (
+              <p className="text-sm text-red-500">{fieldErrors.password}</p>
+            )}
           </div>
           
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? (
+          <Button type="submit" className="w-full" disabled={loading || isSubmitting}>
+            {loading || isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Signing in...

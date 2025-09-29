@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from database import get_database
+from database import get_database, connect_to_mongodb, close_mongodb_connection, client
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -27,12 +27,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# MongoDB connection - using mock database for testing
-from database_mock import get_mock_database
-database = get_mock_database()
+# MongoDB connection - using real MongoDB database
+# Global database instance
+database = None
 
-# Keep the original client for health check
-from database import client
+# Startup and shutdown events
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database connection on startup"""
+    global database
+    try:
+        database = await connect_to_mongodb()
+        print("✅ MongoDB connection established successfully")
+    except Exception as e:
+        print(f"❌ Failed to connect to MongoDB: {e}")
+        # Don't raise here to allow the server to start even if DB is down
+        database = None
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Close database connection on shutdown"""
+    await close_mongodb_connection()
+    print("✅ MongoDB connection closed")
 
 # Response models
 class HealthCheckResponse(BaseModel):
@@ -53,10 +69,16 @@ async def health_check():
     Health check endpoint that verifies the API is running and MongoDB is connected.
     """
     try:
-        # Test MongoDB connection
-        await client.admin.command('ping')
-        db_connected = True
-        message = "API is healthy and database is connected"
+        # Use the database module's health check function
+        from database import health_check as db_health_check
+        health_result = await db_health_check()
+        
+        if health_result["status"] == "healthy":
+            db_connected = True
+            message = "API is healthy and database is connected"
+        else:
+            db_connected = False
+            message = f"API is running but database connection failed: {health_result['message']}"
     except Exception as e:
         db_connected = False
         message = f"API is running but database connection failed: {str(e)}"
@@ -81,7 +103,13 @@ async def api_v1_health_check():
     """
     return await health_check()
 
-# Database dependency
+# Database dependency function for routes
+def get_database_instance():
+    """Get the database instance for routes that need it"""
+    global database
+    if not database:
+        raise HTTPException(status_code=500, detail="Database not initialized")
+    return database
 
 # Import and include route modules
 from routes.auth import router as auth_router

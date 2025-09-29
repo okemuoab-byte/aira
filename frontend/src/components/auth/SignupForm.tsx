@@ -17,13 +17,28 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { signup, loading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
 
-    if (!name || !email || !password || !confirmPassword) {
+    // Prevent multiple simultaneous submissions
+    if (isSubmitting || loading) {
+      return;
+    }
+
+    // Trim and validate name
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setFieldErrors({ name: 'Name cannot be empty or contain only whitespace' });
+      return;
+    }
+
+    if (!email || !password || !confirmPassword) {
       setError('Please fill in all fields');
       return;
     }
@@ -33,15 +48,43 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long');
       return;
     }
 
     try {
-      await signup({ name, email, password });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Signup failed');
+      setIsSubmitting(true);
+      await signup({ name: trimmedName, email, password });
+    } catch (err: any) {
+      // Handle detailed validation errors from 422 responses
+      if (err.status === 422 && err.validationErrors) {
+        const errors: Record<string, string> = {};
+        
+        // Parse validation errors - handle both array and object formats
+        if (Array.isArray(err.validationErrors)) {
+          err.validationErrors.forEach((error: any) => {
+            if (error.loc && error.msg) {
+              const field = error.loc[error.loc.length - 1]; // Get the field name
+              errors[field] = error.msg;
+            }
+          });
+        } else if (typeof err.validationErrors === 'object') {
+          Object.keys(err.validationErrors).forEach(field => {
+            errors[field] = err.validationErrors[field];
+          });
+        }
+        
+        if (Object.keys(errors).length > 0) {
+          setFieldErrors(errors);
+        } else {
+          setError('Validation failed. Please check your input.');
+        }
+      } else {
+        setError(err instanceof Error ? err.message : 'Signup failed');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -71,11 +114,14 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
                 placeholder="Enter your full name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="pl-10"
-                disabled={loading}
+                className={`pl-10 ${fieldErrors.name ? 'border-red-500' : ''}`}
+                disabled={loading || isSubmitting}
                 required
               />
             </div>
+            {fieldErrors.name && (
+              <p className="text-sm text-red-500">{fieldErrors.name}</p>
+            )}
           </div>
           
           <div className="space-y-2">
@@ -88,11 +134,14 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-10"
-                disabled={loading}
+                className={`pl-10 ${fieldErrors.email ? 'border-red-500' : ''}`}
+                disabled={loading || isSubmitting}
                 required
               />
             </div>
+            {fieldErrors.email && (
+              <p className="text-sm text-red-500">{fieldErrors.email}</p>
+            )}
           </div>
           
           <div className="space-y-2">
@@ -102,14 +151,17 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a password"
+                placeholder="Create a password (min 8 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10"
-                disabled={loading}
+                className={`pl-10 ${fieldErrors.password ? 'border-red-500' : ''}`}
+                disabled={loading || isSubmitting}
                 required
               />
             </div>
+            {fieldErrors.password && (
+              <p className="text-sm text-red-500">{fieldErrors.password}</p>
+            )}
           </div>
           
           <div className="space-y-2">
@@ -123,14 +175,14 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="pl-10"
-                disabled={loading}
+                disabled={loading || isSubmitting}
                 required
               />
             </div>
           </div>
           
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? (
+          <Button type="submit" className="w-full" disabled={loading || isSubmitting}>
+            {loading || isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Creating account...

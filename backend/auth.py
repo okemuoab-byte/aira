@@ -61,10 +61,10 @@ async def authenticate_user(database: AsyncIOMotorDatabase, email: str, password
     return user
 
 
-def get_database_dependency():
+async def get_database_dependency():
     """Get database dependency."""
-    from main import database
-    return database
+    from database import get_database
+    return await get_database()
 
 
 async def get_current_user(
