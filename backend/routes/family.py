@@ -10,7 +10,7 @@ from models import (
     ShareSettingsUpdate, ShareSettings,
     RELATIONSHIP_TYPES, ACCESS_LEVELS, SHARED_DATA_TYPES
 )
-from database import get_database
+from database import get_database, create_family_member, get_family_members, update_sharing_settings
 
 router = APIRouter()
 
@@ -46,18 +46,15 @@ async def invite_family_member(
                 )
         
         # Check if family member already exists
-        existing_member = await db.family_members.find_one({
-            "user_id": ObjectId(current_user["_id"]),
-            "email": invite_request.email
-        })
+        existing_members = await get_family_members(current_user["_id"])
+        for member in existing_members:
+            if member["email"] == invite_request.email:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Family member with this email already exists"
+                )
         
-        if existing_member:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Family member with this email already exists"
-            )
-        
-        # Create family member invitation
+        # Create family member invitation using MongoDB CRUD function
         family_member_data = {
             "name": invite_request.name,
             "email": invite_request.email,
@@ -65,27 +62,10 @@ async def invite_family_member(
             "access_level": invite_request.access_level,
             "shared_data": invite_request.shared_data,
             "invite_status": "pending",
-            "user_id": ObjectId(current_user["_id"]),
-            "invited_date": datetime.utcnow(),
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
+            "invited_date": datetime.utcnow()
         }
         
-        # Insert the family member
-        result = await db.family_members.insert_one(family_member_data)
-        
-        # Retrieve the created family member
-        created_member = await db.family_members.find_one({"_id": result.inserted_id})
-        if not created_member:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to create family member invitation"
-            )
-        
-        # Convert ObjectId to string for JSON serialization
-        created_member["id"] = str(created_member["_id"])
-        created_member["user_id"] = str(created_member["user_id"])
-        del created_member["_id"]
+        created_member = await create_family_member(current_user["_id"], family_member_data)
         
         return {
             "family_member": created_member,
@@ -102,21 +82,14 @@ async def invite_family_member(
 
 
 @router.get("/members")
-async def get_family_members(
+async def get_family_members_endpoint(
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Get list of all family members for the current user"""
     try:
-        # Get all family members for the user
-        cursor = db.family_members.find({"user_id": ObjectId(current_user["_id"])})
-        family_members = await cursor.to_list(length=None)
-        
-        # Convert ObjectIds to strings for JSON serialization
-        for member in family_members:
-            member["id"] = str(member["_id"])
-            member["user_id"] = str(member["user_id"])
-            del member["_id"]
+        # Use MongoDB CRUD function to get family members
+        family_members = await get_family_members(current_user["_id"])
         
         return {
             "family_members": family_members,
@@ -276,7 +249,7 @@ async def remove_family_member(
 
 
 @router.put("/settings")
-async def update_sharing_settings(
+async def update_sharing_settings_endpoint(
     settings_update: ShareSettingsUpdate,
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
@@ -292,49 +265,8 @@ async def update_sharing_settings(
                 detail="No valid fields provided for update"
             )
         
-        # Add updated timestamp
-        update_data["updated_at"] = datetime.utcnow()
-        
-        # Check if settings exist for user
-        existing_settings = await db.share_settings.find_one({"user_id": ObjectId(current_user["_id"])})
-        
-        if existing_settings:
-            # Update existing settings
-            result = await db.share_settings.update_one(
-                {"user_id": ObjectId(current_user["_id"])},
-                {"$set": update_data}
-            )
-            
-            if result.modified_count == 0:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="No changes were made to the sharing settings"
-                )
-        else:
-            # Create new settings with defaults
-            settings_data = {
-                "user_id": ObjectId(current_user["_id"]),
-                "symptoms_sharing": True,
-                "medications_sharing": True,
-                "appointments_sharing": True,
-                "photos_sharing": False,
-                "emergency_contacts_can_override": True,
-                "family_summary_enabled": True,
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow()
-            }
-            # Override with provided values
-            settings_data.update(update_data)
-            
-            result = await db.share_settings.insert_one(settings_data)
-        
-        # Retrieve updated settings
-        updated_settings = await db.share_settings.find_one({"user_id": ObjectId(current_user["_id"])})
-        
-        # Convert ObjectId to string for JSON serialization
-        updated_settings["id"] = str(updated_settings["_id"])
-        updated_settings["user_id"] = str(updated_settings["user_id"])
-        del updated_settings["_id"]
+        # Use MongoDB CRUD function to update sharing settings
+        updated_settings = await update_sharing_settings(current_user["_id"], update_data)
         
         return {
             "settings": updated_settings,

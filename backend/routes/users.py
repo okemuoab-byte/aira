@@ -6,7 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from auth import get_current_user
 from models import User, UserUpdate
-from database import get_database
+from database import get_database, get_user_by_id, update_user
 
 router = APIRouter()
 
@@ -18,18 +18,14 @@ async def get_user_profile(
 ):
     """Get detailed user profile with family history"""
     try:
-        # Get the full user document from database
-        user_doc = await db.users.find_one({"_id": ObjectId(current_user["_id"])})
+        # Get the full user document using MongoDB CRUD function
+        user_doc = await get_user_by_id(current_user["_id"])
         
         if not user_doc:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User profile not found"
             )
-        
-        # Convert ObjectId to string for JSON serialization
-        user_doc["id"] = str(user_doc["_id"])
-        del user_doc["_id"]
         
         # Remove sensitive information
         if "password_hash" in user_doc:
@@ -61,8 +57,8 @@ async def update_user_profile(
 ):
     """Update user profile and preferences"""
     try:
-        # Check if user exists
-        existing_user = await db.users.find_one({"_id": ObjectId(current_user["_id"])})
+        # Check if user exists using MongoDB CRUD function
+        existing_user = await get_user_by_id(current_user["_id"])
         
         if not existing_user:
             raise HTTPException(
@@ -78,9 +74,6 @@ async def update_user_profile(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No valid fields provided for update"
             )
-        
-        # Add updated timestamp
-        update_data["updated_at"] = datetime.utcnow()
         
         # Validate specific fields if provided
         if "gender" in update_data:
@@ -108,24 +101,17 @@ async def update_user_profile(
                     detail="Weight must be an object with 'value' and 'unit' fields"
                 )
         
-        # Update the user profile
-        result = await db.users.update_one(
-            {"_id": ObjectId(current_user["_id"])},
-            {"$set": update_data}
-        )
+        # Update the user profile using MongoDB CRUD function
+        success = await update_user(current_user["_id"], update_data)
         
-        if result.modified_count == 0:
+        if not success:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No changes were made to the profile"
             )
         
         # Retrieve and return updated user profile
-        updated_user = await db.users.find_one({"_id": ObjectId(current_user["_id"])})
-        
-        # Convert ObjectId to string for JSON serialization
-        updated_user["id"] = str(updated_user["_id"])
-        del updated_user["_id"]
+        updated_user = await get_user_by_id(current_user["_id"])
         
         # Remove sensitive information
         if "password_hash" in updated_user:

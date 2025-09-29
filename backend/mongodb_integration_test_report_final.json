@@ -1,0 +1,509 @@
+{
+  "summary": {
+    "total_tests": 29,
+    "passed_tests": 29,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "test_timestamp": "2025-09-29T23:26:22.108745"
+  },
+  "categories": {
+    "Database": {
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Database Health Check",
+          "success": true,
+          "details": "Database is healthy and connected",
+          "timestamp": "2025-09-29T23:26:16.075107",
+          "data": null
+        }
+      ]
+    },
+    "User": {
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "User Signup",
+          "success": true,
+          "details": "User created with ID: 68db0788128dbb40f1b735c2",
+          "timestamp": "2025-09-29T23:26:16.448677",
+          "data": null
+        },
+        {
+          "test_name": "User Login",
+          "success": true,
+          "details": "Login successful",
+          "timestamp": "2025-09-29T23:26:16.747818",
+          "data": null
+        }
+      ]
+    },
+    "Get": {
+      "passed": 9,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Get User Profile",
+          "success": true,
+          "details": "Profile retrieved for: test_user_e044c9af@example.com",
+          "timestamp": "2025-09-29T23:26:16.776044",
+          "data": null
+        },
+        {
+          "test_name": "Get Detailed Profile",
+          "success": true,
+          "details": "Profile retrieved successfully",
+          "timestamp": "2025-09-29T23:26:16.808410",
+          "data": null
+        },
+        {
+          "test_name": "Get Symptoms",
+          "success": true,
+          "details": "Retrieved 1 symptoms",
+          "timestamp": "2025-09-29T23:26:16.979201",
+          "data": null
+        },
+        {
+          "test_name": "Get Specific Symptom",
+          "success": true,
+          "details": "Symptom retrieved successfully",
+          "timestamp": "2025-09-29T23:26:17.013797",
+          "data": null
+        },
+        {
+          "test_name": "Get Medications",
+          "success": true,
+          "details": "Retrieved 1 medications",
+          "timestamp": "2025-09-29T23:26:17.176254",
+          "data": null
+        },
+        {
+          "test_name": "Get Healthcare Visits",
+          "success": true,
+          "details": "Retrieved 1 visits",
+          "timestamp": "2025-09-29T23:26:20.326156",
+          "data": null
+        },
+        {
+          "test_name": "Get Visit Statistics",
+          "success": true,
+          "details": "Visit statistics retrieved",
+          "timestamp": "2025-09-29T23:26:20.377866",
+          "data": null
+        },
+        {
+          "test_name": "Get User Photos",
+          "success": true,
+          "details": "Retrieved 1 photos",
+          "timestamp": "2025-09-29T23:26:20.465459",
+          "data": null
+        },
+        {
+          "test_name": "Get Family Members",
+          "success": true,
+          "details": "Retrieved 0 family members",
+          "timestamp": "2025-09-29T23:26:20.501981",
+          "data": null
+        }
+      ]
+    },
+    "Update": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Update User Profile",
+          "success": true,
+          "details": "Profile updated successfully",
+          "timestamp": "2025-09-29T23:26:16.877651",
+          "data": null
+        },
+        {
+          "test_name": "Update Symptom",
+          "success": true,
+          "details": "Symptom updated successfully",
+          "timestamp": "2025-09-29T23:26:17.085441",
+          "data": null
+        },
+        {
+          "test_name": "Update Sharing Settings",
+          "success": true,
+          "details": "Sharing settings updated",
+          "timestamp": "2025-09-29T23:26:20.556956",
+          "data": null
+        }
+      ]
+    },
+    "Create": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Create Symptom",
+          "success": true,
+          "details": "Symptom created with ID: 68db0788128dbb40f1b735c3",
+          "timestamp": "2025-09-29T23:26:16.935351",
+          "data": null
+        },
+        {
+          "test_name": "Create Medication",
+          "success": true,
+          "details": "Medication created with ID: 68db0789128dbb40f1b735c4",
+          "timestamp": "2025-09-29T23:26:17.143448",
+          "data": null
+        },
+        {
+          "test_name": "Create Healthcare Visit",
+          "success": true,
+          "details": "Visit created with ID: 68db078c128dbb40f1b735c6",
+          "timestamp": "2025-09-29T23:26:20.257029",
+          "data": null
+        }
+      ]
+    },
+    "Log": {
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Log Medication Dose",
+          "success": true,
+          "details": "Dose logged successfully",
+          "timestamp": "2025-09-29T23:26:17.278256",
+          "data": null
+        }
+      ]
+    },
+    "Medication": {
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Medication Suggestions",
+          "success": true,
+          "details": "AI suggestions retrieved",
+          "timestamp": "2025-09-29T23:26:20.192642",
+          "data": null
+        }
+      ]
+    },
+    "Upload": {
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Upload Photo",
+          "success": true,
+          "details": "Photo uploaded with ID: 68db078c128dbb40f1b735c7",
+          "timestamp": "2025-09-29T23:26:20.432399",
+          "data": null
+        }
+      ]
+    },
+    "Symptoms": {
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Symptoms Data Persistence",
+          "success": true,
+          "details": "Found 1 persisted symptoms",
+          "timestamp": "2025-09-29T23:26:21.623472",
+          "data": null
+        }
+      ]
+    },
+    "Medications": {
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Medications Data Persistence",
+          "success": true,
+          "details": "Found 1 persisted medications",
+          "timestamp": "2025-09-29T23:26:21.724025",
+          "data": null
+        }
+      ]
+    },
+    "Visits": {
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Visits Data Persistence",
+          "success": true,
+          "details": "Found 1 persisted visits",
+          "timestamp": "2025-09-29T23:26:21.773048",
+          "data": null
+        }
+      ]
+    },
+    "Photos": {
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Photos Data Persistence",
+          "success": true,
+          "details": "Found 1 persisted photos",
+          "timestamp": "2025-09-29T23:26:21.819320",
+          "data": null
+        }
+      ]
+    },
+    "Overall": {
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Overall Data Persistence",
+          "success": true,
+          "details": "Total persisted items: 4",
+          "timestamp": "2025-09-29T23:26:21.819338",
+          "data": null
+        }
+      ]
+    },
+    "Invalid": {
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Invalid Symptom ID Handling",
+          "success": true,
+          "details": "Properly handled invalid ID",
+          "timestamp": "2025-09-29T23:26:21.839876",
+          "data": null
+        },
+        {
+          "test_name": "Invalid Medication Data Handling",
+          "success": true,
+          "details": "Properly rejected invalid medication data",
+          "timestamp": "2025-09-29T23:26:21.860406",
+          "data": null
+        }
+      ]
+    },
+    "Unauthorized": {
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Unauthorized Access Handling",
+          "success": true,
+          "details": "Properly rejected unauthorized request",
+          "timestamp": "2025-09-29T23:26:21.842331",
+          "data": null
+        }
+      ]
+    }
+  },
+  "detailed_results": [
+    {
+      "test_name": "Database Health Check",
+      "success": true,
+      "details": "Database is healthy and connected",
+      "timestamp": "2025-09-29T23:26:16.075107",
+      "data": null
+    },
+    {
+      "test_name": "User Signup",
+      "success": true,
+      "details": "User created with ID: 68db0788128dbb40f1b735c2",
+      "timestamp": "2025-09-29T23:26:16.448677",
+      "data": null
+    },
+    {
+      "test_name": "User Login",
+      "success": true,
+      "details": "Login successful",
+      "timestamp": "2025-09-29T23:26:16.747818",
+      "data": null
+    },
+    {
+      "test_name": "Get User Profile",
+      "success": true,
+      "details": "Profile retrieved for: test_user_e044c9af@example.com",
+      "timestamp": "2025-09-29T23:26:16.776044",
+      "data": null
+    },
+    {
+      "test_name": "Get Detailed Profile",
+      "success": true,
+      "details": "Profile retrieved successfully",
+      "timestamp": "2025-09-29T23:26:16.808410",
+      "data": null
+    },
+    {
+      "test_name": "Update User Profile",
+      "success": true,
+      "details": "Profile updated successfully",
+      "timestamp": "2025-09-29T23:26:16.877651",
+      "data": null
+    },
+    {
+      "test_name": "Create Symptom",
+      "success": true,
+      "details": "Symptom created with ID: 68db0788128dbb40f1b735c3",
+      "timestamp": "2025-09-29T23:26:16.935351",
+      "data": null
+    },
+    {
+      "test_name": "Get Symptoms",
+      "success": true,
+      "details": "Retrieved 1 symptoms",
+      "timestamp": "2025-09-29T23:26:16.979201",
+      "data": null
+    },
+    {
+      "test_name": "Get Specific Symptom",
+      "success": true,
+      "details": "Symptom retrieved successfully",
+      "timestamp": "2025-09-29T23:26:17.013797",
+      "data": null
+    },
+    {
+      "test_name": "Update Symptom",
+      "success": true,
+      "details": "Symptom updated successfully",
+      "timestamp": "2025-09-29T23:26:17.085441",
+      "data": null
+    },
+    {
+      "test_name": "Create Medication",
+      "success": true,
+      "details": "Medication created with ID: 68db0789128dbb40f1b735c4",
+      "timestamp": "2025-09-29T23:26:17.143448",
+      "data": null
+    },
+    {
+      "test_name": "Get Medications",
+      "success": true,
+      "details": "Retrieved 1 medications",
+      "timestamp": "2025-09-29T23:26:17.176254",
+      "data": null
+    },
+    {
+      "test_name": "Log Medication Dose",
+      "success": true,
+      "details": "Dose logged successfully",
+      "timestamp": "2025-09-29T23:26:17.278256",
+      "data": null
+    },
+    {
+      "test_name": "Medication Suggestions",
+      "success": true,
+      "details": "AI suggestions retrieved",
+      "timestamp": "2025-09-29T23:26:20.192642",
+      "data": null
+    },
+    {
+      "test_name": "Create Healthcare Visit",
+      "success": true,
+      "details": "Visit created with ID: 68db078c128dbb40f1b735c6",
+      "timestamp": "2025-09-29T23:26:20.257029",
+      "data": null
+    },
+    {
+      "test_name": "Get Healthcare Visits",
+      "success": true,
+      "details": "Retrieved 1 visits",
+      "timestamp": "2025-09-29T23:26:20.326156",
+      "data": null
+    },
+    {
+      "test_name": "Get Visit Statistics",
+      "success": true,
+      "details": "Visit statistics retrieved",
+      "timestamp": "2025-09-29T23:26:20.377866",
+      "data": null
+    },
+    {
+      "test_name": "Upload Photo",
+      "success": true,
+      "details": "Photo uploaded with ID: 68db078c128dbb40f1b735c7",
+      "timestamp": "2025-09-29T23:26:20.432399",
+      "data": null
+    },
+    {
+      "test_name": "Get User Photos",
+      "success": true,
+      "details": "Retrieved 1 photos",
+      "timestamp": "2025-09-29T23:26:20.465459",
+      "data": null
+    },
+    {
+      "test_name": "Get Family Members",
+      "success": true,
+      "details": "Retrieved 0 family members",
+      "timestamp": "2025-09-29T23:26:20.501981",
+      "data": null
+    },
+    {
+      "test_name": "Update Sharing Settings",
+      "success": true,
+      "details": "Sharing settings updated",
+      "timestamp": "2025-09-29T23:26:20.556956",
+      "data": null
+    },
+    {
+      "test_name": "Symptoms Data Persistence",
+      "success": true,
+      "details": "Found 1 persisted symptoms",
+      "timestamp": "2025-09-29T23:26:21.623472",
+      "data": null
+    },
+    {
+      "test_name": "Medications Data Persistence",
+      "success": true,
+      "details": "Found 1 persisted medications",
+      "timestamp": "2025-09-29T23:26:21.724025",
+      "data": null
+    },
+    {
+      "test_name": "Visits Data Persistence",
+      "success": true,
+      "details": "Found 1 persisted visits",
+      "timestamp": "2025-09-29T23:26:21.773048",
+      "data": null
+    },
+    {
+      "test_name": "Photos Data Persistence",
+      "success": true,
+      "details": "Found 1 persisted photos",
+      "timestamp": "2025-09-29T23:26:21.819320",
+      "data": null
+    },
+    {
+      "test_name": "Overall Data Persistence",
+      "success": true,
+      "details": "Total persisted items: 4",
+      "timestamp": "2025-09-29T23:26:21.819338",
+      "data": null
+    },
+    {
+      "test_name": "Invalid Symptom ID Handling",
+      "success": true,
+      "details": "Properly handled invalid ID",
+      "timestamp": "2025-09-29T23:26:21.839876",
+      "data": null
+    },
+    {
+      "test_name": "Unauthorized Access Handling",
+      "success": true,
+      "details": "Properly rejected unauthorized request",
+      "timestamp": "2025-09-29T23:26:21.842331",
+      "data": null
+    },
+    {
+      "test_name": "Invalid Medication Data Handling",
+      "success": true,
+      "details": "Properly rejected invalid medication data",
+      "timestamp": "2025-09-29T23:26:21.860406",
+      "data": null
+    }
+  ]
+}

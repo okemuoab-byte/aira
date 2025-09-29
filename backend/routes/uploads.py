@@ -14,7 +14,7 @@ from models import (
     User, PhotoCreate, PhotoUpdate, Photo, PhotoInDB, PhotoUploadResponse,
     ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE
 )
-from database import get_database
+from database import get_database, create_photo, get_photos, delete_photo, get_symptoms
 
 router = APIRouter()
 
@@ -88,12 +88,9 @@ async def upload_photo(
                     detail="Invalid symptom ID"
                 )
             
-            # Check if symptom exists and belongs to user
-            symptom = await db.symptoms.find_one({
-                "_id": ObjectId(symptom_id),
-                "user_id": ObjectId(current_user["_id"])
-            })
-            if not symptom:
+            # Check if symptom exists and belongs to user using MongoDB CRUD function
+            symptoms = await get_symptoms(current_user["_id"], {"_id": ObjectId(symptom_id)}, 1)
+            if not symptoms:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Symptom not found"
@@ -103,9 +100,8 @@ async def upload_photo(
         async with aiofiles.open(file_path, 'wb') as f:
             await f.write(file_content)
         
-        # Create photo document
+        # Create photo document using MongoDB CRUD function
         photo_data = {
-            "user_id": ObjectId(current_user["_id"]),
             "symptom_id": ObjectId(symptom_id) if symptom_id else None,
             "filename": unique_filename,
             "file_path": file_path,
@@ -113,17 +109,30 @@ async def upload_photo(
             "measurements": parsed_measurements,
             "file_size": file_size,
             "mime_type": file.content_type,
-            "timestamp": datetime.utcnow(),
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
+            "timestamp": datetime.utcnow()
         }
         
-        # Insert photo into database
-        result = await db.photos.insert_one(photo_data)
-        
-        # Retrieve the created photo
-        created_photo = await db.photos.find_one({"_id": result.inserted_id})
-        if not created_photo:
+        try:
+            created_photo = await create_photo(current_user["_id"], photo_data)
+            
+            # Convert response for PhotoUploadResponse
+            response_data = {
+                "id": created_photo["id"],
+                "filename": created_photo["filename"],
+                "file_path": created_photo["file_path"],
+                "description": created_photo.get("description"),
+                "measurements": created_photo.get("measurements"),
+                "file_size": created_photo["file_size"],
+                "mime_type": created_photo["mime_type"],
+                "symptom_id": created_photo.get("symptom_id"),
+                "timestamp": created_photo["timestamp"],
+                "created_at": created_photo["created_at"],
+                "message": "Photo uploaded successfully"
+            }
+            
+            return PhotoUploadResponse(**response_data)
+            
+        except Exception as e:
             # Clean up file if database insert failed
             try:
                 os.remove(file_path)
@@ -131,25 +140,8 @@ async def upload_photo(
                 pass
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to create photo record"
+                detail=f"Failed to create photo record: {str(e)}"
             )
-        
-        # Convert ObjectIds to strings for response
-        response_data = {
-            "id": str(created_photo["_id"]),
-            "filename": created_photo["filename"],
-            "file_path": created_photo["file_path"],
-            "description": created_photo.get("description"),
-            "measurements": created_photo.get("measurements"),
-            "file_size": created_photo["file_size"],
-            "mime_type": created_photo["mime_type"],
-            "symptom_id": str(created_photo["symptom_id"]) if created_photo.get("symptom_id") else None,
-            "timestamp": created_photo["timestamp"],
-            "created_at": created_photo["created_at"],
-            "message": "Photo uploaded successfully"
-        }
-        
-        return PhotoUploadResponse(**response_data)
         
     except HTTPException:
         raise
@@ -179,25 +171,16 @@ async def get_photo(
             detail="Invalid photo ID"
         )
     
-    photo = await db.photos.find_one({
-        "_id": ObjectId(photo_id),
-        "user_id": ObjectId(current_user["_id"])
-    })
+    # Use MongoDB CRUD function to get photos with filter by ID
+    photos = await get_photos(current_user["_id"], {"_id": ObjectId(photo_id)}, 1)
     
-    if not photo:
+    if not photos:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Photo not found"
         )
     
-    # Convert ObjectIds to strings for JSON serialization
-    photo["id"] = str(photo["_id"])
-    photo["user_id"] = str(photo["user_id"])
-    if photo.get("symptom_id"):
-        photo["symptom_id"] = str(photo["symptom_id"])
-    del photo["_id"]
-    
-    return photo
+    return photos[0]
 
 
 @router.get("/photos/{photo_id}/file")
@@ -213,17 +196,16 @@ async def get_photo_file(
             detail="Invalid photo ID"
         )
     
-    photo = await db.photos.find_one({
-        "_id": ObjectId(photo_id),
-        "user_id": ObjectId(current_user["_id"])
-    })
+    # Use MongoDB CRUD function to get photos with filter by ID
+    photos = await get_photos(current_user["_id"], {"_id": ObjectId(photo_id)}, 1)
     
-    if not photo:
+    if not photos:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Photo not found"
         )
     
+    photo = photos[0]
     file_path = photo["file_path"]
     
     # Check if file exists on disk
@@ -303,7 +285,7 @@ async def update_photo(
 
 
 @router.delete("/photos/{photo_id}")
-async def delete_photo(
+async def delete_photo_endpoint(
     photo_id: str,
     current_user: User = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
@@ -316,21 +298,20 @@ async def delete_photo(
         )
     
     # Check if photo exists and belongs to user
-    existing_photo = await db.photos.find_one({
-        "_id": ObjectId(photo_id),
-        "user_id": ObjectId(current_user["_id"])
-    })
+    existing_photos = await get_photos(current_user["_id"], {"_id": ObjectId(photo_id)}, 1)
     
-    if not existing_photo:
+    if not existing_photos:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Photo not found"
         )
     
-    # Delete from database
-    result = await db.photos.delete_one({"_id": ObjectId(photo_id)})
+    existing_photo = existing_photos[0]
     
-    if result.deleted_count == 0:
+    # Use MongoDB CRUD function to delete photo
+    success = await delete_photo(photo_id, current_user["_id"])
+    
+    if not success:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete photo from database"
@@ -361,32 +342,17 @@ async def get_symptom_photos(
             detail="Invalid symptom ID"
         )
     
-    # Check if symptom exists and belongs to user
-    symptom = await db.symptoms.find_one({
-        "_id": ObjectId(symptom_id),
-        "user_id": ObjectId(current_user["_id"])
-    })
+    # Check if symptom exists and belongs to user using MongoDB CRUD function
+    symptoms = await get_symptoms(current_user["_id"], {"_id": ObjectId(symptom_id)}, 1)
     
-    if not symptom:
+    if not symptoms:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Symptom not found"
         )
     
-    # Get all photos for this symptom
-    cursor = db.photos.find({
-        "symptom_id": ObjectId(symptom_id),
-        "user_id": ObjectId(current_user["_id"])
-    }).sort("created_at", -1)
-    
-    photos = await cursor.to_list(length=None)
-    
-    # Convert ObjectIds to strings for JSON serialization
-    for photo in photos:
-        photo["id"] = str(photo["_id"])
-        photo["user_id"] = str(photo["user_id"])
-        photo["symptom_id"] = str(photo["symptom_id"])
-        del photo["_id"]
+    # Get all photos for this symptom using MongoDB CRUD function
+    photos = await get_photos(current_user["_id"], {"symptom_id": ObjectId(symptom_id)})
     
     return {"photos": photos, "count": len(photos)}
 
@@ -398,18 +364,7 @@ async def get_user_photos(
     limit: int = 50
 ):
     """Get all photos for the current user"""
-    cursor = db.photos.find({
-        "user_id": ObjectId(current_user["_id"])
-    }).sort("created_at", -1).limit(limit)
-    
-    photos = await cursor.to_list(length=limit)
-    
-    # Convert ObjectIds to strings for JSON serialization
-    for photo in photos:
-        photo["id"] = str(photo["_id"])
-        photo["user_id"] = str(photo["user_id"])
-        if photo.get("symptom_id"):
-            photo["symptom_id"] = str(photo["symptom_id"])
-        del photo["_id"]
+    # Use MongoDB CRUD function to get photos
+    photos = await get_photos(current_user["_id"], {}, limit)
     
     return {"photos": photos, "count": len(photos)}

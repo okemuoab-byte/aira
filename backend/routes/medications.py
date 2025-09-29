@@ -10,7 +10,7 @@ from models import (
     MedicationSuggestionRequest, MedicationPurposeResponse,
     MedicationAIAssistRequest, MedicationAIAssistResponse
 )
-from database import get_database
+from database import get_database, create_medication, get_medications, update_medication, delete_medication, log_dose
 from services.medication_ai_service import get_medication_ai_service
 
 router = APIRouter()
@@ -20,60 +20,34 @@ medication_ai_service = get_medication_ai_service()
 
 
 @router.post("/")
-async def create_medication(
+async def create_medication_endpoint(
     medication: MedicationCreate,
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Create a new medication"""
-    medication_dict = medication.model_dump()
-    medication_dict["user_id"] = ObjectId(current_user["_id"])
-    medication_dict["created_at"] = datetime.utcnow()
-    medication_dict["updated_at"] = datetime.utcnow()
-    
-    result = await db.medications.insert_one(medication_dict)
-    
-    # Retrieve the created medication
-    created_medication = await db.medications.find_one({"_id": result.inserted_id})
-    if not created_medication:
-        raise HTTPException(status_code=500, detail="Failed to create medication")
-    
-    # Convert ObjectId to string for JSON serialization
-    created_medication["id"] = str(created_medication["_id"])
-    created_medication["user_id"] = str(created_medication["user_id"])
-    del created_medication["_id"]
-    
-    return created_medication
+    try:
+        # Use MongoDB CRUD function to create medication
+        created_medication = await create_medication(current_user["_id"], medication.model_dump())
+        return created_medication
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create medication: {str(e)}")
 
 
 @router.get("/")
-async def get_medications(
+async def get_medications_endpoint(
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database),
     active_only: bool = Query(True, description="Filter to show only active medications"),
     limit: int = Query(100, le=1000, description="Maximum number of medications to return")
 ):
     """Get user's medications with optional filtering"""
-    query = {"user_id": ObjectId(current_user["_id"])}
-    
-    # Add active/inactive filtering
-    if active_only:
-        now = datetime.utcnow()
-        query["$or"] = [
-            {"end_date": None},
-            {"end_date": {"$gte": now}}
-        ]
-    
-    cursor = db.medications.find(query).sort("created_at", -1).limit(limit)
-    medications = await cursor.to_list(length=limit)
-    
-    # Convert ObjectIds to strings for JSON serialization
-    for medication in medications:
-        medication["id"] = str(medication["_id"])
-        medication["user_id"] = str(medication["user_id"])
-        del medication["_id"]
-    
-    return medications
+    try:
+        # Use MongoDB CRUD function to get medications
+        medications = await get_medications(current_user["_id"], active_only, limit)
+        return medications
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve medications: {str(e)}")
 
 
 # Move specific routes before parameterized routes to avoid conflicts
@@ -123,24 +97,25 @@ async def get_medication(
     if not ObjectId.is_valid(medication_id):
         raise HTTPException(status_code=400, detail="Invalid medication ID")
     
-    medication = await db.medications.find_one({
-        "_id": ObjectId(medication_id),
-        "user_id": ObjectId(current_user["_id"])
-    })
-    
-    if not medication:
-        raise HTTPException(status_code=404, detail="Medication not found")
-    
-    # Convert ObjectId to string for JSON serialization
-    medication["id"] = str(medication["_id"])
-    medication["user_id"] = str(medication["user_id"])
-    del medication["_id"]
-    
-    return medication
+    try:
+        # Use MongoDB CRUD function to get medications with filter by ID
+        medications = await get_medications(current_user["_id"], active_only=False, limit=1)
+        
+        # Find the specific medication by ID
+        medication = next((med for med in medications if med["id"] == medication_id), None)
+        
+        if not medication:
+            raise HTTPException(status_code=404, detail="Medication not found")
+        
+        return medication
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve medication: {str(e)}")
 
 
 @router.put("/{medication_id}")
-async def update_medication(
+async def update_medication_endpoint(
     medication_id: str,
     medication_update: MedicationUpdate,
     current_user: dict = Depends(get_current_user),
@@ -150,41 +125,37 @@ async def update_medication(
     if not ObjectId.is_valid(medication_id):
         raise HTTPException(status_code=400, detail="Invalid medication ID")
     
-    # Check if medication exists and belongs to user
-    existing_medication = await db.medications.find_one({
-        "_id": ObjectId(medication_id),
-        "user_id": ObjectId(current_user["_id"])
-    })
-    
-    if not existing_medication:
-        raise HTTPException(status_code=404, detail="Medication not found")
-    
-    # Prepare update data
-    update_data = {k: v for k, v in medication_update.model_dump().items() if v is not None}
-    update_data["updated_at"] = datetime.utcnow()
-    
-    # Update the medication
-    result = await db.medications.update_one(
-        {"_id": ObjectId(medication_id)},
-        {"$set": update_data}
-    )
-    
-    if result.modified_count == 0:
-        raise HTTPException(status_code=500, detail="Failed to update medication")
-    
-    # Return updated medication
-    updated_medication = await db.medications.find_one({"_id": ObjectId(medication_id)})
-    
-    # Convert ObjectId to string for JSON serialization
-    updated_medication["id"] = str(updated_medication["_id"])
-    updated_medication["user_id"] = str(updated_medication["user_id"])
-    del updated_medication["_id"]
-    
-    return updated_medication
+    try:
+        # Check if medication exists and belongs to user
+        medications = await get_medications(current_user["_id"], active_only=False, limit=1000)
+        existing_medication = next((med for med in medications if med["id"] == medication_id), None)
+        
+        if not existing_medication:
+            raise HTTPException(status_code=404, detail="Medication not found")
+        
+        # Prepare update data
+        update_data = {k: v for k, v in medication_update.model_dump().items() if v is not None}
+        
+        # Use MongoDB CRUD function to update medication
+        success = await update_medication(medication_id, current_user["_id"], update_data)
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to update medication")
+        
+        # Return updated medication
+        updated_medications = await get_medications(current_user["_id"], active_only=False, limit=1000)
+        updated_medication = next((med for med in updated_medications if med["id"] == medication_id), None)
+        
+        return updated_medication
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update medication: {str(e)}")
 
 
 @router.delete("/{medication_id}")
-async def delete_medication(
+async def delete_medication_endpoint(
     medication_id: str,
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
@@ -193,22 +164,26 @@ async def delete_medication(
     if not ObjectId.is_valid(medication_id):
         raise HTTPException(status_code=400, detail="Invalid medication ID")
     
-    # Check if medication exists and belongs to user
-    existing_medication = await db.medications.find_one({
-        "_id": ObjectId(medication_id),
-        "user_id": ObjectId(current_user["_id"])
-    })
-    
-    if not existing_medication:
-        raise HTTPException(status_code=404, detail="Medication not found")
-    
-    # Delete the medication
-    result = await db.medications.delete_one({"_id": ObjectId(medication_id)})
-    
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=500, detail="Failed to delete medication")
-    
-    return {"message": "Medication deleted successfully"}
+    try:
+        # Check if medication exists and belongs to user
+        medications = await get_medications(current_user["_id"], active_only=False, limit=1000)
+        existing_medication = next((med for med in medications if med["id"] == medication_id), None)
+        
+        if not existing_medication:
+            raise HTTPException(status_code=404, detail="Medication not found")
+        
+        # Use MongoDB CRUD function to delete medication
+        success = await delete_medication(medication_id, current_user["_id"])
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to delete medication")
+        
+        return {"message": "Medication deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete medication: {str(e)}")
 
 
 @router.get("/{medication_id}/safety")
@@ -271,7 +246,7 @@ async def get_medication_safety_info(
 
 
 @router.post("/{medication_id}/doses")
-async def log_dose(
+async def log_dose_endpoint(
     medication_id: str,
     dose_log: DoseLogCreate,
     current_user: dict = Depends(get_current_user),
@@ -281,35 +256,30 @@ async def log_dose(
     if not ObjectId.is_valid(medication_id):
         raise HTTPException(status_code=400, detail="Invalid medication ID")
     
-    # Check if medication exists and belongs to user
-    medication = await db.medications.find_one({
-        "_id": ObjectId(medication_id),
-        "user_id": ObjectId(current_user["_id"])
-    })
-    
-    if not medication:
-        raise HTTPException(status_code=404, detail="Medication not found")
-    
-    # Create dose log entry
-    dose_dict = dose_log.model_dump()
-    dose_dict["user_id"] = ObjectId(current_user["_id"])
-    dose_dict["created_at"] = datetime.utcnow()
-    
-    result = await db.dose_logs.insert_one(dose_dict)
-    
-    # Update medication adherence rate
-    await update_adherence_rate(db, medication_id, current_user["_id"])
-    
-    # Retrieve the created dose log
-    created_dose = await db.dose_logs.find_one({"_id": result.inserted_id})
-    
-    # Convert ObjectId to string for JSON serialization
-    created_dose["id"] = str(created_dose["_id"])
-    created_dose["user_id"] = str(created_dose["user_id"])
-    created_dose["medication_id"] = str(created_dose["medication_id"])
-    del created_dose["_id"]
-    
-    return created_dose
+    try:
+        # Check if medication exists and belongs to user
+        medications = await get_medications(current_user["_id"], active_only=False, limit=1000)
+        medication = next((med for med in medications if med["id"] == medication_id), None)
+        
+        if not medication:
+            raise HTTPException(status_code=404, detail="Medication not found")
+        
+        # Prepare dose log data
+        dose_data = dose_log.model_dump()
+        dose_data["medication_id"] = ObjectId(medication_id)
+        
+        # Use MongoDB CRUD function to log dose
+        created_dose = await log_dose(current_user["_id"], dose_data)
+        
+        # Update medication adherence rate
+        await update_adherence_rate(db, medication_id, current_user["_id"])
+        
+        return created_dose
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to log dose: {str(e)}")
 
 
 @router.get("/reminders/upcoming")

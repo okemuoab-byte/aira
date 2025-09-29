@@ -6,40 +6,28 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from auth import get_current_user
 from models import User, SymptomCreate, SymptomUpdate, Symptom, SymptomInDB
-from database import get_database
+from database import get_database, create_symptom, get_symptoms, update_symptom, delete_symptom
 
 router = APIRouter()
 
 
 @router.post("/")
-async def create_symptom(
+async def create_symptom_endpoint(
     symptom: SymptomCreate,
     current_user: User = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Create a new symptom entry"""
-    symptom_dict = symptom.model_dump()
-    symptom_dict["user_id"] = ObjectId(current_user["_id"])
-    symptom_dict["created_at"] = datetime.utcnow()
-    symptom_dict["updated_at"] = datetime.utcnow()
-    
-    result = await db.symptoms.insert_one(symptom_dict)
-    
-    # Retrieve the created symptom
-    created_symptom = await db.symptoms.find_one({"_id": result.inserted_id})
-    if not created_symptom:
-        raise HTTPException(status_code=500, detail="Failed to create symptom")
-    
-    # Convert ObjectId to string for JSON serialization
-    created_symptom["id"] = str(created_symptom["_id"])
-    created_symptom["user_id"] = str(created_symptom["user_id"])
-    del created_symptom["_id"]
-    
-    return created_symptom
+    try:
+        # Use MongoDB CRUD function to create symptom
+        created_symptom = await create_symptom(current_user["_id"], symptom.model_dump())
+        return created_symptom
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create symptom: {str(e)}")
 
 
 @router.get("/")
-async def get_symptoms(
+async def get_symptoms_endpoint(
     current_user: User = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database),
     start_date: Optional[datetime] = Query(None, description="Filter symptoms from this date"),
@@ -48,31 +36,28 @@ async def get_symptoms(
     limit: int = Query(100, le=1000, description="Maximum number of symptoms to return")
 ):
     """Get user's symptom history with optional filtering"""
-    query = {"user_id": ObjectId(current_user["_id"])}
-    
-    # Add date filtering
-    if start_date or end_date:
-        date_filter = {}
-        if start_date:
-            date_filter["$gte"] = start_date
-        if end_date:
-            date_filter["$lte"] = end_date
-        query["timestamp"] = date_filter
-    
-    # Add body part filtering
-    if body_part:
-        query["body_part_id"] = body_part
-    
-    cursor = db.symptoms.find(query).sort("timestamp", -1).limit(limit)
-    symptoms = await cursor.to_list(length=limit)
-    
-    # Convert ObjectIds to strings for JSON serialization
-    for symptom in symptoms:
-        symptom["id"] = str(symptom["_id"])
-        symptom["user_id"] = str(symptom["user_id"])
-        del symptom["_id"]
-    
-    return symptoms
+    try:
+        # Build filters for MongoDB CRUD function
+        filters = {}
+        
+        # Add date filtering
+        if start_date or end_date:
+            date_filter = {}
+            if start_date:
+                date_filter["$gte"] = start_date
+            if end_date:
+                date_filter["$lte"] = end_date
+            filters["timestamp"] = date_filter
+        
+        # Add body part filtering
+        if body_part:
+            filters["body_part_id"] = body_part
+        
+        # Use MongoDB CRUD function to get symptoms
+        symptoms = await get_symptoms(current_user["_id"], filters, limit)
+        return symptoms
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve symptoms: {str(e)}")
 
 
 @router.get("/{symptom_id}")
@@ -85,24 +70,22 @@ async def get_symptom(
     if not ObjectId.is_valid(symptom_id):
         raise HTTPException(status_code=400, detail="Invalid symptom ID")
     
-    symptom = await db.symptoms.find_one({
-        "_id": ObjectId(symptom_id),
-        "user_id": ObjectId(current_user["_id"])
-    })
-    
-    if not symptom:
-        raise HTTPException(status_code=404, detail="Symptom not found")
-    
-    # Convert ObjectId to string for JSON serialization
-    symptom["id"] = str(symptom["_id"])
-    symptom["user_id"] = str(symptom["user_id"])
-    del symptom["_id"]
-    
-    return symptom
+    try:
+        # Use MongoDB CRUD function to get symptoms with filter by ID
+        symptoms = await get_symptoms(current_user["_id"], {"_id": ObjectId(symptom_id)}, 1)
+        
+        if not symptoms:
+            raise HTTPException(status_code=404, detail="Symptom not found")
+        
+        return symptoms[0]
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve symptom: {str(e)}")
 
 
 @router.put("/{symptom_id}")
-async def update_symptom(
+async def update_symptom_endpoint(
     symptom_id: str,
     symptom_update: SymptomUpdate,
     current_user: User = Depends(get_current_user),
@@ -112,49 +95,48 @@ async def update_symptom(
     if not ObjectId.is_valid(symptom_id):
         raise HTTPException(status_code=400, detail="Invalid symptom ID")
     
-    # Check if symptom exists and belongs to user
-    existing_symptom = await db.symptoms.find_one({
-        "_id": ObjectId(symptom_id),
-        "user_id": ObjectId(current_user["_id"])
-    })
-    
-    if not existing_symptom:
-        raise HTTPException(status_code=404, detail="Symptom not found")
-    
-    # Check 24-hour edit window
-    created_at = existing_symptom.get("created_at")
-    if created_at and datetime.utcnow() - created_at > timedelta(hours=24):
-        raise HTTPException(
-            status_code=403, 
-            detail="Symptom can only be edited within 24 hours of creation"
-        )
-    
-    # Prepare update data
-    update_data = {k: v for k, v in symptom_update.model_dump().items() if v is not None}
-    update_data["updated_at"] = datetime.utcnow()
-    
-    # Update the symptom
-    result = await db.symptoms.update_one(
-        {"_id": ObjectId(symptom_id)},
-        {"$set": update_data}
-    )
-    
-    if result.modified_count == 0:
-        raise HTTPException(status_code=500, detail="Failed to update symptom")
-    
-    # Return updated symptom
-    updated_symptom = await db.symptoms.find_one({"_id": ObjectId(symptom_id)})
-    
-    # Convert ObjectId to string for JSON serialization
-    updated_symptom["id"] = str(updated_symptom["_id"])
-    updated_symptom["user_id"] = str(updated_symptom["user_id"])
-    del updated_symptom["_id"]
-    
-    return updated_symptom
+    try:
+        # Check if symptom exists and belongs to user
+        existing_symptoms = await get_symptoms(current_user["_id"], {"_id": ObjectId(symptom_id)}, 1)
+        
+        if not existing_symptoms:
+            raise HTTPException(status_code=404, detail="Symptom not found")
+        
+        existing_symptom = existing_symptoms[0]
+        
+        # Check 24-hour edit window
+        created_at = existing_symptom.get("created_at")
+        if created_at:
+            # Parse ISO string back to datetime if needed
+            if isinstance(created_at, str):
+                created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+            if datetime.utcnow() - created_at > timedelta(hours=24):
+                raise HTTPException(
+                    status_code=403,
+                    detail="Symptom can only be edited within 24 hours of creation"
+                )
+        
+        # Prepare update data
+        update_data = {k: v for k, v in symptom_update.model_dump().items() if v is not None}
+        
+        # Use MongoDB CRUD function to update symptom
+        success = await update_symptom(symptom_id, current_user["_id"], update_data)
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to update symptom")
+        
+        # Return updated symptom
+        updated_symptoms = await get_symptoms(current_user["_id"], {"_id": ObjectId(symptom_id)}, 1)
+        return updated_symptoms[0] if updated_symptoms else None
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update symptom: {str(e)}")
 
 
 @router.delete("/{symptom_id}")
-async def delete_symptom(
+async def delete_symptom_endpoint(
     symptom_id: str,
     current_user: User = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
@@ -163,25 +145,25 @@ async def delete_symptom(
     if not ObjectId.is_valid(symptom_id):
         raise HTTPException(status_code=400, detail="Invalid symptom ID")
     
-    # Check if symptom exists and belongs to user
-    existing_symptom = await db.symptoms.find_one({
-        "_id": ObjectId(symptom_id),
-        "user_id": ObjectId(current_user["_id"])
-    })
-    
-    if not existing_symptom:
-        raise HTTPException(status_code=404, detail="Symptom not found")
-    
-    # Soft delete by adding deleted_at timestamp
-    result = await db.symptoms.update_one(
-        {"_id": ObjectId(symptom_id)},
-        {"$set": {"deleted_at": datetime.utcnow(), "updated_at": datetime.utcnow()}}
-    )
-    
-    if result.modified_count == 0:
-        raise HTTPException(status_code=500, detail="Failed to delete symptom")
-    
-    return {"message": "Symptom deleted successfully"}
+    try:
+        # Check if symptom exists and belongs to user
+        existing_symptoms = await get_symptoms(current_user["_id"], {"_id": ObjectId(symptom_id)}, 1)
+        
+        if not existing_symptoms:
+            raise HTTPException(status_code=404, detail="Symptom not found")
+        
+        # Use MongoDB CRUD function to soft delete symptom
+        success = await delete_symptom(symptom_id, current_user["_id"])
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to delete symptom")
+        
+        return {"message": "Symptom deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete symptom: {str(e)}")
 
 
 @router.get("/body-parts/definitions")

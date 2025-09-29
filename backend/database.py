@@ -219,7 +219,7 @@ async def ensure_indexes():
 
 async def get_collection_stats() -> dict:
     """Get statistics for all collections"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     stats = {}
@@ -262,7 +262,7 @@ from models import (
 # User Operations
 async def create_user(user_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new user"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     try:
@@ -285,7 +285,7 @@ async def create_user(user_data: Dict[str, Any]) -> Dict[str, Any]:
 
 async def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
     """Get user by email"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     user = await db.users.find_one({"email": email})
@@ -293,7 +293,7 @@ async def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
 
 async def get_user_by_id(user_id: str) -> Optional[Dict[str, Any]]:
     """Get user by ID"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     if not ObjectId.is_valid(user_id):
@@ -304,7 +304,7 @@ async def get_user_by_id(user_id: str) -> Optional[Dict[str, Any]]:
 
 async def update_user(user_id: str, update_data: Dict[str, Any]) -> bool:
     """Update user data"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     if not ObjectId.is_valid(user_id):
@@ -319,7 +319,7 @@ async def update_user(user_id: str, update_data: Dict[str, Any]) -> bool:
 
 async def delete_user(user_id: str) -> bool:
     """Soft delete user"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     if not ObjectId.is_valid(user_id):
@@ -335,7 +335,7 @@ async def delete_user(user_id: str) -> bool:
 # Symptom Operations
 async def create_symptom(user_id: str, symptom_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new symptom"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     symptom_doc = prepare_for_mongo(symptom_data)
@@ -349,7 +349,7 @@ async def create_symptom(user_id: str, symptom_data: Dict[str, Any]) -> Dict[str
 
 async def get_symptoms(user_id: str, filters: Dict[str, Any] = None, limit: int = 100) -> List[Dict[str, Any]]:
     """Get user's symptoms with optional filtering"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     query = DatabaseHelpers.build_user_query(user_id)
@@ -364,7 +364,7 @@ async def get_symptoms(user_id: str, filters: Dict[str, Any] = None, limit: int 
 
 async def update_symptom(symptom_id: str, user_id: str, update_data: Dict[str, Any]) -> bool:
     """Update symptom"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     if not ObjectId.is_valid(symptom_id):
@@ -379,7 +379,7 @@ async def update_symptom(symptom_id: str, user_id: str, update_data: Dict[str, A
 
 async def delete_symptom(symptom_id: str, user_id: str) -> bool:
     """Soft delete symptom"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     if not ObjectId.is_valid(symptom_id):
@@ -395,7 +395,7 @@ async def delete_symptom(symptom_id: str, user_id: str) -> bool:
 # Medication Operations
 async def create_medication(user_id: str, medication_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new medication"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     medication_doc = prepare_for_mongo(medication_data)
@@ -409,7 +409,7 @@ async def create_medication(user_id: str, medication_data: Dict[str, Any]) -> Di
 
 async def get_medications(user_id: str, active_only: bool = True, limit: int = 100) -> List[Dict[str, Any]]:
     """Get user's medications"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     query = DatabaseHelpers.build_user_query(user_id)
@@ -427,7 +427,7 @@ async def get_medications(user_id: str, active_only: bool = True, limit: int = 1
 
 async def update_medication(medication_id: str, user_id: str, update_data: Dict[str, Any]) -> bool:
     """Update medication"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     if not ObjectId.is_valid(medication_id):
@@ -442,7 +442,7 @@ async def update_medication(medication_id: str, user_id: str, update_data: Dict[
 
 async def delete_medication(medication_id: str, user_id: str) -> bool:
     """Delete medication"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     if not ObjectId.is_valid(medication_id):
@@ -455,7 +455,7 @@ async def delete_medication(medication_id: str, user_id: str) -> bool:
 
 async def log_dose(user_id: str, dose_data: Dict[str, Any]) -> Dict[str, Any]:
     """Log a medication dose"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     dose_doc = prepare_for_mongo(dose_data)
@@ -469,7 +469,7 @@ async def log_dose(user_id: str, dose_data: Dict[str, Any]) -> Dict[str, Any]:
 # Healthcare Visit Operations
 async def create_visit(user_id: str, visit_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new healthcare visit"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     visit_doc = prepare_for_mongo(visit_data)
@@ -483,7 +483,7 @@ async def create_visit(user_id: str, visit_data: Dict[str, Any]) -> Dict[str, An
 
 async def get_visits(user_id: str, filters: Dict[str, Any] = None, limit: int = 50, skip: int = 0) -> List[Dict[str, Any]]:
     """Get user's healthcare visits"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     query = DatabaseHelpers.build_user_query(user_id)
@@ -497,7 +497,7 @@ async def get_visits(user_id: str, filters: Dict[str, Any] = None, limit: int = 
 
 async def update_visit(visit_id: str, user_id: str, update_data: Dict[str, Any]) -> bool:
     """Update healthcare visit"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     if not ObjectId.is_valid(visit_id):
@@ -512,7 +512,7 @@ async def update_visit(visit_id: str, user_id: str, update_data: Dict[str, Any])
 
 async def delete_visit(visit_id: str, user_id: str) -> bool:
     """Delete healthcare visit"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     if not ObjectId.is_valid(visit_id):
@@ -526,7 +526,7 @@ async def delete_visit(visit_id: str, user_id: str) -> bool:
 # Family Member Operations
 async def create_family_member(user_id: str, member_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new family member"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     member_doc = prepare_for_mongo(member_data)
@@ -540,7 +540,7 @@ async def create_family_member(user_id: str, member_data: Dict[str, Any]) -> Dic
 
 async def get_family_members(user_id: str) -> List[Dict[str, Any]]:
     """Get user's family members"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     query = DatabaseHelpers.build_user_query(user_id)
@@ -550,7 +550,7 @@ async def get_family_members(user_id: str) -> List[Dict[str, Any]]:
 
 async def update_sharing_settings(user_id: str, settings_data: Dict[str, Any]) -> Dict[str, Any]:
     """Update or create sharing settings"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     settings_doc = prepare_for_mongo(settings_data)
@@ -571,7 +571,7 @@ async def update_sharing_settings(user_id: str, settings_data: Dict[str, Any]) -
 # Photo Operations
 async def create_photo(user_id: str, photo_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new photo record"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     photo_doc = prepare_for_mongo(photo_data)
@@ -585,7 +585,7 @@ async def create_photo(user_id: str, photo_data: Dict[str, Any]) -> Dict[str, An
 
 async def get_photos(user_id: str, filters: Dict[str, Any] = None, limit: int = 50) -> List[Dict[str, Any]]:
     """Get user's photos"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     query = DatabaseHelpers.build_user_query(user_id)
@@ -600,7 +600,7 @@ async def get_photos(user_id: str, filters: Dict[str, Any] = None, limit: int = 
 
 async def delete_photo(photo_id: str, user_id: str) -> bool:
     """Delete photo"""
-    if not db:
+    if db is None:
         raise RuntimeError("Database not initialized")
     
     if not ObjectId.is_valid(photo_id):
